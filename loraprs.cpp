@@ -55,6 +55,7 @@ void LoraPrs::setupLora(int loraFreq)
   LoRa.setSyncWord(CfgSync);
   LoRa.setSpreadingFactor(CfgSpread);
   LoRa.setSignalBandwidth(CfgBw);
+  Lora.setCodingRate4(CfgCodingRate);
   LoRa.setTxPower(CfgPower);
   
   Serial.println("ok");  
