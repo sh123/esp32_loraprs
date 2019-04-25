@@ -1,5 +1,5 @@
 # Experimental LoRA APRS ESP32 APRSDroid bluetooth modem and iGate
-Tiny experimental amateur radio esp32 based LoRA (RA-01) APRSDroid bluetooth modem and iGate. 
+Tiny experimental amateur radio esp32 based LoRA (RA-01) APRSDroid bluetooth modem and iGate server.
 
 Can be used in two modes: 
 - as a client, where you need to use APRSDroid application, connect to the modem using bluetooth, data will be re-transmitted through the LoRA radio, this is similar to APRSDroid micromodem, received data will be sent back to the APRSDroid using bluetooth
