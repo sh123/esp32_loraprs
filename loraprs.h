@@ -17,7 +17,7 @@ public:
   const byte CfgPinRst = 26;
   const byte CfgPinDio0 = 14;
 
-  const int CfgBw = 20e3;
+  const int CfgBw = 25e3;
   const byte CfgSpread = 9;
   const byte CfgCodingRate = 5;
   const byte CfgSync = 0xf3;
