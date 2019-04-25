@@ -23,3 +23,4 @@ Can be used in two modes:
   - lora bandwidth CfgBw, 20 kHz (to fit into standard 25 kHz channel)
   - lora spread factor CfgSpread, 9 (seems to be optimal between signal level and transmit time)
   - lora output power CfgPower, 20 (set to maximum 20 dBm ~ 100mW, change to lower value if needed)
+- use 80 MHz ESP32 frequency in Arduino, it will prolong battery life when operating portable, higher speed is not needed
