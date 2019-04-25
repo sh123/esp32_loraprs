@@ -19,6 +19,7 @@ public:
 
   const int CfgBw = 20e3;
   const byte CfgSpread = 9;
+  const byte CfgCodingRate = 5;
   const byte CfgSync = 0xf3;
   const byte CfgPower = 20;
 
