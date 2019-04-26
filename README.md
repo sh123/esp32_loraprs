@@ -3,7 +3,7 @@ Tiny experimental amateur radio esp32 based LoRA (RA-01) APRSDroid bluetooth mod
 
 Can be used in two modes: 
 - as a client, where you need to use APRSDroid application, connect to the modem using bluetooth, data will be re-transmitted through the LoRA radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth
-- as a server, which connects to your WiFI and sends received LoRA APRS positions into APRS-IS network, it also reports client signal level, by appending it into the APRS comment
+- as a iGate server, which connects to your WiFI and forwards received LoRA APRS positions into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment
 
 # Software Dependencies
 - espressif/arduino-esp32 library (install using arduino library manager)
