@@ -1,4 +1,4 @@
-# Experimental LoRA APRS ESP32 APRSDroid bluetooth modem and LoRA APRS-IS iGate
+# Experimental LoRa APRS ESP32 APRSDroid bluetooth modem and LoRa APRS-IS iGate
 Tiny experimental amateur radio esp32 based LoRa APRSDroid bluetooth modem and iGate server.
 
 Can be used in two modes: 
@@ -10,12 +10,12 @@ Can be used in two modes:
 - sandeepmistry/arduino-LoRa (install using arduino library manager)
 
 # Software Setup
-- when setting up APRSDroid, use "TNC (plaintext TNC2)" connection protocol in Connection Preferences -> Connection Protocol
+- when setting up APRSDroid, use **"TNC (plaintext TNC2)"** connection protocol in Connection Preferences -> Connection Protocol
 - go to esp32_loraprs.ino and make next changes based on your requirements
   - comment out / remove LORAPRS_CLIENT define if you are planning to run server mode iGate
   - for server mode fill LORAPRS_WIFI_SSID and LORAPRS_WIFI_KEY with your WiFI AP data
   - for server mode fill LORAPRS_LOGIN and LORAPRS_PASS with APRS-IS login callsign and pass
-  - change LORAPRS_FREQ if you are planning to use different frequency, currently it is set to 432.500, which is 70cm band APRS frequency in IARU-1 region, see http://info.aprs.net/index.php?title=Frequencies
+  - change LORAPRS_FREQ if you are planning to use different frequency, currently it is set to **432.500MHz**, which is 70cm band APRS frequency in IARU-1 region, see http://info.aprs.net/index.php?title=Frequencies
 - if you are planning to use different esp32 pinouts for lora and/or different LoRA spread factor / bandwidth then modify loraprs.h
   - lora module CfgPinSs, pin 5
   - lora module CfgPinRst, pin 26
