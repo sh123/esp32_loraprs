@@ -1,6 +1,8 @@
 # Experimental LoRa APRS ESP32 APRSDroid bluetooth modem and LoRa APRS-IS iGate
 Tiny experimental amateur radio ESP32 based LoRa APRSDroid Bluetooth modem and LoRa APRS-IS iGate server.
 
+![alt text](https://www.smart-prototyping.com/image/data/5_community/WIFI/101770%20Ra-01/2.png)
+
 Can be used in two modes: 
 - **as a LoRa APRS client**, you need to use APRSDroid application, connect to the modem using bluetooth, data will be re-transmitted through the LoRA radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth
 - **as a LoRa APRS iGate server**, which connects to your WiFI and forwards received LoRa APRS positions into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations
