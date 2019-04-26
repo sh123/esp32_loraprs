@@ -27,7 +27,7 @@ Can be used in two modes:
 - use 80 MHz ESP32 frequency in Arduino, it will prolong battery life when operating portable, higher speed is not needed
 
 # Test Results
-- About 4 km between base and portable
-- About 13 km between base and base
+- About 4 km when client is ~2m above the ground
+- About 13 km when client is at some higher point ~40m above the ground
 
 # Hardware Photos
