@@ -1,9 +1,9 @@
 # Experimental LoRA APRS ESP32 APRSDroid bluetooth modem and LoRA APRS-IS iGate
-Tiny experimental amateur radio esp32 based LoRA (RA-01) APRSDroid bluetooth modem and iGate server.
+Tiny experimental amateur radio esp32 based LoRa APRSDroid bluetooth modem and iGate server.
 
 Can be used in two modes: 
-- as a client, where you need to use APRSDroid application, connect to the modem using bluetooth, data will be re-transmitted through the LoRA radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth
-- as a iGate server, which connects to your WiFI and forwards received LoRA APRS positions into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment
+- **as LoRa APRS client**, you need to use APRSDroid application, connect to the modem using bluetooth, data will be re-transmitted through the LoRA radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth
+- **as a LoRa APRS iGate server**, which connects to your WiFI and forwards received LoRA APRS positions into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment
 
 # Software Dependencies
 - espressif/arduino-esp32 library (install using arduino library manager)
@@ -27,7 +27,7 @@ Can be used in two modes:
 - use 80 MHz ESP32 frequency in Arduino, it will prolong battery life when operating portable, higher speed is not needed
 
 # Test Results
-- About 4 km when server is 30m above the ground and client is 2m above the ground
-- About 13 km when server is 30m above the ground and client is at some higher point ~40m above the ground
+- **About 4 km** when server is 30m above the ground and client is 2m above the ground
+- **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground
 
 # Hardware Photos
