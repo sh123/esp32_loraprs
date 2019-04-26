@@ -27,7 +27,7 @@ public:
   const String CfgAprsHost = "rotate.aprs2.net";
 
 public:
-  LoraPrs(int freq, String btName, String wifiName, 
+  LoraPrs(int loraFreq, String btName, String wifiName, 
     String wifiKey, String aprsLoginCallsign, String aprsPass);
   
   void setup();
