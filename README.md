@@ -6,8 +6,8 @@ Can be used in two modes:
 - **as a LoRa APRS iGate server**, which connects to your WiFI and forwards received LoRA APRS positions into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment
 
 # Software Dependencies
-- espressif/arduino-esp32 library (install using arduino library manager)
-- sandeepmistry/arduino-LoRa (install using arduino library manager)
+- Arduino ESP32 library: https://github.com/espressif/arduino-esp32 library (install using arduino library manager)
+- LoRa arduino library: https://github.com/sandeepmistry/arduino-LoRa (install using arduino library manager)
 
 # Software Setup
 - when setting up APRSDroid, use **"TNC (plaintext TNC2)"** connection protocol in Connection Preferences -> Connection Protocol
