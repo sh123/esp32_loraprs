@@ -24,7 +24,7 @@ Can be used in two modes:
   - lora spread factor CfgSpread, 11 (down to -17.5dB)
   - lora coding rate CfgCodingRate, 7
   - lora output power CfgPower, 20 (set to maximum 20 dBm ~ 100mW, change to lower value if needed)
-- use 80 MHz ESP32 frequency in Arduino, it will prolong battery life when operating portable, higher speed is not needed
+- use 80 MHz ESP32 frequency in Arduino, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
 
 # Test Results
 - **About 4 km** when server is 30m above the ground and client is 2m above the ground
