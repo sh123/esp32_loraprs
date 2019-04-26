@@ -25,3 +25,9 @@ Can be used in two modes:
   - lora coding rate CfgCodingRate, 7
   - lora output power CfgPower, 20 (set to maximum 20 dBm ~ 100mW, change to lower value if needed)
 - use 80 MHz ESP32 frequency in Arduino, it will prolong battery life when operating portable, higher speed is not needed
+
+# Test Results
+- About 4 km between base and portable
+- About 13 km between base and base
+
+# Hardware Photos
