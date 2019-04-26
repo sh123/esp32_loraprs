@@ -28,7 +28,11 @@ Can be used in two modes:
 - use 80 MHz ESP32 frequency in Arduino, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
 
 # Test Results
-- **About 4 km** when server is 30m above the ground and client is 2m above the ground
-- **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground
+- Antennas
+  - Client - rubber duck antenna
+  - Server - 6 element UHF yagi indoors
+- Range
+  - **About 4 km** when server is 30m above the ground and client is 2m above the ground
+  - **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground
 
 # Hardware Photos
