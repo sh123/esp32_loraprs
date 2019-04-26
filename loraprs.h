@@ -18,8 +18,8 @@ public:
   const byte CfgPinDio0 = 14;
 
   const int CfgBw = 20e3;
-  const byte CfgSpread = 10;
-  const byte CfgCodingRate = 6;
+  const byte CfgSpread = 11;
+  const byte CfgCodingRate = 7;
   const byte CfgSync = 0xf3;
   const byte CfgPower = 20;
 
