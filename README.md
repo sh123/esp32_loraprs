@@ -7,9 +7,10 @@ Can be used in two modes:
 - **as a LoRa APRS client**, you need to use APRSDroid application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth
 - **as a LoRa APRS iGate server**, which connects to your WiFI and forwards received LoRa APRS positions into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations
 
-# Software Dependencies
-- Arduino ESP32 library: https://github.com/espressif/arduino-esp32 library (install using arduino library manager)
-- LoRa arduino library: https://github.com/sandeepmistry/arduino-LoRa (install using arduino library manager)
+# Software Dependencies (install via libraries)
+- Arduino ESP32 library: https://github.com/espressif/arduino-esp32
+- LoRa arduino library: https://github.com/sandeepmistry/arduino-LoRa
+- Arduino Timer library: https://github.com/contrem/arduino-timer
 
 # Software Setup
 - when setting up APRSDroid, use **"TNC (plaintext TNC2)"** connection protocol in Connection Preferences -> Connection Protocol
