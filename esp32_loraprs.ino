@@ -1,5 +1,9 @@
+#include <timer.h>
 #include "WiFi.h"
 #include "loraprs.h"
+
+#define LED_BUILTIN         2
+#define LED_TOGGLE_PERIOD   1000
 
 #define LORAPRS_CLIENT
 
@@ -27,13 +31,26 @@ LoraPrs loraPrs(
   LORAPRS_LOGIN,
   LORAPRS_PASS);
 
+auto watchdogLedTimer = timer_create_default();
+
 void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, 1);
+
   Serial.begin(115200);
   while (!Serial);
 
   loraPrs.setup();
+
+  watchdogLedTimer.every(LED_TOGGLE_PERIOD, toggleWatchdogLed);
 }
 
 void loop() {
   loraPrs.loop();
+  watchdogLedTimer.tick();
+}
+
+bool toggleWatchdogLed(void *) {
+  digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+  return true;
 }
