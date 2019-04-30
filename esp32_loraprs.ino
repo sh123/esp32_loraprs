@@ -12,7 +12,7 @@
 #define LORAPRS_LOGIN       "NOCALL-0"
 #define LORAPRS_PASS        "00000"
 #else
-#define LORAPRS_BT_NAME     "loraprs_server"
+#define LORAPRS_BT_NAME     ""
 #define LORAPRS_WIFI_SSID   "<mywifi>"
 #define LORAPRS_WIFI_KEY    "<key>"
 #define LORAPRS_LOGIN       "NOCALL-0"

@@ -63,14 +63,16 @@ void LoraPrs::setupLora(int loraFreq)
 
 void LoraPrs::setupBt(String btName) 
 {
-  Serial.print("BT init " + btName + "...");
+  if (btName.length() != 0) {
+    Serial.print("BT init " + btName + "...");
   
-  if (serialBt_.begin(btName)) {
-    Serial.println("ok");
-  }
-  else
-  {
-    Serial.println("failed");
+    if (serialBt_.begin(btName)) {
+      Serial.println("ok");
+    }
+    else
+    {
+      Serial.println("failed");
+    }
   }
 }
 
