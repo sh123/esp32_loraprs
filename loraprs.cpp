@@ -32,7 +32,6 @@ void LoraPrs::setupWifi(String wifiName, String wifiKey)
 
     WiFi.begin(wifiName.c_str(), wifiKey.c_str());
 
-    // TODO, add timeout
     while (WiFi.status() != WL_CONNECTED) {
       delay(500);
       Serial.print(".");
@@ -114,7 +113,10 @@ void LoraPrs::onLoraReceived()
   for (int i; i < buf.length(); i++) {
     serialBt_.write((uint8_t)buf[i]);
   }
-  onAprsReceived(buf + " " + String(LoRa.packetSnr()) + "dB\n");
+  onAprsReceived(buf + " " +
+    String(LoRa.packetRssi()) + ", " +
+    String(LoRa.packetSnr()) + "dB, " +
+    String(LoRa.packetFrequencyError()) + "ppm\n");
   delay(50);
 }
 
