@@ -30,6 +30,8 @@ void LoraPrs::setupWifi(String wifiName, String wifiKey)
   if (wifiName.length() != 0) {    
     Serial.print("WIFI connecting to " + wifiName);
 
+    WiFi.setHostname("loraprs");
+    WiFi.mode(WIFI_STA);
     WiFi.begin(wifiName.c_str(), wifiKey.c_str());
 
     while (WiFi.status() != WL_CONNECTED) {
@@ -39,6 +41,19 @@ void LoraPrs::setupWifi(String wifiName, String wifiKey)
     Serial.println("ok");
     Serial.println(WiFi.localIP());
   }
+}
+
+void LoraPrs::reconnectWifi() {
+
+  Serial.print("WIFI re-connecting...");
+
+  while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0,0,0,0)) {
+    WiFi.reconnect();
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("ok");
 }
 
 void LoraPrs::setupLora(int loraFreq)
@@ -77,12 +92,16 @@ void LoraPrs::setupBt(String btName)
 
 void LoraPrs::loop()
 {
+  if (WiFi.status() != WL_CONNECTED && wifiName_.length() != 0) {
+    reconnectWifi();
+  }
   if (serialBt_.available()) {
     onBtReceived();
   }
   if (LoRa.parsePacket()) {
     onLoraReceived();
   }
+  delay(10);
 }
 
 void LoraPrs::onAprsReceived(String aprsMessage)
@@ -114,9 +133,9 @@ void LoraPrs::onLoraReceived()
     serialBt_.write((uint8_t)buf[i]);
   }
   onAprsReceived(buf + " " +
-    String(LoRa.packetRssi()) + ", " +
-    String(LoRa.packetSnr()) + "dB, " +
-    String(LoRa.packetFrequencyError()) + "ppm\n");
+    "RSSI: " + String(LoRa.packetRssi()) + ", " +
+    "SNR: " + String(LoRa.packetSnr()) + "dB, " +
+    "ERR: " + String(LoRa.packetFrequencyError()) + "Hz\n");
   delay(50);
 }
 

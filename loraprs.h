@@ -37,6 +37,8 @@ private:
   void setupWifi(String wifiName, String wifiKey);
   void setupLora(int loraFreq);
   void setupBt(String btName);
+
+  void reconnectWifi();
   
   void onLoraReceived();
   void onBtReceived();
