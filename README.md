@@ -35,9 +35,9 @@ Can be used in two modes:
   - Client - rubber duck antenna or mobile antenna on a car roof
   - Server - UHF yagi indoors
 - Range
-  - **About 4 km** when server is 30m above the ground and client is 2m above the ground
-  - **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground
-  - **About 17km** maximum between base and mobile station with antenna on the car roof
+  - **About 4 km** when server is 30m above the ground and client is 2m above the ground with rubber duck antenna
+  - **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground with rubber duck antenna
+  - **About 17km** maximum (non-reliable) between base and mobile station with antenna on the car roof
 - Signal levels
   - Successful decodes down to **-17.5dB** below the noise floor when using compressed APRS coordinates
 
