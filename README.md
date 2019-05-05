@@ -37,6 +37,7 @@ Can be used in two modes:
 - Range
   - **About 4 km** when server is 30m above the ground and client is 2m above the ground
   - **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground
+  - **About 17km** maximum between base and mobile station with antenna on the car roof
 - Signal levels
-  - Successful decodes down to **-16.5dB** below the noise floor when using compressed APRS coordinates
+  - Successful decodes down to **-17.5dB** below the noise floor when using compressed APRS coordinates
 
