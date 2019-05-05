@@ -32,7 +32,7 @@ Can be used in two modes:
 
 # Test Results
 - Antennas
-  - Client - rubber duck antenna
+  - Client - rubber duck antenna or mobile antenna on a car roof
   - Server - UHF yagi indoors
 - Range
   - **About 4 km** when server is 30m above the ground and client is 2m above the ground
