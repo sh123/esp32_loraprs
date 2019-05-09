@@ -29,6 +29,7 @@ Can be used in two modes:
   - lora coding rate **CfgCodingRate**, 7
   - lora output power **CfgPower**, 20 (max 20 dBm ~ 100mW, change to lower value if needed)
 - use 80 MHz ESP32 frequency in Arduino, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
+- uses LoRa built-in checksum calculation to drop broken packets
 
 # Test Results
 - Antennas
