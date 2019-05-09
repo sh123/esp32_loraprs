@@ -7,7 +7,11 @@
 
 #define LORAPRS_CLIENT
 
+#ifdef LORAPRS_CLIENT
+#define LORAPRS_FREQ        432.499E6
+#else
 #define LORAPRS_FREQ        432.5E6
+#endif
 
 #ifdef LORAPRS_CLIENT
 #define LORAPRS_BT_NAME     "loraprs_client"

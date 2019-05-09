@@ -13,7 +13,7 @@ Can be used in two modes:
 - Arduino Timer library: https://github.com/contrem/arduino-timer
 
 # Software Setup
-- when setting up APRSDroid, use **"TNC (plaintext TNC2)"** connection protocol in Connection Preferences -> Connection Protocol
+- when setting up APRSDroid, use **"TNC (KISS)"** connection protocol in Connection Preferences -> Connection Protocol
 - go to esp32_loraprs.ino and make next changes based on your requirements
   - comment out / remove **LORAPRS_CLIENT** define if you are planning to run server mode for APRS-IS iGate
   - for server mode fill **LORAPRS_WIFI_SSID** and **LORAPRS_WIFI_KEY** with your WiFI AP data
