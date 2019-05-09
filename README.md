@@ -1,5 +1,5 @@
 # Experimental LoRa APRS ESP32 APRSDroid bluetooth modem and LoRa APRS-IS iGate
-Tiny experimental amateur radio ESP32 based LoRa APRSDroid Bluetooth modem and LoRa APRS-IS iGate server.
+Tiny experimental amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem and LoRa APRS-IS iGate server.
 
 ![alt text](https://www.smart-prototyping.com/image/data/5_community/WIFI/101770%20Ra-01/2.png)
 
