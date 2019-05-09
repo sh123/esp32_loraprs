@@ -18,7 +18,7 @@ Can be used in two modes:
   - comment out / remove **LORAPRS_CLIENT** define if you are planning to run server mode for APRS-IS iGate
   - for server mode fill **LORAPRS_WIFI_SSID** and **LORAPRS_WIFI_KEY** with your WiFI AP data
   - for server mode fill **LORAPRS_LOGIN** and **LORAPRS_PASS** with APRS-IS login callsign and pass
-  - change **LORAPRS_FREQ** if you are planning to use different frequency, currently it is set to **432.500MHz**, which is 70cm band APRS frequency in IARU-1 region, see http://info.aprs.net/index.php?title=Frequencies
+  - change **LORAPRS_FREQ** if you are planning to use different frequency or if planning to calibrate clients, currently it is set to **432.500MHz**, which is 70cm band APRS frequency in IARU-1 region, see http://info.aprs.net/index.php?title=Frequencies
 - if you are planning to use different esp32 pinouts then modify loraprs.h
   - lora module SS, **CfgPinSs**, pin 5
   - lora module RST, **CfgPinRst**, pin 26
