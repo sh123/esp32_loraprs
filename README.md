@@ -23,7 +23,7 @@ Can be used in two modes:
   - lora module SS, **CfgPinSs**, pin 5
   - lora module RST, **CfgPinRst**, pin 26
   - lora module DIO0, **CfgPinDio0**, pin 14
-- if you are planning to experiment with different bandwidths/spread factors then modify loraprs.h
+- if you are planning to experiment with different bandwidths/spread factors then modify loraprs.h, with current parameters APRS packet time on air is around **10 seconds**, use https://github.com/tanupoo/lorawan_toa to make calculations
   - lora bandwidth **CfgBw**, 20 kHz (to fit into standard 25 kHz channel)
   - lora spread factor **CfgSpread**, 11 (should decode down to -17.5dB)
   - lora coding rate **CfgCodingRate**, 7
