@@ -8,6 +8,7 @@
 #define LORAPRS_CLIENT
 
 #ifdef LORAPRS_CLIENT
+// calibrate client based on server frequency drift report
 #define LORAPRS_FREQ        432.499E6
 #else
 #define LORAPRS_FREQ        432.5E6
