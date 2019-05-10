@@ -35,7 +35,7 @@ Can be used in two modes:
 - Antennas
   - Client - rubber duck antenna or mobile antenna on a car roof
   - Server - UHF yagi indoors
-- Range
+- Range (20 KHz channel width and 11 spreading factor)
   - **About 4 km** when server is 30m above the ground and client is 2m above the ground with rubber duck antenna
   - **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground with rubber duck antenna
   - **About 17km** maximum (non-reliable) between base and mobile station with antenna on the car roof
