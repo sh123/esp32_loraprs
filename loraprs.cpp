@@ -193,9 +193,8 @@ String LoraPrs::convertAX25ToAprs(byte *rxPayload, int payloadLength, const Stri
   if (appendReport) {
     result += signalReport;
   }
-  else {
-    result += "\n";
-  }
+  
+  result += "\n";
   
   return result;
 }
@@ -236,7 +235,7 @@ void LoraPrs::onLoraReceived(int packetSize)
     String("dB, ") +
     String("ERR: ") + 
     String(LoRa.packetFrequencyError()) + 
-    String("Hz\n");
+    String("Hz");
 
   String aprsMsg = convertAX25ToAprs(rxBuf, rxBufIndex, signalReport);
 
