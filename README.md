@@ -4,7 +4,7 @@ Tiny experimental amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem 
 ![alt text](https://www.smart-prototyping.com/image/data/5_community/WIFI/101770%20Ra-01/2.png)
 
 Can be used in two modes: 
-- **as a LoRa APRS client**, you need to use APRSDroid application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth
+- **as a LoRa APRS client**, you need to use APRSDroid application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth. By having two clients you can not only send your position, but also send and receive APRS messages.
 - **as a LoRa APRS iGate server**, which connects to your WiFI and forwards received LoRa APRS positions into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations
 
 # Software Dependencies (install via libraries)
