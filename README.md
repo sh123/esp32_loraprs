@@ -30,6 +30,7 @@ Can be used in two modes:
   - lora output power **CfgPower**, 20 (max 20 dBm ~ 100mW, change to lower value if needed)
 - use 80 MHz ESP32 frequency in Arduino, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
 - uses LoRa built-in checksum calculation to drop broken packets
+- note, that there a is **significant frequency drift** on temperature changes for different modules, you need to use external TXCO if you are planning to use modules for narrow bandwidths less than 125 kHz or calibrate clients based on server frequency drift report by changing LORAPRS_FREQ, which is OK for experiments
 
 # Test Results
 - Antennas
