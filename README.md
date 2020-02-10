@@ -4,7 +4,7 @@ Tiny experimental amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem 
 ![alt text](https://www.smart-prototyping.com/image/data/5_community/WIFI/101770%20Ra-01/2.png)
 
 Can be used in two modes: 
-- **as a LoRa APRS client**, you need to use APRSDroid application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth
+- **as a LoRa APRS client**, you need to use APRSDroid application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth. By having two clients you can not only send your position, but also send and receive APRS messages.
 - **as a LoRa APRS iGate server**, which connects to your WiFI and forwards received LoRa APRS positions into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations
 
 # Software Dependencies (install via libraries)
@@ -23,13 +23,14 @@ Can be used in two modes:
   - lora module SS, **CfgPinSs**, pin 5
   - lora module RST, **CfgPinRst**, pin 26
   - lora module DIO0, **CfgPinDio0**, pin 14
-- if you are planning to experiment with different bandwidths/spread factors then modify loraprs.h, with current parameters APRS packet time on air is around **10 seconds** to decode with as lower level as possible, use https://github.com/tanupoo/lorawan_toa to make calculations
+- if you are planning to experiment with different bandwidths/spread factors then modify loraprs.h, with current parameters APRS packet time on air is around **1 second** to decode with as lower level as possible, use https://github.com/tanupoo/lorawan_toa to make calculations
   - lora bandwidth **CfgBw**, 125 kHz
   - lora spread factor **CfgSpread**, 11 (should decode down to -17.5dB)
   - lora coding rate **CfgCodingRate**, 7
   - lora output power **CfgPower**, 20 (max 20 dBm ~ 100mW, change to lower value if needed)
 - use 80 MHz ESP32 frequency in Arduino, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
-- uses LoRa built-in checksum calculation to drop broken packets
+- uses LoRa **built-in checksum** calculation to drop broken packets
+- note, that there a is **significant frequency drift** on temperature changes for different modules, you need to use **external TCXO** if you are planning to use modules for narrow bandwidths less than 125 kHz or calibrate clients based on server frequency drift report by changing **LORAPRS_FREQ**, which is OK for experiments
 
 # Test Results
 - Antennas
