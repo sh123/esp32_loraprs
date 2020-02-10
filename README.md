@@ -23,9 +23,9 @@ Can be used in two modes:
   - lora module SS, **CfgPinSs**, pin 5
   - lora module RST, **CfgPinRst**, pin 26
   - lora module DIO0, **CfgPinDio0**, pin 14
-- if you are planning to experiment with different bandwidths/spread factors then modify loraprs.h, with current parameters APRS packet time on air is around **1 second** to decode with as lower level as possible, use https://github.com/tanupoo/lorawan_toa to make calculations
+- if you are planning to experiment with different bandwidths/spread factors then modify loraprs.h, with current parameters APRS packet time on air is around **2 seconds** to decode with as lower level as possible, use https://github.com/tanupoo/lorawan_toa to make calculations
   - lora bandwidth **CfgBw**, 125 kHz
-  - lora spread factor **CfgSpread**, 11 (should decode down to -17.5dB)
+  - lora spread factor **CfgSpread**, 12 (should decode down to -20dB, choosen with the goal for minimum signal decode)
   - lora coding rate **CfgCodingRate**, 7
   - lora output power **CfgPower**, 20 (max 20 dBm ~ 100mW, change to lower value if needed)
 - use 80 MHz ESP32 frequency in Arduino, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
@@ -41,5 +41,7 @@ Can be used in two modes:
   - **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground with rubber duck antenna
   - **About 17km** maximum (non-reliable) between base and mobile station with antenna on the car roof
 - Signal levels
-  - Successful decodes down to **-17.5dB** below the noise floor when using compressed APRS coordinates
+  - Successful decodes down to **-17.5dB** below the noise floor when using compressed APRS coordinates (smaller packets, about 50 bytes)
+- Polarization
+  - Using horizontal polarization improves successful decoding probability in the city environment
 

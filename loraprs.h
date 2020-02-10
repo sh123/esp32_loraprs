@@ -72,7 +72,7 @@ private:
   const byte CfgPinDio0 = 14;
 
   const int CfgBw = 125e3;
-  const byte CfgSpread = 11;
+  const byte CfgSpread = 12;
   const byte CfgCodingRate = 7;
   const byte CfgSync = 0xf3;
   const byte CfgPower = 20;
