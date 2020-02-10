@@ -227,13 +227,13 @@ void LoraPrs::onLoraReceived(int packetSize)
   serialBt_.write(KissMarker::Fend);
 
   String signalReport = String(" ") +  
-    String("RSSI: ") + 
+    String("rssi: ") +
     String(LoRa.packetRssi()) + 
     String(", ") +
-    String("SNR: ") + 
+    String("snr: ") +
     String(LoRa.packetSnr()) + 
     String("dB, ") +
-    String("ERR: ") + 
+    String("err: ") +
     String(LoRa.packetFrequencyError()) + 
     String("Hz");
 
