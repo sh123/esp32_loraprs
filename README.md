@@ -18,13 +18,13 @@ Can be used in two modes:
   - comment out / remove **LORAPRS_CLIENT** define if you are planning to run server mode for APRS-IS iGate
   - for server mode fill **LORAPRS_WIFI_SSID** and **LORAPRS_WIFI_KEY** with your WiFI AP data
   - for server mode fill **LORAPRS_LOGIN** and **LORAPRS_PASS** with APRS-IS login callsign and pass
-  - change **LORAPRS_FREQ** if you are planning to use different frequency or if planning to calibrate clients, currently it is set to **432.500MHz**, which is 70cm band APRS frequency in IARU-1 region, see http://info.aprs.net/index.php?title=Frequencies
+  - change **LORAPRS_FREQ** if you are planning to use different frequency or if planning to calibrate clients, currently it is set to **433.775MHz** as per https://vienna.iaru-r1.org/wp-content/uploads/2019/01/VIE19-C5-015-OEVSV-LORA-APRS-433-MHz.pdf
 - if you are planning to use different esp32 pinouts then modify loraprs.h
   - lora module SS, **CfgPinSs**, pin 5
   - lora module RST, **CfgPinRst**, pin 26
   - lora module DIO0, **CfgPinDio0**, pin 14
 - if you are planning to experiment with different bandwidths/spread factors then modify loraprs.h, with current parameters APRS packet time on air is around **10 seconds** to decode with as lower level as possible, use https://github.com/tanupoo/lorawan_toa to make calculations
-  - lora bandwidth **CfgBw**, 20 kHz (to fit into standard 25 kHz channel)
+  - lora bandwidth **CfgBw**, 125 kHz
   - lora spread factor **CfgSpread**, 11 (should decode down to -17.5dB)
   - lora coding rate **CfgCodingRate**, 7
   - lora output power **CfgPower**, 20 (max 20 dBm ~ 100mW, change to lower value if needed)

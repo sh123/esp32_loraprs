@@ -7,11 +7,12 @@
 
 #define LORAPRS_CLIENT
 
+// https://vienna.iaru-r1.org/wp-content/uploads/2019/01/VIE19-C5-015-OEVSV-LORA-APRS-433-MHz.pdf
 #ifdef LORAPRS_CLIENT
 // calibrate client based on server frequency drift report
-#define LORAPRS_FREQ        432.499E6
+#define LORAPRS_FREQ        433.775E6
 #else
-#define LORAPRS_FREQ        432.5E6
+#define LORAPRS_FREQ        433.775E6
 #endif
 
 #ifdef LORAPRS_CLIENT
