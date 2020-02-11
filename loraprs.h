@@ -26,16 +26,12 @@ private:
   
   void onLoraReceived(int packetSize);
   void onBtReceived();
-
+  void onAprsReceived(const String & aprsMessage);
+  
   void kissResetState();
 
-  void onAprsReceived(const String & aprsMessage);
-
-  bool isAX25CrcValid(byte *rxPayload, int payloadLength);
   String convertAX25ToAprs(byte *rxPayload, int payloadLength, const String & signalReport);
   String decodeCall(byte *rxPtr);
-
-  uint16_t updateCrcCcit(uint8_t newByte, uint16_t prevCrc);
   
 private:
   enum KissMarker {
