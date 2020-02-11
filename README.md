@@ -35,14 +35,14 @@ Can be used in two modes:
 # Test Results
 ![alt text](images/setup.png)
 - Antennas
-  - Client - rubber duck antenna or mobile antenna on a car roof
-  - Server - UHF yagi indoors
-- Range (20 KHz channel width and 11 spreading factor)
+  - Client: rubber duck antenna or mobile antenna on a car roof
+  - Server: 7 element UHF yagi indoors
+- Range (20 KHz channel width and 11 spreading factor, also got similar results with 125 kHz and 12 SF)
   - **About 4 km** when server is 30m above the ground and client is 2m above the ground with rubber duck antenna
   - **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground with rubber duck antenna
   - **About 17km** maximum (non-reliable) between base and mobile station with antenna on the car roof
 - Signal levels
   - Successful decodes down to **-17.5dB** below the noise floor when using compressed APRS coordinates (smaller packets, about 50 bytes), see https://github.com/ge0rg/aprsdroid/issues/170 for APRSDroid version with compressed coordinates support
 - Polarization
-  - Using horizontal polarization improves successful decoding probability in the city environment
+  - Using horizontal polarization improves successful decoding probability and receiving range in the city
 
