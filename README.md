@@ -42,7 +42,7 @@ Can be used in two modes:
   - **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground with rubber duck antenna
   - **About 17km** maximum (non-reliable) between base and mobile station with antenna on the car roof
 - Signal levels
-  - Successful decodes down to **-17.5dB** below the noise floor when using compressed APRS coordinates (smaller packets, about 50 bytes), see https://github.com/ge0rg/aprsdroid/pull/159 and https://github.com/ge0rg/aprsdroid/issues/170 for APRSDroid version with compressed coordinates support
+  - Successful decodes down to **-17.5dB** below the noise floor when using compressed APRS coordinates (smaller packets, about 50 bytes), see https://github.com/ge0rg/aprsdroid/pull/159 and https://github.com/ge0rg/aprsdroid/issues/170 for APRSDroid version with compressed coordinates support, also see branches https://github.com/sh123/aprsdroid/tree/aprsdroid_compressed and https://github.com/sh123/aprsdroid/tree/aprsdroid_compressed_gradle
 - Polarization
   - Using **horizontal polarization** improves successful decoding probability and receiving range
 
