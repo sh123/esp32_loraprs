@@ -232,9 +232,9 @@ void LoraPrs::onLoraReceived(int packetSize)
   String signalReport = String(" ") +
     String("rssi: ") +
     String(snr < 0 ? rssi + snr : rssi) +
-    String("dB, ") +
+    String("dBm, ") +
     String("snr: ") +
-    String(snr) + 
+    String(snr) +
     String("dB, ") +
     String("err: ") +
     String(LoRa.packetFrequencyError()) + 
