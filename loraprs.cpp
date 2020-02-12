@@ -227,7 +227,7 @@ void LoraPrs::onLoraReceived(int packetSize)
   serialBt_.write(KissMarker::Fend);
 
   float snr = LoRa.packetSnr();
-  float rssi = Lora.packetRssi();
+  float rssi = LoRa.packetRssi();
 
   String signalReport = String(" ") +
     String("rssi: ") +
