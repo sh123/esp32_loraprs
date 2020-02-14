@@ -50,5 +50,5 @@ Can be used in two modes:
 - Polarization
   - Using **horizontal polarization** improves successful decoding probability and receiving range
 - Weather
-  - Rain, snow and high humidity decreases signal level by about **~3-6 dB** at UHF band
+  - Rain and high humidity levels decrease signal level by about **~3-6 dB**
 
