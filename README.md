@@ -49,4 +49,6 @@ Can be used in two modes:
     - https://github.com/sh123/aprsdroid/tree/aprsdroid_compressed_gradle
 - Polarization
   - Using **horizontal polarization** improves successful decoding probability and receiving range
+- Weather
+  - Rain, snow and humidity decreases signal level by about **~3-6 dB** at UHF band
 
