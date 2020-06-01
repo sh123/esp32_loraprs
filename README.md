@@ -49,7 +49,7 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
   - **About 7 km** when server is 30m above the ground and client is 2m above the ground with rubber duck antenna or inside a car
   - **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground with rubber duck antenna
   - **About 17km** maximum (non-reliable) between base and mobile station with antenna on the car roof
-  - **About 20km** over the sea
+  - **About 20km** over the sea between base and handheld
 - Signal levels
   - Successful decodes down to **-19.75dB** below the noise floor when using compressed APRS coordinates (smaller packets, about 50 bytes, 32 bytes without PATH, speed, altitude), see APRSDroid discussions on compressed corrdinates support and custom branches
     - https://github.com/ge0rg/aprsdroid/pull/159
