@@ -35,7 +35,10 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 - consider minimum decode level based on on BW + SF ![alt text](images/bandwidth_vs_sf.jpg)
 - use 80 MHz ESP32 frequency in Arduino, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
 - uses LoRa **built-in checksum** calculation to drop broken packets
-- note, that there a is **significant frequency drift** on temperature changes for different modules, you need to use **external TCXO** if you are planning to use modules for narrow bandwidths less than 125 kHz or calibrate clients based on server frequency drift report by changing **LORAPRS_FREQ**, for example, let client and server run for an 30-60 minutes and if server reports err: -1500, then set client frequency to about 1000 kHz less, e.g. instead of 433.775 set it to 433.774, this will give couple of additional dB
+- note, that there a is **significant frequency drift** on temperature changes for different modules
+  - you need to use **external TCXO** if you are planning to use modules for narrow bandwidths less than 125 kHz 
+  - or calibrate clients based on server frequency drift report by changing **LORAPRS_FREQ**, for example, let client and server run for an 30-60 minutes and if server reports err: -1500, then set client frequency to about 1000 kHz less, e.g. instead of 433.775 set it to 433.774, this will give couple of additional dB
+  - alternatively automatic calibration could be done on server side by enabling automatic frequency correction by setting **LORAPRS_FREQ_CORR** to **true**, might be suitable for experiments where only one client is operating
 
 # Test Results
 ![alt text](images/setup.png)

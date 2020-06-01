@@ -21,12 +21,14 @@
 #define LORAPRS_WIFI_KEY    ""
 #define LORAPRS_LOGIN       "NOCALL-0"
 #define LORAPRS_PASS        "00000"
+#define LORAPRS_FREQ_CORR   false
 #else
 #define LORAPRS_BT_NAME     ""
 #define LORAPRS_WIFI_SSID   "<mywifi>"
 #define LORAPRS_WIFI_KEY    "<key>"
 #define LORAPRS_LOGIN       "NOCALL-0"
 #define LORAPRS_PASS        "00000"
+#define LORAPRS_FREQ_CORR   false
 #endif 
 
 LoraPrs loraPrs(
@@ -35,7 +37,8 @@ LoraPrs loraPrs(
   LORAPRS_WIFI_SSID, 
   LORAPRS_WIFI_KEY,
   LORAPRS_LOGIN,
-  LORAPRS_PASS);
+  LORAPRS_PASS,
+  LORAPRS_FREQ_CORR);
 
 auto watchdogLedTimer = timer_create_default();
 

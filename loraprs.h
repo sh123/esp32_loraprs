@@ -11,16 +11,16 @@
 class LoraPrs
 {
 public:
-  LoraPrs(int loraFreq, const String & btName, const String & wifiName, 
-    const String & wifiKey, const String & aprsLoginCallsign, const String & aprsPass);
+  LoraPrs(long loraFreq, const String &btName, const String &wifiName, const String &wifiKey, 
+    const String &aprsLoginCallsign, const String& aprsPass, bool autoCorrectFreq);
   
   void setup();
   void loop();
 
 private:
-  void setupWifi(const String & wifiName, const String & wifiKey);
+  void setupWifi(const String &wifiName, const String &wifiKey);
   void setupLora(int loraFreq);
-  void setupBt(const String & btName);
+  void setupBt(const String &btName);
 
   void reconnectWifi();
   
@@ -30,7 +30,7 @@ private:
   
   void kissResetState();
 
-  String convertAX25ToAprs(byte *rxPayload, int payloadLength, const String & signalReport);
+  String convertAX25ToAprs(byte *rxPayload, int payloadLength, const String &signalReport);
   String decodeCall(byte *rxPtr);
   
 private:
@@ -77,7 +77,8 @@ private:
   const String CfgAprsHost = "rotate.aprs2.net";
 
 private:
-  int loraFreq_;
+  long loraFreq_;
+  bool autoCorrectFreq_;
   String btName_;
   String wifiName_;
   String wifiKey_;

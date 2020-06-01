@@ -1,9 +1,10 @@
 #include "loraprs.h"
 
-LoraPrs::LoraPrs(int loraFreq, const String & btName, const String & wifiName, 
-  const String & wifiKey, const String & aprsLoginCallsign, const String & aprsPass) 
+LoraPrs::LoraPrs(long loraFreq, const String &btName, const String &wifiName, const String &wifiKey, 
+  const String &aprsLoginCallsign, const String &aprsPass, bool autoCorrectFreq) 
   : serialBt_()
   , loraFreq_(loraFreq)
+  , autoCorrectFreq_(autoCorrectFreq)
   , btName_(btName)
   , wifiName_(wifiName)
   , wifiKey_(wifiKey)
@@ -27,7 +28,7 @@ void LoraPrs::setup()
   setupBt(btName_);
 }
 
-void LoraPrs::setupWifi(const String & wifiName, const String & wifiKey) 
+void LoraPrs::setupWifi(const String &wifiName, const String &wifiKey) 
 {
   if (wifiName.length() != 0) {    
     Serial.print("WIFI connecting to " + wifiName);
@@ -78,7 +79,7 @@ void LoraPrs::setupLora(int loraFreq)
   Serial.println("ok");  
 }
 
-void LoraPrs::setupBt(const String & btName)
+void LoraPrs::setupBt(const String &btName)
 {
   if (btName.length() != 0) {
     Serial.print("BT init " + btName + "...");
@@ -107,7 +108,7 @@ void LoraPrs::loop()
   delay(10);
 }
 
-void LoraPrs::onAprsReceived(const String & aprsMessage)
+void LoraPrs::onAprsReceived(const String &aprsMessage)
 {
   if (WiFi.status() == WL_CONNECTED) {
     WiFiClient wifiClient;
@@ -149,7 +150,7 @@ String LoraPrs::decodeCall(byte *rxPtr)
   return result;
 }
 
-String LoraPrs::convertAX25ToAprs(byte *rxPayload, int payloadLength, const String & signalReport)
+String LoraPrs::convertAX25ToAprs(byte *rxPayload, int payloadLength, const String &signalReport)
 {
   byte *rxPtr = rxPayload;
   String srcCall, dstCall, rptFirst, rptSecond, result;
@@ -228,6 +229,7 @@ void LoraPrs::onLoraReceived(int packetSize)
 
   float snr = LoRa.packetSnr();
   float rssi = LoRa.packetRssi();
+  long frequencyError = LoRa.packetFrequencyError();
 
   String signalReport = String(" ") +
     String("rssi: ") +
@@ -237,8 +239,11 @@ void LoraPrs::onLoraReceived(int packetSize)
     String(snr) +
     String("dB, ") +
     String("err: ") +
-    String(LoRa.packetFrequencyError()) + 
+    String(frequencyError) +
     String("Hz");
+
+  if (autoCorrectFreq_)
+    loraFreq_ -= frequencyError;
 
   String aprsMsg = convertAX25ToAprs(rxBuf, rxBufIndex, signalReport);
 
