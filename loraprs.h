@@ -69,6 +69,8 @@ private:
 
   const int CfgBw = 125e3;
   const byte CfgSpread = 12;
+  //const int CfgBw = 20e3;
+  //const byte CfgSpread = 9;
   const byte CfgCodingRate = 7;
   const byte CfgSync = 0xf3;
   const byte CfgPower = 20;

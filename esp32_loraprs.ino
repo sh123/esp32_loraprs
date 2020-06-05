@@ -11,8 +11,10 @@
 #ifdef LORAPRS_CLIENT
 // calibrate client based on server frequency drift report
 #define LORAPRS_FREQ        433.775E6
+//#define LORAPRS_FREQ        433.7688E6
 #else
 #define LORAPRS_FREQ        433.775E6
+//#define LORAPRS_FREQ        433.770E6
 #endif
 
 #ifdef LORAPRS_CLIENT
@@ -24,11 +26,12 @@
 #define LORAPRS_FREQ_CORR   false
 #else
 #define LORAPRS_BT_NAME     ""
-#define LORAPRS_WIFI_SSID   "<mywifi>"
-#define LORAPRS_WIFI_KEY    "<key>"
+#define LORAPRS_WIFI_SSID   "<your access point name>"
+#define LORAPRS_WIFI_KEY    "<your access point key>"
 #define LORAPRS_LOGIN       "NOCALL-0"
-#define LORAPRS_PASS        "00000"
+#define LORAPRS_PASS        "12345"
 #define LORAPRS_FREQ_CORR   false
+//#define LORAPRS_FREQ_CORR   true
 #endif 
 
 LoraPrs loraPrs(

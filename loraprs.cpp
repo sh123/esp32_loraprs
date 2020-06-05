@@ -144,7 +144,7 @@ String LoraPrs::decodeCall(byte *rxPtr)
   ssid = (*ptr >> 1);
   
   String result = String((char*)callsign);
-  if (ssid >= '0' && ssid <= '9') {
+  if (result.length() > 0 && ssid >= '0' && ssid <= '9') {
     result += String("-") + String(ssid);
   }
   return result;
@@ -159,7 +159,7 @@ String LoraPrs::convertAX25ToAprs(byte *rxPayload, int payloadLength, const Stri
   rxPtr += 7;
 
   srcCall = decodeCall(rxPtr);
-  rxPtr += 7;
+  rxPtr += 7; 
   
   if ((rxPayload[13] & 1) == 0) {
     rptFirst = decodeCall(rxPtr);
@@ -242,8 +242,10 @@ void LoraPrs::onLoraReceived(int packetSize)
     String(frequencyError) +
     String("Hz");
 
-  if (autoCorrectFreq_)
+  if (autoCorrectFreq_) {
     loraFreq_ -= frequencyError;
+    LoRa.setFrequency(loraFreq_);
+  }
 
   String aprsMsg = convertAX25ToAprs(rxBuf, rxBufIndex, signalReport);
 
