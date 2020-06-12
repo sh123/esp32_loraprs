@@ -9,10 +9,16 @@ class Payload
 {
 public:
   Payload(byte *rxPayload, int payloadLength);
+  Payload(String inputText);
+  
   String ToText(const String &customComment);
-    
+  bool ToBinary(byte *txPayload, int bufferLength);
+
 private:
   String decodeCall(byte *rxPtr);
+  bool encodeCall(String callsign, byte *txPtr, int bufferLength);
+
+  bool parseString(String inputText);
   bool parsePayload(byte *rxPayload, int payloadLength);
   
 private:
