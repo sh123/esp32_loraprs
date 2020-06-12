@@ -17,28 +17,29 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 
 # Software Setup
 - when setting up APRSDroid, use **"TNC (KISS)"** connection protocol in Connection Preferences -> Connection Protocol
-- go to esp32_loraprs.ino and make next changes based on your requirements
-  - comment out / remove **LORAPRS_CLIENT** define if you are planning to run server mode for APRS-IS iGate
-  - for server mode fill **LORAPRS_WIFI_SSID** and **LORAPRS_WIFI_KEY** with your WiFI AP data
-  - for server mode fill **LORAPRS_LOGIN** and **LORAPRS_PASS** with APRS-IS login callsign and pass
-  - change **LORAPRS_FREQ** if you are planning to use different frequency or if planning to calibrate clients, currently it is set to **433.775MHz** as per https://vienna.iaru-r1.org/wp-content/uploads/2019/01/VIE19-C5-015-OEVSV-LORA-APRS-433-MHz.pdf
+- go to esp32_loraprs.ino and make next changes based on your requirements in `initializeConfig()`
+  - set `cfg.IsClientMode` to `false` if you are planning to run server mode for APRS-IS iGate
+  - for server mode fill `cfg.WifiSsid` and `cfg.WifiKey` with your WiFI AP data
+  - for server mode fill `cfg.AprsLogin` and `cfg.AprsPass` with APRS-IS login callsign and pass
+  - for server mode fill `cfg.AprsFilter` to receive incomfing APRS-IS traffic based on your area
+  - change `cfg.LoraFreq` if you are planning to use different frequency or if planning to calibrate clients, currently it is set to **433.775MHz** as per https://vienna.iaru-r1.org/wp-content/uploads/2019/01/VIE19-C5-015-OEVSV-LORA-APRS-433-MHz.pdf
 - if you are planning to use different esp32 pinouts then modify loraprs.h
   - lora module SS, **CfgPinSs**, pin 5
   - lora module RST, **CfgPinRst**, pin 26
   - lora module DIO0, **CfgPinDio0**, pin 14
 - if you are planning to experiment with different bandwidths/spread factors then modify loraprs.h, with current parameters APRS packet time on air is around **2 seconds** to decode with as lower level as possible, use https://github.com/tanupoo/lorawan_toa to make calculations
-  - lora bandwidth **CfgBw**, 125 kHz
-  - lora spread factor **CfgSpread**, 12 (should decode down to -20dB, choosen with the goal for minimum signal decode)
-  - lora coding rate **CfgCodingRate**, 7
-  - lora output power **CfgPower**, 20 (max 20 dBm ~ 100mW, change to lower value if needed)
-  - sync word **CfgSync**, 0xf3
+  - lora bandwidth `cfg.LoraBw`, 125 kHz
+  - lora spread factor `cfg.LoraSf`, 12 (should decode down to -20dB, choosen with the goal for minimum signal decode)
+  - lora coding rate `cfg.LoraCodingRate`, 7
+  - lora output power `cfg.LoraPower`, 20 (max 20 dBm ~ 100mW, change to lower value if needed)
+  - sync word `cfg.LoraSync`, 0xf3
 - consider minimum decode level based on on BW + SF ![alt text](images/bandwidth_vs_sf.jpg)
 - use 80 MHz ESP32 frequency in Arduino SDK, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
 - uses LoRa **built-in checksum** calculation to drop broken packets
 - note, that there a is **significant frequency drift** on temperature changes for different modules
   - you need to use **external TCXO** if you are planning to use modules for narrow bandwidths less than 125 kHz 
   - or calibrate clients based on server frequency drift report by changing **LORAPRS_FREQ**, for example, let client and server run for an 30-60 minutes and if server reports err: -1500, then set client frequency to about 1000 kHz less, e.g. instead of 433.775 set it to 433.774, this will give couple of additional dB
-  - alternatively automatic calibration could be done on server side by enabling automatic frequency correction by setting **LORAPRS_FREQ_CORR** to **true**, might be suitable for experiments where only one client is operating
+  - alternatively automatic calibration could be done on server side by enabling automatic frequency correction by setting `cfg.EnableAutoFreqCorrection` to **true**, might be suitable for experiments where only one client is operating
 
 # Test Results
 ![alt text](images/setup.png)
