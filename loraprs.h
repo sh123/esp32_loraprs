@@ -9,9 +9,8 @@
 #include "BluetoothSerial.h"
 #include "ax25_payload.h"
 
-class LoraPrsConfig
+struct LoraPrsConfig
 {
-public:
   bool IsClientMode;
   
   long LoraFreq;
