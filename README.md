@@ -21,7 +21,7 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
   - set `cfg.IsClientMode` to `false` if you are planning to run server mode for APRS-IS iGate
   - for server mode fill `cfg.WifiSsid` and `cfg.WifiKey` with your WiFI AP data
   - for server mode fill `cfg.AprsLogin` and `cfg.AprsPass` with APRS-IS login callsign and pass
-  - for server mode fill `cfg.AprsFilter` to receive incomfing APRS-IS traffic based on your area, for example `r/12.34/56.78/25` will provide you the traffic from 25km radios around given coordinate
+  - for server mode fill `cfg.AprsFilter` to receive incomfing APRS-IS traffic based on your area, for example `r/12.34/56.78/25` will provide you the traffic from 25km radius around given coordinate
   - change `cfg.LoraFreq` if you are planning to use different frequency or if planning to calibrate clients, currently it is set to **433.775MHz** as per https://vienna.iaru-r1.org/wp-content/uploads/2019/01/VIE19-C5-015-OEVSV-LORA-APRS-433-MHz.pdf
 - if you are planning to use different esp32 pinouts then modify loraprs.h
   - lora module SS, **CfgPinSs**, pin 5
