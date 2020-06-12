@@ -31,7 +31,7 @@ private:
   String srcCall_, dstCall_;
   String rptCalls_[7];
   int rptCallsCount_;
-  String body_;
+  String info_;
 };
 
 } // AX25

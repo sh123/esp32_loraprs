@@ -17,9 +17,9 @@ String Payload::ToText(const String &customComment)
     }
   }
   
-  txt += String(":") + body_;
+  txt += String(":") + info_;
 
-  if (body_.startsWith("=")) {
+  if (info_.startsWith("=")) {
     txt += customComment;
   }
   
@@ -63,7 +63,7 @@ bool Payload::parsePayload(byte *rxPayload, int payloadLength)
 
   // information field
   while (rxPtr < rxEnd) {
-    body_ += String((char)*(rxPtr++));
+    info_ += String((char)*(rxPtr++));
   }
 
   return true;
