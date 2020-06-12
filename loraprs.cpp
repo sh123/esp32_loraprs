@@ -12,8 +12,13 @@ void LoraPrs::setup(const LoraPrsConfig &conf)
   isClient_ = conf.IsClientMode;
   loraFreq_ = conf.LoraFreq;
   
-  aprsLogin_ = String("user ") + conf.AprsLogin = String(" pass ") + 
-    conf.AprsPass = String(" vers ") + CfgLoraprsVersion + String("\n");
+  aprsLogin_ = String("user ") + conf.AprsLogin + String(" pass ") + 
+    conf.AprsPass + String(" vers ") + CfgLoraprsVersion;
+  if (conf.AprsFilter.length() > 0) {
+    aprsLogin_ += String(" filter ") + conf.AprsFilter;
+  }
+  aprsLogin_ += String("\n");
+  
   aprsHost_ = conf.AprsHost;
   aprsPort_ = conf.AprsPort;
   
@@ -24,8 +29,13 @@ void LoraPrs::setup(const LoraPrsConfig &conf)
   enableRepeater_ = conf.EnableRepeater;
   
   setupWifi(conf.WifiSsid, conf.WifiKey);
+  
   setupLora(conf.LoraFreq, conf.LoraBw, conf.LoraSf, conf.LoraCodingRate, conf.LoraPower, conf.LoraSync);
   setupBt(conf.BtName);
+  
+  if (!isClient_ && persistentConn_) {
+    reconnectAprsis();
+  }
 }
 
 void LoraPrs::setupWifi(const String &wifiName, const String &wifiKey) 
@@ -61,13 +71,15 @@ void LoraPrs::reconnectWifi() {
 
 bool LoraPrs::reconnectAprsis() {
 
-  Serial.print("APRSIS re-connecting...");
+  Serial.print("APRSIS connecting...");
   
-  if (!wifiClient_.connect(aprsHost_.c_str(), aprsPort_)) {
+  if (!aprsisConn_.connect(aprsHost_.c_str(), aprsPort_)) {
     Serial.println("Failed to connect to " + aprsHost_ + ":" + aprsPort_);
     return false;
   }
-  wifiClient_.print(aprsLogin_);
+  Serial.println("ok");
+  
+  aprsisConn_.print(aprsLogin_);
   return true;
 }
 
@@ -108,8 +120,17 @@ void LoraPrs::setupBt(const String &btName)
 
 void LoraPrs::loop()
 {
-  if (WiFi.status() != WL_CONNECTED && !isClient_) {
-    reconnectWifi();
+  if (!isClient_) {
+    if (WiFi.status() != WL_CONNECTED) {
+      reconnectWifi();
+    }
+    if (!aprsisConn_.connected()) {
+      reconnectAprsis();
+    }
+    while (aprsisConn_.available() > 0) {
+      char c = aprsisConn_.read();
+      Serial.print(c);
+    }
   }
   if (serialBt_.available()) {
     onBtDataAvailable();
@@ -122,19 +143,19 @@ void LoraPrs::loop()
 
 void LoraPrs::onRfAprsReceived(const String &aprsMessage)
 {
-  if (WiFi.status() != WL_CONNECTED) {
-    // skip in client mode
-    return;
-  }
+  if (isClient_) return;
   
-  if (!wifiClient_.connected()) {
+  if (WiFi.status() != WL_CONNECTED) {
+    reconnectWifi();
+  }
+  if (!aprsisConn_.connected()) {
     reconnectAprsis();
   }
   Serial.print(aprsMessage);
-  wifiClient_.print(aprsMessage);
+  aprsisConn_.print(aprsMessage);
 
   if (!persistentConn_) {
-    wifiClient_.stop();
+    aprsisConn_.stop();
   }
 }
 

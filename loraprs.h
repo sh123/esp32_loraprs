@@ -25,6 +25,7 @@ public:
   String AprsHost;
   String AprsLogin;
   String AprsPass;
+  String AprsFilter;
   
   String BtName;
   
@@ -105,7 +106,7 @@ private:
   KissState kissState_;
 
   BluetoothSerial serialBt_;
-  WiFiClient wifiClient_;
+  WiFiClient aprsisConn_;
 };
 
 #endif // LORAPRS_H

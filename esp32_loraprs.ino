@@ -13,7 +13,7 @@ auto watchdogLedTimer = timer_create_default();
 void initializeConfig() {
   cfg.IsClientMode = true;
   
-  cfg.LoraFreq = 433.775E6; // 433.7688E6
+  cfg.LoraFreq = 433.775E6; // 433.7688E6;
   cfg.LoraBw = 125e3;
   cfg.LoraSf = 12;
   cfg.LoraCodingRate = 7;
@@ -24,6 +24,7 @@ void initializeConfig() {
   cfg.AprsPort = 14580;
   cfg.AprsLogin = "NOCALL-1";
   cfg.AprsPass = "00000";
+  cfg.AprsFilter = "r/35.60/139.80/25";
   
   cfg.BtName = "loraprs";
   
@@ -32,7 +33,7 @@ void initializeConfig() {
 
   cfg.EnableSignalReport = true;
   cfg.EnableAutoFreqCorrection = true;
-  cfg.EnablePersistentAprsConnection = false;
+  cfg.EnablePersistentAprsConnection = true;
   cfg.EnableIsToRf = false;
   cfg.EnableRepeater = false;
 }
