@@ -5,45 +5,37 @@
 #define LED_BUILTIN         2
 #define LED_TOGGLE_PERIOD   1000
 
-#define LORAPRS_CLIENT
-
-// https://vienna.iaru-r1.org/wp-content/uploads/2019/01/VIE19-C5-015-OEVSV-LORA-APRS-433-MHz.pdf
-#ifdef LORAPRS_CLIENT
-// calibrate client based on server frequency drift report
-#define LORAPRS_FREQ        433.775E6
-//#define LORAPRS_FREQ        433.7688E6
-#else
-#define LORAPRS_FREQ        433.775E6
-//#define LORAPRS_FREQ        433.770E6
-#endif
-
-#ifdef LORAPRS_CLIENT
-#define LORAPRS_BT_NAME     "loraprs_client"
-#define LORAPRS_WIFI_SSID   ""
-#define LORAPRS_WIFI_KEY    ""
-#define LORAPRS_LOGIN       "NOCALL-0"
-#define LORAPRS_PASS        "00000"
-#define LORAPRS_FREQ_CORR   false
-#else
-#define LORAPRS_BT_NAME     ""
-#define LORAPRS_WIFI_SSID   "<your access point name>"
-#define LORAPRS_WIFI_KEY    "<your access point key>"
-#define LORAPRS_LOGIN       "NOCALL-0"
-#define LORAPRS_PASS        "12345"
-#define LORAPRS_FREQ_CORR   false
-//#define LORAPRS_FREQ_CORR   true
-#endif 
-
-LoraPrs loraPrs(
-  LORAPRS_FREQ, 
-  LORAPRS_BT_NAME, 
-  LORAPRS_WIFI_SSID, 
-  LORAPRS_WIFI_KEY,
-  LORAPRS_LOGIN,
-  LORAPRS_PASS,
-  LORAPRS_FREQ_CORR);
+LoraPrsConfig cfg;
+LoraPrs loraPrs;
 
 auto watchdogLedTimer = timer_create_default();
+
+void initializeConfig() {
+  cfg.IsClientMode = true;
+  
+  cfg.LoraFreq = 433.775E6; // 433.7688E6
+  cfg.LoraBw = 125e3;
+  cfg.LoraSf = 12;
+  cfg.LoraCodingRate = 7;
+  cfg.LoraSync = 0xf3;
+  cfg.LoraPower = 20;
+
+  cfg.AprsHost = "rotate.aprs2.net";
+  cfg.AprsPort = 14580;
+  cfg.AprsLogin = "NOCALL-1";
+  cfg.AprsPass = "00000";
+  
+  cfg.BtName = "loraprs";
+  
+  cfg.WifiSsid = "<wifi ssid>";
+  cfg.WifiKey = "<wifi key>";
+
+  cfg.EnableSignalReport = true;
+  cfg.EnableAutoFreqCorrection = true;
+  cfg.EnablePersistentAprsConnection = false;
+  cfg.EnableIsToRf = false;
+  cfg.EnableRepeater = false;
+}
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -52,7 +44,8 @@ void setup() {
   Serial.begin(115200);
   while (!Serial);
 
-  loraPrs.setup();
+  initializeConfig();
+  loraPrs.setup(cfg);
 
   watchdogLedTimer.every(LED_TOGGLE_PERIOD, toggleWatchdogLed);
 }

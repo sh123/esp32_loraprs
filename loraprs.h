@@ -7,32 +7,60 @@
 #include <WiFi.h>
 
 #include "BluetoothSerial.h"
+#include "aprsmsg.h"
+
+class LoraPrsConfig
+{
+public:
+  bool IsClientMode;
+  
+  long LoraFreq;
+  int LoraBw;
+  byte LoraSf;
+  byte LoraCodingRate;
+  byte LoraSync;
+  byte LoraPower;
+
+  int AprsPort;
+  String AprsHost;
+  String AprsLogin;
+  String AprsPass;
+  
+  String BtName;
+  
+  String WifiSsid;
+  String WifiKey;
+
+  bool EnableSignalReport;
+  bool EnableAutoFreqCorrection;
+  bool EnablePersistentAprsConnection;
+  bool EnableIsToRf;
+  bool EnableRepeater;
+};
 
 class LoraPrs
 {
 public:
-  LoraPrs(long loraFreq, const String &btName, const String &wifiName, const String &wifiKey, 
-    const String &aprsLoginCallsign, const String& aprsPass, bool autoCorrectFreq);
+  LoraPrs();
   
-  void setup();
+  void setup(const LoraPrsConfig &conf);
   void loop();
 
 private:
   void setupWifi(const String &wifiName, const String &wifiKey);
-  void setupLora(int loraFreq);
+  void setupLora(int loraFreq, int bw, byte sf, byte cr, byte pwr, byte sync);
   void setupBt(const String &btName);
 
   void reconnectWifi();
-  
-  void onLoraReceived(int packetSize);
-  void onBtReceived();
-  void onAprsReceived(const String & aprsMessage);
-  
+  bool reconnectAprsis();
+
+  void onLoraDataAvailable(int packetSize);
+  void onBtDataAvailable();
+
+  void onRfAprsReceived(const String &aprsMessage);
+
   void kissResetState();
 
-  String convertAX25ToAprs(byte *rxPayload, int payloadLength, const String &signalReport);
-  String decodeCall(byte *rxPtr);
-  
 private:
   enum KissMarker {
     Fend = 0xc0,
@@ -53,43 +81,31 @@ private:
     NoCmd = 0x80
   };
 
-  enum AX25Ctrl {
-    UI = 0x03
-  };
-
-  enum AX25Pid {
-    NoLayer3 = 0xf0
-  };
-  
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
-  
+
   const byte CfgPinSs = 5;
   const byte CfgPinRst = 26;
   const byte CfgPinDio0 = 14;
 
-  const int CfgBw = 125e3;
-  const byte CfgSpread = 12;
-  //const int CfgBw = 20e3;
-  //const byte CfgSpread = 9;
-  const byte CfgCodingRate = 7;
-  const byte CfgSync = 0xf3;
-  const byte CfgPower = 20;
-
-  const int CfgAprsPort = 14580;
-  const String CfgAprsHost = "rotate.aprs2.net";
-
 private:
+  bool isClient_;
   long loraFreq_;
-  bool autoCorrectFreq_;
-  String btName_;
-  String wifiName_;
-  String wifiKey_;
+
+  String aprsHost_;
+  int aprsPort_;
   String aprsLogin_;
+
+  bool autoCorrectFreq_;
+  bool addSignalReport_;
+  bool persistentConn_;
+  bool enableIsToRf_;
+  bool enableRepeater_;
 
   KissCmd kissCmd_;
   KissState kissState_;
 
   BluetoothSerial serialBt_;
+  WiFiClient wifiClient_;
 };
 
 #endif // LORAPRS_H
