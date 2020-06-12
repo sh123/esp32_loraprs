@@ -24,12 +24,13 @@ private:
     NoLayer3 = 0xf0
   };
 
-  const int MaxPayloadSize = 16;
   const int CallsignSize = 7;
+  const int RptMaxCount = 7;
 
 private:
   String srcCall_, dstCall_;
-  String rptFirst_, rptSecond_;
+  String rptCalls_[7];
+  int rptCallsCount_;
   String body_;
 };
 

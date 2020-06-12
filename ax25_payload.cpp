@@ -10,14 +10,13 @@ Payload::Payload(byte *rxPayload, int payloadLength)
 String Payload::ToText(const String &customComment)
 {
   String txt = srcCall_ + String(">") + dstCall_;
-    
-  if (rptFirst_.length() > 0) {
-    txt += String(",") + rptFirst_;
-  }
-  if (rptSecond_.length() > 0) {
-    txt += String(",") + rptSecond_;
-  }
 
+  for (int i = 0; i < rptCallsCount_; i++) {
+    if (rptCalls_[i].length() > 0) {
+      txt += String(",") + rptCalls_[i];
+    }
+  }
+  
   txt += String(":") + body_;
 
   if (body_.startsWith("=")) {
@@ -30,31 +29,40 @@ String Payload::ToText(const String &customComment)
 bool Payload::parsePayload(byte *rxPayload, int payloadLength)
 {
   byte *rxPtr = rxPayload;
+  byte *rxEnd = rxPayload + payloadLength;
 
+  // destination address
   dstCall_ = decodeCall(rxPtr);
   rxPtr += CallsignSize;
   if (rxPtr >= rxPayload + payloadLength) return false;
 
+  // source address
   srcCall_ = decodeCall(rxPtr);
   rxPtr += CallsignSize;
-  if (rxPtr >= rxPayload + payloadLength) return false;
-  
-  if ((rxPayload[2 * CallsignSize - 1] & 1) == 0) {
-    rptFirst_ = decodeCall(rxPtr);
-    rxPtr += CallsignSize;
-    if (rxPtr >= rxPayload + payloadLength) return false;
+  if (rxPtr >= rxEnd) return false;
 
-    if ((rxPayload[3 * CallsignSize - 1] & 1) == 0) {
-      rptSecond_ = decodeCall(rxPtr);
+  rptCallsCount_ = 0;
+  
+  // digipeater addresses
+  for (int i = 0; i < RptMaxCount; i++) {
+    if ((rxPayload[(i + 2) * CallsignSize - 1] & 1) == 0) {
+      rptCalls_[i] = decodeCall(rxPtr);
+      rptCallsCount_++;
       rxPtr += CallsignSize;
+      if (rxPtr >= rxEnd) return false;
+    }
+    else {
+      break;
     }
   }
-  if ((rxPtr + 1) >= rxPayload + payloadLength) return false;
-  
+
+  // control + protocol id
+  if ((rxPtr + 2) >= rxEnd) return false;
   if (*(rxPtr++) != AX25Ctrl::UI) return false;
   if (*(rxPtr++) != AX25Pid::NoLayer3) return false;
-  
-  while (rxPtr < rxPayload + payloadLength) {
+
+  // information field
+  while (rxPtr < rxEnd) {
     body_ += String((char)*(rxPtr++));
   }
 
