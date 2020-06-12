@@ -1,4 +1,4 @@
-#include "aprsmsg.h"
+#include "ax25_payload.h"
 
 namespace AX25 {
   

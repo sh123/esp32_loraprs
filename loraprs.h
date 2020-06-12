@@ -7,7 +7,7 @@
 #include <WiFi.h>
 
 #include "BluetoothSerial.h"
-#include "aprsmsg.h"
+#include "ax25_payload.h"
 
 class LoraPrsConfig
 {
