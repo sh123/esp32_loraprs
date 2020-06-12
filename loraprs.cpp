@@ -1,36 +1,46 @@
 #include "loraprs.h"
 
-LoraPrs::LoraPrs(long loraFreq, const String &btName, const String &wifiName, const String &wifiKey, 
-  const String &aprsLoginCallsign, const String &aprsPass, bool autoCorrectFreq) 
+LoraPrs::LoraPrs() 
   : serialBt_()
-  , loraFreq_(loraFreq)
-  , autoCorrectFreq_(autoCorrectFreq)
-  , btName_(btName)
-  , wifiName_(wifiName)
-  , wifiKey_(wifiKey)
   , kissState_(KissState::Void)
   , kissCmd_(KissCmd::NoCmd)
 { 
-    aprsLogin_ = "";
-    aprsLogin_ += "user ";
-    aprsLogin_ += aprsLoginCallsign;
-    aprsLogin_ += " pass ";
-    aprsLogin_ += aprsPass;
-    aprsLogin_ += " vers ";
-    aprsLogin_ += CfgLoraprsVersion;
-    aprsLogin_ += "\n";
 }
 
-void LoraPrs::setup()
+void LoraPrs::setup(const LoraPrsConfig &conf)
 {
-  setupWifi(wifiName_, wifiKey_);
-  setupLora(loraFreq_);
-  setupBt(btName_);
+  isClient_ = conf.IsClientMode;
+  loraFreq_ = conf.LoraFreq;
+  
+  aprsLogin_ = String("user ") + conf.AprsLogin + String(" pass ") + 
+    conf.AprsPass + String(" vers ") + CfgLoraprsVersion;
+  if (conf.AprsFilter.length() > 0) {
+    aprsLogin_ += String(" filter ") + conf.AprsFilter;
+  }
+  aprsLogin_ += String("\n");
+  
+  aprsHost_ = conf.AprsHost;
+  aprsPort_ = conf.AprsPort;
+  
+  autoCorrectFreq_ = conf.EnableAutoFreqCorrection;
+  addSignalReport_ = conf.EnableSignalReport;
+  persistentConn_ = conf.EnablePersistentAprsConnection;
+  enableIsToRf_ = conf.EnableIsToRf;
+  enableRepeater_ = conf.EnableRepeater;
+  
+  setupWifi(conf.WifiSsid, conf.WifiKey);
+  
+  setupLora(conf.LoraFreq, conf.LoraBw, conf.LoraSf, conf.LoraCodingRate, conf.LoraPower, conf.LoraSync);
+  setupBt(conf.BtName);
+  
+  if (!isClient_ && persistentConn_) {
+    reconnectAprsis();
+  }
 }
 
 void LoraPrs::setupWifi(const String &wifiName, const String &wifiKey) 
 {
-  if (wifiName.length() != 0) {    
+  if (!isClient_) {
     Serial.print("WIFI connecting to " + wifiName);
 
     WiFi.setHostname("loraprs");
@@ -59,7 +69,21 @@ void LoraPrs::reconnectWifi() {
   Serial.println("ok");
 }
 
-void LoraPrs::setupLora(int loraFreq)
+bool LoraPrs::reconnectAprsis() {
+
+  Serial.print("APRSIS connecting...");
+  
+  if (!aprsisConn_.connect(aprsHost_.c_str(), aprsPort_)) {
+    Serial.println("Failed to connect to " + aprsHost_ + ":" + aprsPort_);
+    return false;
+  }
+  Serial.println("ok");
+  
+  aprsisConn_.print(aprsLogin_);
+  return true;
+}
+
+void LoraPrs::setupLora(int loraFreq, int bw, byte sf, byte cr, byte pwr, byte sync)
 {
   Serial.print("LoRa init...");
   
@@ -69,11 +93,11 @@ void LoraPrs::setupLora(int loraFreq)
     Serial.print(".");
     delay(500);
   }
-  LoRa.setSyncWord(CfgSync);
-  LoRa.setSpreadingFactor(CfgSpread);
-  LoRa.setSignalBandwidth(CfgBw);
-  LoRa.setCodingRate4(CfgCodingRate);
-  LoRa.setTxPower(CfgPower);
+  LoRa.setSyncWord(sync);
+  LoRa.setSpreadingFactor(sf);
+  LoRa.setSignalBandwidth(bw);
+  LoRa.setCodingRate4(cr);
+  LoRa.setTxPower(pwr);
   LoRa.enableCrc();
   
   Serial.println("ok");  
@@ -81,7 +105,7 @@ void LoraPrs::setupLora(int loraFreq)
 
 void LoraPrs::setupBt(const String &btName)
 {
-  if (btName.length() != 0) {
+  if (isClient_) {
     Serial.print("BT init " + btName + "...");
   
     if (serialBt_.begin(btName)) {
@@ -96,111 +120,46 @@ void LoraPrs::setupBt(const String &btName)
 
 void LoraPrs::loop()
 {
-  if (WiFi.status() != WL_CONNECTED && wifiName_.length() != 0) {
-    reconnectWifi();
+  if (!isClient_) {
+    if (WiFi.status() != WL_CONNECTED) {
+      reconnectWifi();
+    }
+    if (!aprsisConn_.connected()) {
+      reconnectAprsis();
+    }
+    while (aprsisConn_.available() > 0) {
+      char c = aprsisConn_.read();
+      Serial.print(c);
+    }
   }
   if (serialBt_.available()) {
-    onBtReceived();
+    onBtDataAvailable();
   }
   if (int packetSize = LoRa.parsePacket()) {
-    onLoraReceived(packetSize);
+    onLoraDataAvailable(packetSize);
   }
   delay(10);
 }
 
-void LoraPrs::onAprsReceived(const String &aprsMessage)
+void LoraPrs::onRfAprsReceived(const String &aprsMessage)
 {
-  if (WiFi.status() == WL_CONNECTED) {
-    WiFiClient wifiClient;
+  if (isClient_) return;
+  
+  if (WiFi.status() != WL_CONNECTED) {
+    reconnectWifi();
+  }
+  if (!aprsisConn_.connected()) {
+    reconnectAprsis();
+  }
+  Serial.print(aprsMessage);
+  aprsisConn_.print(aprsMessage);
 
-    if (!wifiClient.connect(CfgAprsHost.c_str(), CfgAprsPort)) {
-      Serial.println("Failed to connect to " + CfgAprsHost + ":" + CfgAprsPort);
-      return;
-    }
-    wifiClient.print(aprsLogin_);
-    Serial.print(aprsMessage);
-    wifiClient.print(aprsMessage);
-    wifiClient.stop();
-  } 
-  else {
-    Serial.println("Wifi not connected, not sent");
+  if (!persistentConn_) {
+    aprsisConn_.stop();
   }
 }
 
-String LoraPrs::decodeCall(byte *rxPtr) 
-{
-  byte callsign[7];
-  char ssid;
-  
-  byte *ptr = rxPtr;
-
-  memset(callsign, 0, sizeof(callsign));
-    
-  for (int i = 0; i < 6; i++) {
-    char c = *(ptr++) >> 1;
-    callsign[i] = (c == ' ') ? '\0' : c;
-  }
-  callsign[6] = '\0';
-  ssid = (*ptr >> 1);
-  
-  String result = String((char*)callsign);
-  if (result.length() > 0 && ssid >= '0' && ssid <= '9') {
-    result += String("-") + String(ssid);
-  }
-  return result;
-}
-
-String LoraPrs::convertAX25ToAprs(byte *rxPayload, int payloadLength, const String &signalReport)
-{
-  byte *rxPtr = rxPayload;
-  String srcCall, dstCall, rptFirst, rptSecond, result;
-
-  dstCall = decodeCall(rxPtr);
-  rxPtr += 7;
-
-  srcCall = decodeCall(rxPtr);
-  rxPtr += 7; 
-  
-  if ((rxPayload[13] & 1) == 0) {
-    rptFirst = decodeCall(rxPtr);
-    rxPtr += 7;
-
-    if ((rxPayload[20] & 1) == 0) {
-      rptSecond = decodeCall(rxPtr);
-      rxPtr += 7;
-    }
-  }
-  
-  if (*(rxPtr++) != AX25Ctrl::UI) return result;
-  if (*(rxPtr++) != AX25Pid::NoLayer3) return result;
-  
-  result += srcCall + String(">") + dstCall;
-    
-  if (rptFirst.length() > 0) {
-    result += String(",") + rptFirst;
-  }
-  if (rptSecond.length() > 0) {
-    result += String(",") + rptSecond;
-  }
-
-  result += ":";
-
-  bool appendReport = ((char)*rxPtr == '=');
-  
-  while (rxPtr < rxPayload + payloadLength) {
-    result += String((char)*(rxPtr++));
-  }
-
-  if (appendReport) {
-    result += signalReport;
-  }
-  
-  result += "\n";
-  
-  return result;
-}
-
-void LoraPrs::onLoraReceived(int packetSize)
+void LoraPrs::onLoraDataAvailable(int packetSize)
 {
   int rxBufIndex = 0;
   byte rxBuf[packetSize];
@@ -247,10 +206,10 @@ void LoraPrs::onLoraReceived(int packetSize)
     LoRa.setFrequency(loraFreq_);
   }
 
-  String aprsMsg = convertAX25ToAprs(rxBuf, rxBufIndex, signalReport);
+  String aprsMsg = AX25::Payload(rxBuf, rxBufIndex).ToText(addSignalReport_ ? signalReport : String());
 
   if (aprsMsg.length() != 0) {
-    onAprsReceived(aprsMsg);
+    onRfAprsReceived(aprsMsg);
   }
 
   delay(50);
@@ -262,7 +221,7 @@ void LoraPrs::kissResetState()
   kissState_ = KissState::Void;
 }
 
-void LoraPrs::onBtReceived() 
+void LoraPrs::onBtDataAvailable() 
 { 
   while (serialBt_.available()) {
     byte txByte = serialBt_.read();
