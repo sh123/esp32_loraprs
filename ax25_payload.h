@@ -9,11 +9,21 @@ class Payload
 {
 public:
   Payload(byte *rxPayload, int payloadLength);
-  String ToText(const String &customComment);
-    
+  Payload(String inputText);
+
+  inline bool IsValid() const { return isValid_; }
+  
+  String ToText(String customComment);
+  int ToBinary(byte *txPayload, int bufferLength);
+
+  void Dump();
+
 private:
-  String decodeCall(byte *rxPtr);
-  bool parsePayload(byte *rxPayload, int payloadLength);
+  String decodeCall(const byte *rxPtr);
+  bool encodeCall(String callsign, byte *txPtr, int bufferLength);
+
+  bool parseString(String inputText);
+  bool parsePayload(const byte *rxPayload, int payloadLength);
   
 private:
   enum AX25Ctrl {
@@ -28,6 +38,7 @@ private:
   const int RptMaxCount = 7;
 
 private:
+  bool isValid_;
   String srcCall_, dstCall_;
   String rptCalls_[7];
   int rptCallsCount_;

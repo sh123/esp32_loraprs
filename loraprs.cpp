@@ -4,7 +4,7 @@ LoraPrs::LoraPrs()
   : serialBt_()
   , kissState_(KissState::Void)
   , kissCmd_(KissCmd::NoCmd)
-{ 
+{
 }
 
 void LoraPrs::setup(const LoraPrsConfig &conf)
@@ -38,7 +38,7 @@ void LoraPrs::setup(const LoraPrsConfig &conf)
   }
 }
 
-void LoraPrs::setupWifi(const String &wifiName, const String &wifiKey) 
+void LoraPrs::setupWifi(const String &wifiName, const String &wifiKey)
 {
   if (!isClient_) {
     Serial.print("WIFI connecting to " + wifiName);
@@ -56,8 +56,8 @@ void LoraPrs::setupWifi(const String &wifiName, const String &wifiKey)
   }
 }
 
-void LoraPrs::reconnectWifi() {
-
+void LoraPrs::reconnectWifi()
+{
   Serial.print("WIFI re-connecting...");
 
   while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0,0,0,0)) {
@@ -69,8 +69,8 @@ void LoraPrs::reconnectWifi() {
   Serial.println("ok");
 }
 
-bool LoraPrs::reconnectAprsis() {
-
+bool LoraPrs::reconnectAprsis()
+{
   Serial.print("APRSIS connecting...");
   
   if (!aprsisConn_.connect(aprsHost_.c_str(), aprsPort_)) {
@@ -78,7 +78,7 @@ bool LoraPrs::reconnectAprsis() {
     return false;
   }
   Serial.println("ok");
-  
+
   aprsisConn_.print(aprsLogin_);
   return true;
 }
@@ -127,9 +127,8 @@ void LoraPrs::loop()
     if (!aprsisConn_.connected()) {
       reconnectAprsis();
     }
-    while (aprsisConn_.available() > 0) {
-      char c = aprsisConn_.read();
-      Serial.print(c);
+    if (aprsisConn_.available() > 0) {
+      onAprsisDataAvailable();
     }
   }
   if (serialBt_.available()) {
@@ -141,21 +140,56 @@ void LoraPrs::loop()
   delay(10);
 }
 
-void LoraPrs::onRfAprsReceived(const String &aprsMessage)
+void LoraPrs::onRfAprsReceived(String aprsMessage)
 {
+  Serial.print(aprsMessage);
+
   if (isClient_) return;
-  
+
   if (WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
   if (!aprsisConn_.connected()) {
     reconnectAprsis();
   }
-  Serial.print(aprsMessage);
   aprsisConn_.print(aprsMessage);
 
   if (!persistentConn_) {
     aprsisConn_.stop();
+  }
+}
+
+void LoraPrs::onAprsisDataAvailable()
+{
+  String aprsisData;
+  
+  while (aprsisConn_.available() > 0) {
+    char c = aprsisConn_.read();
+    if (c == '\r') continue;
+    Serial.print(c);
+    if (c == '\n') break;
+    aprsisData += c;
+  }
+
+  if (enableIsToRf_ && aprsisData.length() > 0) {
+    AX25::Payload payload(aprsisData);
+
+    if (payload.IsValid()) {
+
+      byte buf[512];
+      int bytesWritten = payload.ToBinary(buf, sizeof(buf));
+      if (bytesWritten > 0) {
+        LoRa.beginPacket();
+        LoRa.write(buf, bytesWritten);
+        LoRa.endPacket(true);
+      }
+      else {
+        Serial.println("Failed to serialize payload");
+      }
+    }
+    else {
+      Serial.println("Invalid payload from APRSIS");
+    }
   }
 }
 
@@ -206,10 +240,13 @@ void LoraPrs::onLoraDataAvailable(int packetSize)
     LoRa.setFrequency(loraFreq_);
   }
 
-  String aprsMsg = AX25::Payload(rxBuf, rxBufIndex).ToText(addSignalReport_ ? signalReport : String());
+  AX25::Payload payload(rxBuf, rxBufIndex);
 
-  if (aprsMsg.length() != 0) {
-    onRfAprsReceived(aprsMsg);
+  if (payload.IsValid()) {
+    onRfAprsReceived(payload.ToText(addSignalReport_ ? signalReport : String()));
+  }
+  else {
+    Serial.println("Invalid payload from LoRA");
   }
 
   delay(50);
