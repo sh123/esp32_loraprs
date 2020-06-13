@@ -2,17 +2,18 @@
 
 namespace AX25 {
   
-Payload::Payload(byte *rxPayload, int payloadLength)
+Payload::Payload(const byte *rxPayload, int payloadLength)
+  : isValid_(parsePayload(rxPayload, payloadLength))
 {
-  parsePayload(rxPayload, payloadLength);
 }
 
-Payload::Payload(String inputText)
+Payload::Payload(const String &inputText)
+  : isValid_(parseString(inputText))
 {
   parseString(inputText);
 }
 
-bool Payload::ToBinary(byte *txPayload, int bufferLength)
+bool Payload::ToBinary(byte *txPayload, int bufferLength) const
 {
   byte *txPtr = txPayload;
   byte *txEnd = txPayload + bufferLength;
@@ -50,7 +51,7 @@ bool Payload::ToBinary(byte *txPayload, int bufferLength)
   return true;
 }
 
-String Payload::ToText(const String &customComment)
+String Payload::ToText(const String &customComment) const
 {
   String txt = srcCall_ + String(">") + dstCall_;
 
@@ -69,10 +70,10 @@ String Payload::ToText(const String &customComment)
   return txt + String("\n");
 }
 
-bool Payload::parsePayload(byte *rxPayload, int payloadLength)
+bool Payload::parsePayload(const byte *rxPayload, int payloadLength)
 {
-  byte *rxPtr = rxPayload;
-  byte *rxEnd = rxPayload + payloadLength;
+  const byte *rxPtr = rxPayload;
+  const byte *rxEnd = rxPayload + payloadLength;
 
   // destination address
   dstCall_ = decodeCall(rxPtr);
@@ -112,7 +113,7 @@ bool Payload::parsePayload(byte *rxPayload, int payloadLength)
   return true;
 }
 
-bool Payload::parseString(String inputText)
+bool Payload::parseString(const String &inputText)
 {
   int rptIndex = inputText.indexOf('>');
   int infoIndex = inputText.indexOf(':');
@@ -143,7 +144,7 @@ bool Payload::parseString(String inputText)
   return true;
 }
 
-bool Payload::encodeCall(String inputText, byte *txPtr, int bufferLength)
+bool Payload::encodeCall(const String &inputText, byte *txPtr, int bufferLength) const
 {
   if (bufferLength < CallsignSize) return false;
 
@@ -176,11 +177,11 @@ bool Payload::encodeCall(String inputText, byte *txPtr, int bufferLength)
   return true;
 }
 
-String Payload::decodeCall(byte *rxPtr)
+String Payload::decodeCall(const byte *rxPtr) const
 {
   byte callsign[CallsignSize];
   
-  byte *ptr = rxPtr;
+  const byte *ptr = rxPtr;
 
   memset(callsign, 0, sizeof(callsign));
     

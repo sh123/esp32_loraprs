@@ -8,18 +8,20 @@ namespace AX25 {
 class Payload
 {
 public:
-  Payload(byte *rxPayload, int payloadLength);
-  Payload(String inputText);
+  Payload(const byte *rxPayload, int payloadLength);
+  Payload(const String &inputText);
+
+  inline bool IsValid() const { return isValid_; }
   
-  String ToText(const String &customComment);
-  bool ToBinary(byte *txPayload, int bufferLength);
+  String ToText(const String &customComment) const;
+  bool ToBinary(byte *txPayload, int bufferLength) const;
 
 private:
-  String decodeCall(byte *rxPtr);
-  bool encodeCall(String callsign, byte *txPtr, int bufferLength);
+  String decodeCall(const byte *rxPtr) const;
+  bool encodeCall(const String &callsign, byte *txPtr, int bufferLength) const;
 
-  bool parseString(String inputText);
-  bool parsePayload(byte *rxPayload, int payloadLength);
+  bool parseString(const String &inputText);
+  bool parsePayload(const byte *rxPayload, int payloadLength);
   
 private:
   enum AX25Ctrl {
@@ -34,6 +36,7 @@ private:
   const int RptMaxCount = 7;
 
 private:
+  bool isValid_;
   String srcCall_, dstCall_;
   String rptCalls_[7];
   int rptCallsCount_;

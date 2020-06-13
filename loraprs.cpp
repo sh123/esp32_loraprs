@@ -38,7 +38,7 @@ void LoraPrs::setup(const LoraPrsConfig &conf)
   }
 }
 
-void LoraPrs::setupWifi(const String &wifiName, const String &wifiKey) 
+void LoraPrs::setupWifi(const String &wifiName, const String &wifiKey)
 {
   if (!isClient_) {
     Serial.print("WIFI connecting to " + wifiName);
@@ -56,8 +56,8 @@ void LoraPrs::setupWifi(const String &wifiName, const String &wifiKey)
   }
 }
 
-void LoraPrs::reconnectWifi() {
-
+void LoraPrs::reconnectWifi()
+{
   Serial.print("WIFI re-connecting...");
 
   while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0,0,0,0)) {
@@ -69,8 +69,8 @@ void LoraPrs::reconnectWifi() {
   Serial.println("ok");
 }
 
-bool LoraPrs::reconnectAprsis() {
-
+bool LoraPrs::reconnectAprsis()
+{
   Serial.print("APRSIS connecting...");
   
   if (!aprsisConn_.connect(aprsHost_.c_str(), aprsPort_)) {
@@ -206,10 +206,13 @@ void LoraPrs::onLoraDataAvailable(int packetSize)
     LoRa.setFrequency(loraFreq_);
   }
 
-  String aprsMsg = AX25::Payload(rxBuf, rxBufIndex).ToText(addSignalReport_ ? signalReport : String());
+  AX25::Payload payload(rxBuf, rxBufIndex);
 
-  if (aprsMsg.length() != 0) {
-    onRfAprsReceived(aprsMsg);
+  if (payload.IsValid()) {
+    onRfAprsReceived(payload.ToText(addSignalReport_ ? signalReport : String()));
+  }
+  else {
+    Serial.println("Invalid payload from LoRA");
   }
 
   delay(50);
