@@ -13,30 +13,30 @@ Payload::Payload(const String &inputText)
   parseString(inputText);
 }
 
-bool Payload::ToBinary(byte *txPayload, int bufferLength) const
+int Payload::ToBinary(byte *txPayload, int bufferLength) const
 {
   byte *txPtr = txPayload;
   byte *txEnd = txPayload + bufferLength;
 
   // destination address
-  if (!encodeCall(dstCall_, txPtr, CallsignSize)) return false;
+  if (!encodeCall(dstCall_, txPtr, CallsignSize)) return 0;
   txPtr += CallsignSize;
-  if (txPtr >= txEnd) return false;
+  if (txPtr >= txEnd) return 0;
 
   // source address
-  if (!encodeCall(srcCall_, txPtr, CallsignSize)) return false;
+  if (!encodeCall(srcCall_, txPtr, CallsignSize)) return 0;
   txPtr += CallsignSize;
-  if (txPtr >= txEnd) return false;
+  if (txPtr >= txEnd) return 0;
   
   // digipeater addresses
   for (int i = 0; i < rptCallsCount_; i++) {
-    if (!encodeCall(rptCalls_[i], txPtr, CallsignSize)) return false;
+    if (!encodeCall(rptCalls_[i], txPtr, CallsignSize)) return 0;
     txPtr += CallsignSize;
-    if (txPtr >= txEnd) return false;
+    if (txPtr >= txEnd) return 0;
   }
 
   // control + protocol id
-  if ((txPtr + 2) >= txEnd) return false;
+  if ((txPtr + 2) >= txEnd) return 0;
   *(txPtr++) = AX25Ctrl::UI;
   *(txPtr++) = AX25Pid::NoLayer3;
 
@@ -48,7 +48,7 @@ bool Payload::ToBinary(byte *txPayload, int bufferLength) const
     if (txPtr >= txEnd) break;
   }
 
-  return true;
+  return (int)(txPtr-txPayload);
 }
 
 String Payload::ToText(const String &customComment) const

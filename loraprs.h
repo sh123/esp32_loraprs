@@ -56,6 +56,7 @@ private:
 
   void onLoraDataAvailable(int packetSize);
   void onBtDataAvailable();
+  void onAprsisDataAvailable();
 
   void onRfAprsReceived(const String &aprsMessage);
 

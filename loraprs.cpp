@@ -127,9 +127,8 @@ void LoraPrs::loop()
     if (!aprsisConn_.connected()) {
       reconnectAprsis();
     }
-    while (aprsisConn_.available() > 0) {
-      char c = aprsisConn_.read();
-      Serial.print(c);
+    if (aprsisConn_.available() > 0) {
+      onAprsisDataAvailable();
     }
   }
   if (serialBt_.available()) {
@@ -156,6 +155,35 @@ void LoraPrs::onRfAprsReceived(const String &aprsMessage)
 
   if (!persistentConn_) {
     aprsisConn_.stop();
+  }
+}
+
+void LoraPrs::onAprsisDataAvailable()
+{
+  String aprsisData = String();
+  
+  while (aprsisConn_.available() > 0) {
+    char c = aprsisConn_.read();
+    Serial.print(c);
+    aprsisData += String(c);
+  }
+
+  if (enableIsToRf_ && aprsisData.length() > 0) {
+    AX25::Payload payload(aprsisData);
+
+    if (payload.IsValid()) {
+      byte buf[512];
+      int bytesWritten = payload.ToBinary(buf, sizeof(buf));
+      if (bytesWritten > 0) {
+        LoRa.write(buf, bytesWritten);
+      }
+      else {
+        Serial.println("Failed to serialize payload");
+      }
+    }
+    else {
+      Serial.println("Invalid payload from APRSIS");
+    }
   }
 }
 

@@ -14,7 +14,7 @@ public:
   inline bool IsValid() const { return isValid_; }
   
   String ToText(const String &customComment) const;
-  bool ToBinary(byte *txPayload, int bufferLength) const;
+  int ToBinary(byte *txPayload, int bufferLength) const;
 
 private:
   String decodeCall(const byte *rxPtr) const;
