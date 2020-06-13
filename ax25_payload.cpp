@@ -12,8 +12,42 @@ Payload::Payload(String inputText)
   parseString(inputText);
 }
 
-bool ToBinary(byte *txPayload, int bufferLength)
+bool Payload::ToBinary(byte *txPayload, int bufferLength)
 {
+  byte *txPtr = txPayload;
+  byte *txEnd = txPayload + bufferLength;
+
+  // destination address
+  if (!encodeCall(dstCall_, txPtr, CallsignSize)) return false;
+  txPtr += CallsignSize;
+  if (txPtr >= txEnd) return false;
+
+  // source address
+  if (!encodeCall(srcCall_, txPtr, CallsignSize)) return false;
+  txPtr += CallsignSize;
+  if (txPtr >= txEnd) return false;
+  
+  // digipeater addresses
+  for (int i = 0; i < rptCallsCount_; i++) {
+    if (!encodeCall(rptCalls_[i], txPtr, CallsignSize)) return false;
+    txPtr += CallsignSize;
+    if (txPtr >= txEnd) return false;
+  }
+
+  // control + protocol id
+  if ((txPtr + 2) >= txEnd) return false;
+  *(txPtr++) = AX25Ctrl::UI;
+  *(txPtr++) = AX25Pid::NoLayer3;
+
+  // information field
+  for (int i = 0; i < info_.length(); i++) {
+    char c = info_.charAt(i);
+    if (c == '\0') break;
+    *(txPtr++) = c;
+    if (txPtr >= txEnd) break;
+  }
+
+  return true;
 }
 
 String Payload::ToText(const String &customComment)
@@ -43,7 +77,7 @@ bool Payload::parsePayload(byte *rxPayload, int payloadLength)
   // destination address
   dstCall_ = decodeCall(rxPtr);
   rxPtr += CallsignSize;
-  if (rxPtr >= rxPayload + payloadLength) return false;
+  if (rxPtr >= rxEnd) return false;
 
   // source address
   srcCall_ = decodeCall(rxPtr);
