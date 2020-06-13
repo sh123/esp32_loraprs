@@ -2,18 +2,33 @@
 
 namespace AX25 {
   
-Payload::Payload(const byte *rxPayload, int payloadLength)
-  : isValid_(parsePayload(rxPayload, payloadLength))
+Payload::Payload(byte *rxPayload, int payloadLength)
+  : rptCallsCount_(0)
 {
+  isValid_ = parsePayload(rxPayload, payloadLength);
 }
 
-Payload::Payload(const String &inputText)
-  : isValid_(parseString(inputText))
+Payload::Payload(String inputText)
+  : rptCallsCount_(0)
 {
-  parseString(inputText);
+  isValid_ = parseString(inputText);
 }
 
-int Payload::ToBinary(byte *txPayload, int bufferLength) const
+void Payload::Dump() 
+{
+  Serial.println();
+  Serial.print("valid: "); Serial.println(isValid_);
+  Serial.println("src: " + srcCall_);
+  Serial.println("dst: " + dstCall_);
+  Serial.print("rpt: ");
+  for (int i = 0; i < rptCallsCount_; i++) {
+    Serial.print(rptCalls_[i] + " ");
+  }
+  Serial.println();
+  Serial.println("info: " + info_);
+}
+
+int Payload::ToBinary(byte *txPayload, int bufferLength)
 {
   byte *txPtr = txPayload;
   byte *txEnd = txPayload + bufferLength;
@@ -51,7 +66,7 @@ int Payload::ToBinary(byte *txPayload, int bufferLength) const
   return (int)(txPtr-txPayload);
 }
 
-String Payload::ToText(const String &customComment) const
+String Payload::ToText(String customComment)
 {
   String txt = srcCall_ + String(">") + dstCall_;
 
@@ -113,24 +128,23 @@ bool Payload::parsePayload(const byte *rxPayload, int payloadLength)
   return true;
 }
 
-bool Payload::parseString(const String &inputText)
+bool Payload::parseString(String inputText)
 {
   int rptIndex = inputText.indexOf('>');
   int infoIndex = inputText.indexOf(':');
 
   // bad format
   if (rptIndex == -1 || infoIndex == -1) return false;
-  
+
   info_ = inputText.substring(infoIndex + 1);
   srcCall_ = inputText.substring(0, rptIndex);
-  
   String paths = inputText.substring(rptIndex + 1, infoIndex);
-
+  
   rptCallsCount_ = 0;
   int index = 0;
-  while (index != -1 && rptCallsCount_ <= RptMaxCount) {
+  while (rptCallsCount_ <= RptMaxCount) {
     int nextIndex = paths.indexOf(',', index);
-    String pathItem = paths.substring(index == 0 ? index : index + 1, nextIndex == -1 ? paths.length() - 1 : nextIndex);
+    String pathItem = paths.substring(index, nextIndex == -1 ? paths.length() : nextIndex);
     if (index == 0) {
       dstCall_ = pathItem;
     }
@@ -138,13 +152,14 @@ bool Payload::parseString(const String &inputText)
       rptCallsCount_++;
       rptCalls_[rptCallsCount_ - 1] = pathItem;
     }
-    index = nextIndex;
+    if (nextIndex == -1) break;
+    index = nextIndex + 1;
   }
-
+  
   return true;
 }
 
-bool Payload::encodeCall(const String &inputText, byte *txPtr, int bufferLength) const
+bool Payload::encodeCall(String inputText, byte *txPtr, int bufferLength)
 {
   if (bufferLength < CallsignSize) return false;
 
@@ -177,7 +192,7 @@ bool Payload::encodeCall(const String &inputText, byte *txPtr, int bufferLength)
   return true;
 }
 
-String Payload::decodeCall(const byte *rxPtr) const
+String Payload::decodeCall(const byte *rxPtr)
 {
   byte callsign[CallsignSize];
   
@@ -194,7 +209,7 @@ String Payload::decodeCall(const byte *rxPtr) const
   
   String result = String((char*)callsign);
   
-  if (result.length() > 0) {
+  if (result.length() > 0 && ssid != 0) {
     result += String("-") + String(ssid);
   }
   return result;

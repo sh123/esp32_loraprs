@@ -58,7 +58,7 @@ private:
   void onBtDataAvailable();
   void onAprsisDataAvailable();
 
-  void onRfAprsReceived(const String &aprsMessage);
+  void onRfAprsReceived(String aprsMessage);
 
   void kissResetState();
 
