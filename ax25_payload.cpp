@@ -49,7 +49,8 @@ int Payload::ToBinary(byte *txPayload, int bufferLength)
     txPtr += CallsignSize;
     if (txPtr >= txEnd) return 0;
   }
-
+  *(txPtr - 1) |= 1;
+  
   // control + protocol id
   if ((txPtr + 2) >= txEnd) return 0;
   *(txPtr++) = AX25Ctrl::UI;
@@ -101,7 +102,7 @@ bool Payload::parsePayload(const byte *rxPayload, int payloadLength)
   if (rxPtr >= rxEnd) return false;
 
   rptCallsCount_ = 0;
-  
+
   // digipeater addresses
   for (int i = 0; i < RptMaxCount; i++) {
     if ((rxPayload[(i + 2) * CallsignSize - 1] & 1) == 0) {

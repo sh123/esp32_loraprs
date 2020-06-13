@@ -4,7 +4,7 @@ LoraPrs::LoraPrs()
   : serialBt_()
   , kissState_(KissState::Void)
   , kissCmd_(KissCmd::NoCmd)
-{ 
+{
 }
 
 void LoraPrs::setup(const LoraPrsConfig &conf)
@@ -142,15 +142,16 @@ void LoraPrs::loop()
 
 void LoraPrs::onRfAprsReceived(String aprsMessage)
 {
+  Serial.print(aprsMessage);
+
   if (isClient_) return;
-  
+
   if (WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
   if (!aprsisConn_.connected()) {
     reconnectAprsis();
   }
-  Serial.print(aprsMessage);
   aprsisConn_.print(aprsMessage);
 
   if (!persistentConn_) {
