@@ -21,7 +21,7 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 # Software Setup
 - when setting up APRSDroid, use **"TNC (KISS)"** connection protocol in Connection Preferences -> Connection Protocol
 - go to esp32_loraprs.ino and make next changes based on your requirements in `initializeConfig()`
-  - set `cfg.IsClientMode` to `false` if you are planning to run server mode for APRS-IS iGate
+  - set `cfg.IsClientMode` to `false` if you are planning to run server mode for APRS-IS iGate / Digipeater
   - for server mode fill `cfg.WifiSsid` and `cfg.WifiKey` with your WiFI AP data
   - for server mode fill `cfg.AprsLogin` and `cfg.AprsPass` with APRS-IS login callsign and pass
   - for server mode fill `cfg.AprsFilter`, see http://www.aprs-is.net/javAPRSFilter.aspx for various formats
@@ -49,7 +49,6 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
    - `cfg.EnableRfToIs` set to `true` to forward RF traffic to APRS-IS
    - `cfg.EnableIsToRf` set to `true` to forward APRS-IS traffic to RF, see also `cfg.AprsFilter` for traffic filtering
    - `cfg.EnableRepeater` set to `true` to enable packet repeater
-   - `cfg.EnableSignalReport` set to `true` to enable signal report into the comment submitted to APRS-IS
    - `cfg.EnableBeacon` set to `true` to enable periodic beacons specified in `cfg.AprsRawBeacon` with period specified in `cfg.AprsRawBeaconPeriodMinutes` into RF and APRS-IS if `cfg.EnableRfToIs` is enabled
 
 # Test Results
