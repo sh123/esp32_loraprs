@@ -5,7 +5,10 @@ Amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem and LoRa APRS-IS i
 
 Can be used in two modes: 
 - **as a LoRa APRS client**, you need to use APRSDroid application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth. By having two clients you can not only send your position, but also send and receive APRS messages.
-- **as a LoRa APRS iGate server**, which connects to your WiFI and forwards received LoRa APRS positions into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations (could be enabled or disabled). It also supports **APRS-IS to RF gating**, so it is possible to enable it together with the filter in the config.
+- **as a LoRa APRS iGate server**, which connects to your WiFI and forwards received LoRa APRS positions into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations (could be enabled or disabled). It also supports:
+  - **APRS-IS to RF gating**, so it is possible to enable it together with the filter in the config
+  - **RF digirepating** for basic `WIDEn-n` paths, `TRACE` and others are not supported yet
+  - Own station periodic beacon announcement to APRS-IS and RF
 
 # Compatible Boards
 All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 board is compatible then it should work, but there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section)
@@ -39,12 +42,12 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 - note, that there a is **significant frequency drift** on temperature changes for different modules
   - you need to use **external TCXO** if you are planning to use modules for narrow bandwidths less than 125 kHz 
   - or calibrate clients based on server frequency drift report by changing `cfg.LoraFreq`, for example, let client and server run for an 30-60 minutes and if server reports err: -1500, then set client frequency to about 1000 kHz less, e.g. instead of 433.775 set it to 433.774, this will give couple of additional dB
-  - alternatively automatic calibration could be done on server or client side by enabling automatic frequency correction by setting `cfg.EnableAutoFreqCorrection` to **true**, might be suitable for experiments where only one client is operating or if server broadcast messages, so clients can correct their frequency
+  - alternatively automatic calibration could be done on server or client side by enabling automatic frequency correction by setting `cfg.EnableAutoFreqCorrection` to `true`, might be suitable for experiments where only one client is operating or if server broadcast messages, so clients can correct their frequency
  - other useful options are
    - `cfg.EnableSignalReport` set to `true` to enable signal report, it will be added as a comment to APRS-IS submitted location
    - `cfg.EnablePersistentAprsConnection` set to `false` to avoid keeping connection open to APRS-IS
    - `cfg.EnableIsToRf` set to `true` to forward APRS-IS traffic to RF, see also `cfg.AprsFilter` for traffic filtering
-   - **[INACTIVE YET]** `cfg.EnableRepeater` set to `true` to enable packet repeater
+   - `cfg.EnableRepeater` set to `true` to enable packet repeater
 
 # Test Results
 ![alt text](images/setup.png)
