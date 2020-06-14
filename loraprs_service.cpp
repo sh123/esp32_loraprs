@@ -1,13 +1,15 @@
-#include "loraprs.h"
+#include "loraprs_service.h"
 
-LoraPrs::LoraPrs() 
+namespace LoraPrs {
+  
+Service::Service() 
   : serialBt_()
   , kissState_(KissState::Void)
   , kissCmd_(KissCmd::NoCmd)
 {
 }
 
-void LoraPrs::setup(const LoraPrsConfig &conf)
+void Service::setup(const Config &conf)
 {
   previousBeaconMs_ = 0;
 
@@ -52,7 +54,7 @@ void LoraPrs::setup(const LoraPrsConfig &conf)
   }
 }
 
-void LoraPrs::setupWifi(const String &wifiName, const String &wifiKey)
+void Service::setupWifi(const String &wifiName, const String &wifiKey)
 {
   if (!isClient_) {
     Serial.print("WIFI connecting to " + wifiName);
@@ -70,7 +72,7 @@ void LoraPrs::setupWifi(const String &wifiName, const String &wifiKey)
   }
 }
 
-void LoraPrs::reconnectWifi()
+void Service::reconnectWifi()
 {
   Serial.print("WIFI re-connecting...");
 
@@ -83,7 +85,7 @@ void LoraPrs::reconnectWifi()
   Serial.println("ok");
 }
 
-bool LoraPrs::reconnectAprsis()
+bool Service::reconnectAprsis()
 {
   Serial.print("APRSIS connecting...");
   
@@ -97,7 +99,7 @@ bool LoraPrs::reconnectAprsis()
   return true;
 }
 
-void LoraPrs::setupLora(int loraFreq, int bw, byte sf, byte cr, byte pwr, byte sync)
+void Service::setupLora(int loraFreq, int bw, byte sf, byte cr, byte pwr, byte sync)
 {
   Serial.print("LoRa init...");
   
@@ -117,7 +119,7 @@ void LoraPrs::setupLora(int loraFreq, int bw, byte sf, byte cr, byte pwr, byte s
   Serial.println("ok");  
 }
 
-void LoraPrs::setupBt(const String &btName)
+void Service::setupBt(const String &btName)
 {
   Serial.print("BT init " + btName + "...");
   
@@ -130,7 +132,7 @@ void LoraPrs::setupBt(const String &btName)
   }
 }
 
-void LoraPrs::loop()
+void Service::loop()
 {
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
@@ -153,7 +155,7 @@ void LoraPrs::loop()
   delay(10);
 }
 
-void LoraPrs::sendBeacon()
+void Service::sendBeacon()
 {
   long currentMs = millis();
   
@@ -172,7 +174,7 @@ void LoraPrs::sendBeacon()
       previousBeaconMs_ = currentMs;
   }
 }
-void LoraPrs::sendToAprsis(String aprsMessage)
+void Service::sendToAprsis(String aprsMessage)
 {
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
@@ -187,7 +189,7 @@ void LoraPrs::sendToAprsis(String aprsMessage)
   }
 }
 
-void LoraPrs::onAprsisDataAvailable()
+void Service::onAprsisDataAvailable()
 {
   String aprsisData;
   
@@ -210,7 +212,7 @@ void LoraPrs::onAprsisDataAvailable()
   }
 }
 
-bool LoraPrs::sendToLora(const AX25::Payload &payload) 
+bool Service::sendToLora(const AX25::Payload &payload) 
 {
   byte buf[512];
   int bytesWritten = payload.ToBinary(buf, sizeof(buf));
@@ -225,7 +227,7 @@ bool LoraPrs::sendToLora(const AX25::Payload &payload)
   return true;
 }
 
-void LoraPrs::onLoraDataAvailable(int packetSize)
+void Service::onLoraDataAvailable(int packetSize)
 {
   int rxBufIndex = 0;
   byte rxBuf[packetSize];
@@ -292,13 +294,13 @@ void LoraPrs::onLoraDataAvailable(int packetSize)
   delay(50);
 }
 
-void LoraPrs::kissResetState()
+void Service::kissResetState()
 {
   kissCmd_ = KissCmd::NoCmd;
   kissState_ = KissState::Void;
 }
 
-void LoraPrs::onBtDataAvailable() 
+void Service::onBtDataAvailable() 
 { 
   while (serialBt_.available()) {
     byte txByte = serialBt_.read();
@@ -355,3 +357,5 @@ void LoraPrs::onBtDataAvailable()
   }
   delay(20);
 }
+
+} // LoraPrs

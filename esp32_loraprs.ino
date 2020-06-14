@@ -1,12 +1,12 @@
 #include <timer.h>
 #include "WiFi.h"
-#include "loraprs.h"
+#include "loraprs_service.h"
 
 #define LED_BUILTIN         2
 #define LED_TOGGLE_PERIOD   1000
 
-LoraPrsConfig cfg;
-LoraPrs loraPrs;
+LoraPrs::Config cfg;
+LoraPrs::Service loraPrsService;
 
 auto watchdogLedTimer = timer_create_default();
 
@@ -57,13 +57,13 @@ void setup() {
   while (!Serial);
 
   initializeConfig();
-  loraPrs.setup(cfg);
+  loraPrsService.setup(cfg);
 
   watchdogLedTimer.every(LED_TOGGLE_PERIOD, toggleWatchdogLed);
 }
 
 void loop() {
-  loraPrs.loop();
+  loraPrsService.loop();
   watchdogLedTimer.tick();
 }
 

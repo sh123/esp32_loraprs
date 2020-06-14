@@ -1,5 +1,5 @@
-#ifndef LORAPRS_H
-#define LORAPRS_H
+#ifndef LORAPRS_SEVICE_H
+#define LORAPRS_SERVICE_H
 
 #include <Arduino.h>
 #include <SPI.h>
@@ -8,46 +8,16 @@
 
 #include "BluetoothSerial.h"
 #include "ax25_payload.h"
+#include "loraprs_config.h"
 
-struct LoraPrsConfig
-{
-  bool IsClientMode;
-  
-  long LoraFreq;
-  int LoraBw;
-  byte LoraSf;
-  byte LoraCodingRate;
-  byte LoraSync;
-  byte LoraPower;
+namespace LoraPrs {
 
-  int AprsPort;
-  String AprsHost;
-  String AprsLogin;
-  String AprsPass;
-  String AprsFilter;
-  String AprsRawBeacon;
-  int AprsRawBeaconPeriodMinutes;
-  
-  String BtName;
-  
-  String WifiSsid;
-  String WifiKey;
-
-  bool EnableSignalReport;
-  bool EnableAutoFreqCorrection;
-  bool EnablePersistentAprsConnection;
-  bool EnableRfToIs;
-  bool EnableIsToRf;
-  bool EnableRepeater;
-  bool EnableBeacon;
-};
-
-class LoraPrs
+class Service
 {
 public:
-  LoraPrs();
+  Service();
   
-  void setup(const LoraPrsConfig &conf);
+  void setup(const Config &conf);
   void loop();
 
 private:
@@ -132,4 +102,6 @@ private:
   WiFiClient aprsisConn_;
 };
 
-#endif // LORAPRS_H
+} // LoraPrs
+
+#endif // LORAPRS_SERVICE_H
