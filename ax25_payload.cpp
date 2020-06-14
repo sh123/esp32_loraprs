@@ -105,21 +105,26 @@ bool Payload::fromBinary(const byte *rxPayload, int payloadLength)
   
   // destination address
   dstCall_ = AX25::Callsign(rxPtr, CallsignSize);
+  if (!dstCall_.IsValid()) return false;
   rxPtr += CallsignSize;
   if (rxPtr >= rxEnd) return false;
 
   // source address
   srcCall_ = AX25::Callsign(rxPtr, CallsignSize);
+  if (!srcCall_.IsValid()) return false;
   rxPtr += CallsignSize;
   if (rxPtr >= rxEnd) return false;
 
   rptCallsCount_ = 0;
 
   // digipeater addresses
-  for (int i = 0; i < RptMaxCount; i++) {
+  for (int i = 0, j = 0; i < RptMaxCount; i++) {
     if ((rxPayload[(i + 2) * CallsignSize - 1] & 1) == 0) {
-      rptCalls_[i] = AX25::Callsign(rxPtr, CallsignSize);
-      rptCallsCount_++;
+      rptCalls_[j] = AX25::Callsign(rxPtr, CallsignSize);
+      if (rptCalls_[j].IsValid()) {
+        rptCallsCount_++;
+        j++;
+      }
       rxPtr += CallsignSize;
       if (rxPtr >= rxEnd) return false;
     }
@@ -150,7 +155,8 @@ bool Payload::fromString(String inputText)
   if (rptIndex == -1 || infoIndex == -1) return false;
 
   info_ = inputText.substring(infoIndex + 1);
-  srcCall_ = inputText.substring(0, rptIndex);
+  srcCall_ = AX25::Callsign(inputText.substring(0, rptIndex));
+  if (!srcCall_.IsValid()) return false;
   String paths = inputText.substring(rptIndex + 1, infoIndex);
   
   rptCallsCount_ = 0;
@@ -159,11 +165,14 @@ bool Payload::fromString(String inputText)
     int nextIndex = paths.indexOf(',', index);
     String pathItem = paths.substring(index, nextIndex == -1 ? paths.length() : nextIndex);
     if (index == 0) {
-      dstCall_ = pathItem;
+      dstCall_ = AX25::Callsign(pathItem);
+      if (!dstCall_.IsValid()) return false;
     }
     else {
-      rptCallsCount_++;
-      rptCalls_[rptCallsCount_ - 1] = pathItem;
+      rptCalls_[rptCallsCount_] = AX25::Callsign(pathItem);
+      if (rptCalls_[rptCallsCount_].IsValid()) {
+        rptCallsCount_++;
+      }
     }
     if (nextIndex == -1) break;
     index = nextIndex + 1;

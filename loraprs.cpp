@@ -9,6 +9,9 @@ LoraPrs::LoraPrs()
 
 void LoraPrs::setup(const LoraPrsConfig &conf)
 {
+  previousBeaconMs_ = 0;
+
+  // config
   isClient_ = conf.IsClientMode;
   loraFreq_ = conf.LoraFreq;
   ownCallsign_ = conf.AprsLogin;
@@ -22,6 +25,8 @@ void LoraPrs::setup(const LoraPrsConfig &conf)
   
   aprsHost_ = conf.AprsHost;
   aprsPort_ = conf.AprsPort;
+  aprsBeacon_ = conf.AprsRawBeacon;
+  aprsBeaconPeriodMinutes_ = conf.AprsRawBeaconPeriodMinutes;
   
   autoCorrectFreq_ = conf.EnableAutoFreqCorrection;
   addSignalReport_ = conf.EnableSignalReport;
@@ -29,13 +34,20 @@ void LoraPrs::setup(const LoraPrsConfig &conf)
   enableRfToIs_ = conf.EnableRfToIs;
   enableIsToRf_ = conf.EnableIsToRf;
   enableRepeater_ = conf.EnableRepeater;
-  
-  setupWifi(conf.WifiSsid, conf.WifiKey);
-  
+  enableBeacon_ = conf.EnableBeacon;
+
+  // peripherals
   setupLora(conf.LoraFreq, conf.LoraBw, conf.LoraSf, conf.LoraCodingRate, conf.LoraPower, conf.LoraSync);
-  setupBt(conf.BtName);
+    
+  if (needsWifi()) {
+    setupWifi(conf.WifiSsid, conf.WifiKey);
+  }
+
+  if (needsBt()) {
+    setupBt(conf.BtName);
+  }
   
-  if (!isClient_ && persistentConn_) {
+  if (needsAprsis() && persistentConn_) {
     reconnectAprsis();
   }
 }
@@ -107,31 +119,27 @@ void LoraPrs::setupLora(int loraFreq, int bw, byte sf, byte cr, byte pwr, byte s
 
 void LoraPrs::setupBt(const String &btName)
 {
-  if (isClient_) {
-    Serial.print("BT init " + btName + "...");
+  Serial.print("BT init " + btName + "...");
   
-    if (serialBt_.begin(btName)) {
-      Serial.println("ok");
-    }
-    else
-    {
-      Serial.println("failed");
-    }
+  if (serialBt_.begin(btName)) {
+    Serial.println("ok");
+  }
+  else
+  {
+    Serial.println("failed");
   }
 }
 
 void LoraPrs::loop()
 {
-  if (!isClient_) {
-    if (WiFi.status() != WL_CONNECTED) {
-      reconnectWifi();
-    }
-    if (!aprsisConn_.connected()) {
-      reconnectAprsis();
-    }
-    if (aprsisConn_.available() > 0) {
-      onAprsisDataAvailable();
-    }
+  if (needsWifi() && WiFi.status() != WL_CONNECTED) {
+    reconnectWifi();
+  }
+  if (needsAprsis() && !aprsisConn_.connected() && persistentConn_) {
+    reconnectAprsis();
+  }
+  if (aprsisConn_.available() > 0) {
+    onAprsisDataAvailable();
   }
   if (serialBt_.available()) {
     onBtDataAvailable();
@@ -139,15 +147,37 @@ void LoraPrs::loop()
   if (int packetSize = LoRa.parsePacket()) {
     onLoraDataAvailable(packetSize);
   }
+  if (needsBeacon()) {
+    sendBeacon();
+  }
   delay(10);
 }
 
+void LoraPrs::sendBeacon()
+{
+  long currentMs = millis();
+  
+  if (previousBeaconMs_ == 0 || currentMs - previousBeaconMs_ >= aprsBeaconPeriodMinutes_ * 60 * 1000) {
+      AX25::Payload payload(aprsBeacon_);
+      if (payload.IsValid()) {
+        sendToLora(payload);
+        if (enableRfToIs_) {
+          sendToAprsis(payload.ToString(String()));
+        }
+        Serial.println("Sent beacon");
+      }
+      else {
+        Serial.println("Beacon payload is invalid");
+      }
+      previousBeaconMs_ = currentMs;
+  }
+}
 void LoraPrs::sendToAprsis(String aprsMessage)
 {
-  if (WiFi.status() != WL_CONNECTED) {
+  if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
-  if (!aprsisConn_.connected()) {
+  if (needsAprsis() && !aprsisConn_.connected()) {
     reconnectAprsis();
   }
   aprsisConn_.print(aprsMessage);
@@ -171,17 +201,17 @@ void LoraPrs::onAprsisDataAvailable()
 
   if (enableIsToRf_ && aprsisData.length() > 0) {
     AX25::Payload payload(aprsisData);
-    sendToLora(payload);
+    if (payload.IsValid()) {
+      sendToLora(payload);
+    }
+    else {
+      Serial.println("Invalid payload from APRSIS");
+    }
   }
 }
 
 bool LoraPrs::sendToLora(const AX25::Payload &payload) 
 {
-  if (!payload.IsValid()) {
-    Serial.println("Invalid payload from APRSIS");
-    return false;
-  }
-  
   byte buf[512];
   int bytesWritten = payload.ToBinary(buf, sizeof(buf));
   if (bytesWritten <= 0) {
@@ -191,7 +221,7 @@ bool LoraPrs::sendToLora(const AX25::Payload &payload)
   }
   LoRa.beginPacket();
   LoRa.write(buf, bytesWritten);
-  LoRa.endPacket(true);
+  LoRa.endPacket();
   return true;
 }
 
@@ -247,7 +277,7 @@ void LoraPrs::onLoraDataAvailable(int packetSize)
   if (payload.IsValid()) {
     String textPayload = payload.ToString(addSignalReport_ ? signalReport : String());
     Serial.print(textPayload);
-    
+
     if (enableRfToIs_ && !isClient_) {
       sendToAprsis(textPayload);
     }

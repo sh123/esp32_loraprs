@@ -25,6 +25,8 @@ struct LoraPrsConfig
   String AprsLogin;
   String AprsPass;
   String AprsFilter;
+  String AprsRawBeacon;
+  int AprsRawBeaconPeriodMinutes;
   
   String BtName;
   
@@ -37,6 +39,7 @@ struct LoraPrsConfig
   bool EnableRfToIs;
   bool EnableIsToRf;
   bool EnableRepeater;
+  bool EnableBeacon;
 };
 
 class LoraPrs
@@ -59,10 +62,17 @@ private:
   void onBtDataAvailable();
   void onAprsisDataAvailable();
 
+  void sendBeacon();
+  
   void sendToAprsis(String aprsMessage);
   bool sendToLora(const AX25::Payload &payload);
 
   void kissResetState();
+
+  inline bool needsAprsis() const { return !isClient_ && (enableRfToIs_ || enableIsToRf_); }
+  inline bool needsWifi() const { return needsAprsis(); }
+  inline bool needsBt() const { return isClient_; }
+  inline bool needsBeacon() const { return !isClient_ && enableBeacon_; }
 
 private:
   enum KissMarker {
@@ -85,21 +95,23 @@ private:
   };
 
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
-  const String CfgAprsSoftware = "APZLRA";
 
   const byte CfgPinSs = 5;
   const byte CfgPinRst = 26;
   const byte CfgPinDio0 = 14;
 
 private:
+  // config
   bool isClient_;
   long loraFreq_;
 
   String ownCallsign_;
-  
+
   String aprsHost_;
   int aprsPort_;
   String aprsLogin_;
+  String aprsBeacon_;
+  int aprsBeaconPeriodMinutes_;
 
   bool autoCorrectFreq_;
   bool addSignalReport_;
@@ -107,10 +119,15 @@ private:
   bool enableRfToIs_;
   bool enableIsToRf_;
   bool enableRepeater_;
+  bool enableBeacon_;
 
+  // state
   KissCmd kissCmd_;
   KissState kissState_;
 
+  long previousBeaconMs_;
+  
+  // peripherals
   BluetoothSerial serialBt_;
   WiFiClient aprsisConn_;
 };

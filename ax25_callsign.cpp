@@ -96,17 +96,18 @@ bool Callsign::fromString(String callsign)
 {  
   // "ABCDEF-XX"
   if (callsign.length() > CallsignSize + 2 || callsign.length() == 0) return false;
-  
+
   int delimIndex = callsign.indexOf('-');
+
   // "ABCDEF-"
-  if (delimIndex = callsign.length() - 1) return false;
+  if (delimIndex != -1 && delimIndex == callsign.length() - 1) return false;
 
   call_ = callsign;
   ssid_ = 0;
 
   if (delimIndex == -1) {
-    // "ABCDEFG"
-    if (callsign.length() >= CallsignSize) return false;
+    // "ABCDEF"
+    if (call_.length() >= CallsignSize) return false;
   }
   else {
     call_ = callsign.substring(0, delimIndex);
@@ -134,6 +135,8 @@ bool Callsign::fromBinary(const byte *rxPtr, int length)
   
   ssid_ = (*ptr >> 1) & 0x0f;
   call_ = String((char*)callsign);
+  
+  if (call_.length() == 0) return false;
 
   return true;
 }
