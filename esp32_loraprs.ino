@@ -26,10 +26,10 @@ void initializeConfig() {
   // aprs configuration
   cfg.AprsHost = "rotate.aprs2.net";
   cfg.AprsPort = 14580;
-  cfg.AprsLogin = "NOCALL-1";
+  cfg.AprsLogin = "NOCALL-10";
   cfg.AprsPass = "12345";
   cfg.AprsFilter = "r/35.60/139.80/25";
-  cfg.AprsRawBeacon = "NOCALL-1>APZMDM,WIDE1-1:!0000.00N/00000.00E#LoRA 433.775MHz/BW125/SF12/CR7/0xf3";
+  cfg.AprsRawBeacon = "NOCALL-10>APZMDM,WIDE1-1:!0000.00N/00000.00E#LoRA 433.775MHz/BW125/SF12/CR7/0xf3";
   cfg.AprsRawBeaconPeriodMinutes = 20;
 
   // bluetooth device name
