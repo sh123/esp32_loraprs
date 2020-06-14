@@ -46,8 +46,11 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
  - other useful options are
    - `cfg.EnableSignalReport` set to `true` to enable signal report, it will be added as a comment to APRS-IS submitted location
    - `cfg.EnablePersistentAprsConnection` set to `false` to avoid keeping connection open to APRS-IS
+   - `cfg.EnableRfToIs` set to `true` to forward RF traffic to APRS-IS
    - `cfg.EnableIsToRf` set to `true` to forward APRS-IS traffic to RF, see also `cfg.AprsFilter` for traffic filtering
    - `cfg.EnableRepeater` set to `true` to enable packet repeater
+   - `cfg.EnableSignalReport` set to `true` to enable signal report into the comment submitted to APRS-IS
+   - `cfg.EnableBeacon` set to `true` to enable periodic beacons specified in `cfg.AprsRawBeacon` with period specified in `cfg.AprsRawBeaconPeriodMinutes` into RF and APRS-IS if `cfg.EnableRfToIs` is enabled
 
 # Test Results
 ![alt text](images/setup.png)
