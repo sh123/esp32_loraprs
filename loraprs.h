@@ -34,6 +34,7 @@ struct LoraPrsConfig
   bool EnableSignalReport;
   bool EnableAutoFreqCorrection;
   bool EnablePersistentAprsConnection;
+  bool EnableRfToIs;
   bool EnableIsToRf;
   bool EnableRepeater;
 };
@@ -58,7 +59,8 @@ private:
   void onBtDataAvailable();
   void onAprsisDataAvailable();
 
-  void onRfAprsReceived(String aprsMessage);
+  void sendToAprsis(String aprsMessage);
+  bool sendToLora(const AX25::Payload &payload);
 
   void kissResetState();
 
@@ -83,6 +85,7 @@ private:
   };
 
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
+  const String CfgAprsSoftware = "APZLRA";
 
   const byte CfgPinSs = 5;
   const byte CfgPinRst = 26;
@@ -92,6 +95,8 @@ private:
   bool isClient_;
   long loraFreq_;
 
+  String ownCallsign_;
+  
   String aprsHost_;
   int aprsPort_;
   String aprsLogin_;
@@ -99,6 +104,7 @@ private:
   bool autoCorrectFreq_;
   bool addSignalReport_;
   bool persistentConn_;
+  bool enableRfToIs_;
   bool enableIsToRf_;
   bool enableRepeater_;
 

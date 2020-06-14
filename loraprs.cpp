@@ -11,6 +11,7 @@ void LoraPrs::setup(const LoraPrsConfig &conf)
 {
   isClient_ = conf.IsClientMode;
   loraFreq_ = conf.LoraFreq;
+  ownCallsign_ = conf.AprsLogin;
   
   aprsLogin_ = String("user ") + conf.AprsLogin + String(" pass ") + 
     conf.AprsPass + String(" vers ") + CfgLoraprsVersion;
@@ -25,6 +26,7 @@ void LoraPrs::setup(const LoraPrsConfig &conf)
   autoCorrectFreq_ = conf.EnableAutoFreqCorrection;
   addSignalReport_ = conf.EnableSignalReport;
   persistentConn_ = conf.EnablePersistentAprsConnection;
+  enableRfToIs_ = conf.EnableRfToIs;
   enableIsToRf_ = conf.EnableIsToRf;
   enableRepeater_ = conf.EnableRepeater;
   
@@ -140,12 +142,8 @@ void LoraPrs::loop()
   delay(10);
 }
 
-void LoraPrs::onRfAprsReceived(String aprsMessage)
+void LoraPrs::sendToAprsis(String aprsMessage)
 {
-  Serial.print(aprsMessage);
-
-  if (isClient_) return;
-
   if (WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
@@ -173,24 +171,28 @@ void LoraPrs::onAprsisDataAvailable()
 
   if (enableIsToRf_ && aprsisData.length() > 0) {
     AX25::Payload payload(aprsisData);
-
-    if (payload.IsValid()) {
-
-      byte buf[512];
-      int bytesWritten = payload.ToBinary(buf, sizeof(buf));
-      if (bytesWritten > 0) {
-        LoRa.beginPacket();
-        LoRa.write(buf, bytesWritten);
-        LoRa.endPacket(true);
-      }
-      else {
-        Serial.println("Failed to serialize payload");
-      }
-    }
-    else {
-      Serial.println("Invalid payload from APRSIS");
-    }
+    sendToLora(payload);
   }
+}
+
+bool LoraPrs::sendToLora(const AX25::Payload &payload) 
+{
+  if (!payload.IsValid()) {
+    Serial.println("Invalid payload from APRSIS");
+    return false;
+  }
+  
+  byte buf[512];
+  int bytesWritten = payload.ToBinary(buf, sizeof(buf));
+  if (bytesWritten <= 0) {
+    Serial.println("Failed to serialize payload");
+    return false;
+  
+  }
+  LoRa.beginPacket();
+  LoRa.write(buf, bytesWritten);
+  LoRa.endPacket(true);
+  return true;
 }
 
 void LoraPrs::onLoraDataAvailable(int packetSize)
@@ -243,7 +245,15 @@ void LoraPrs::onLoraDataAvailable(int packetSize)
   AX25::Payload payload(rxBuf, rxBufIndex);
 
   if (payload.IsValid()) {
-    onRfAprsReceived(payload.ToText(addSignalReport_ ? signalReport : String()));
+    String textPayload = payload.ToString(addSignalReport_ ? signalReport : String());
+    Serial.print(textPayload);
+    
+    if (enableRfToIs_ && !isClient_) {
+      sendToAprsis(textPayload);
+    }
+    if (enableRepeater_ && payload.Digirepeat(ownCallsign_)) {
+      sendToLora(payload);
+    }
   }
   else {
     Serial.println("Invalid payload from LoRA");

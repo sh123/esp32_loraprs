@@ -1,7 +1,9 @@
-#ifndef APRSMSG_H
-#define APRSMSG_H
+#ifndef AX25_PAYLOAD_H
+#define AX25_PAYLOAD_H
 
 #include <Arduino.h>
+
+#include "ax25_callsign.h"
 
 namespace AX25 {
   
@@ -13,17 +15,15 @@ public:
 
   inline bool IsValid() const { return isValid_; }
   
-  String ToText(String customComment);
-  int ToBinary(byte *txPayload, int bufferLength);
+  String ToString(String customComment);
+  int ToBinary(byte *txPayload, int bufferLength) const;
 
+  bool Digirepeat(const String &ownCallsign);
   void Dump();
 
 private:
-  String decodeCall(const byte *rxPtr);
-  bool encodeCall(String callsign, byte *txPtr, int bufferLength);
-
-  bool parseString(String inputText);
-  bool parsePayload(const byte *rxPayload, int payloadLength);
+  bool fromString(String inputText);
+  bool fromBinary(const byte *rxPayload, int payloadLength);
   
 private:
   enum AX25Ctrl {
@@ -39,8 +39,8 @@ private:
 
 private:
   bool isValid_;
-  String srcCall_, dstCall_;
-  String rptCalls_[7];
+  Callsign srcCall_, dstCall_;
+  Callsign rptCalls_[7];
   int rptCallsCount_;
   String info_;
 };

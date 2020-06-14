@@ -5,47 +5,47 @@ namespace AX25 {
 Payload::Payload(byte *rxPayload, int payloadLength)
   : rptCallsCount_(0)
 {
-  isValid_ = parsePayload(rxPayload, payloadLength);
+  isValid_ = fromBinary(rxPayload, payloadLength);
 }
 
 Payload::Payload(String inputText)
   : rptCallsCount_(0)
 {
-  isValid_ = parseString(inputText);
+  isValid_ = fromString(inputText);
 }
 
 void Payload::Dump() 
 {
   Serial.println();
   Serial.print("valid: "); Serial.println(isValid_);
-  Serial.println("src: " + srcCall_);
-  Serial.println("dst: " + dstCall_);
+  Serial.println("src: " + srcCall_.ToString());
+  Serial.println("dst: " + dstCall_.ToString());
   Serial.print("rpt: ");
   for (int i = 0; i < rptCallsCount_; i++) {
-    Serial.print(rptCalls_[i] + " ");
+    Serial.print(rptCalls_[i].ToString() + " ");
   }
   Serial.println();
   Serial.println("info: " + info_);
 }
 
-int Payload::ToBinary(byte *txPayload, int bufferLength)
+int Payload::ToBinary(byte *txPayload, int bufferLength) const
 {
   byte *txPtr = txPayload;
   byte *txEnd = txPayload + bufferLength;
 
   // destination address
-  if (!encodeCall(dstCall_, txPtr, CallsignSize)) return 0;
+  if (!dstCall_.ToBinary(txPtr, CallsignSize)) return 0;
   txPtr += CallsignSize;
   if (txPtr >= txEnd) return 0;
 
   // source address
-  if (!encodeCall(srcCall_, txPtr, CallsignSize)) return 0;
+  if (!srcCall_.ToBinary(txPtr, CallsignSize)) return 0;
   txPtr += CallsignSize;
   if (txPtr >= txEnd) return 0;
   
   // digipeater addresses
   for (int i = 0; i < rptCallsCount_; i++) {
-    if (!encodeCall(rptCalls_[i], txPtr, CallsignSize)) return 0;
+    if (!rptCalls_[i].ToBinary(txPtr, CallsignSize)) return 0;
     txPtr += CallsignSize;
     if (txPtr >= txEnd) return 0;
   }
@@ -67,37 +67,49 @@ int Payload::ToBinary(byte *txPayload, int bufferLength)
   return (int)(txPtr-txPayload);
 }
 
-String Payload::ToText(String customComment)
+String Payload::ToString(String customComment)
 {
-  String txt = srcCall_ + String(">") + dstCall_;
+  String txt = srcCall_.ToString() + String(">") + dstCall_.ToString();
 
   for (int i = 0; i < rptCallsCount_; i++) {
-    if (rptCalls_[i].length() > 0) {
-      txt += String(",") + rptCalls_[i];
+    if (rptCalls_[i].IsValid()) {
+      txt += String(",") + rptCalls_[i].ToString();
     }
   }
-  
+
   txt += String(":") + info_;
 
   if (info_.startsWith("=")) {
     txt += customComment;
   }
-  
+
   return txt + String("\n");
 }
 
-bool Payload::parsePayload(const byte *rxPayload, int payloadLength)
+bool Payload::Digirepeat(const String &ownCallsign)
+{
+  for (int i = 0; i < rptCallsCount_; i++) {    
+    if (rptCalls_[i].Digirepeat(ownCallsign)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool Payload::fromBinary(const byte *rxPayload, int payloadLength)
 {
   const byte *rxPtr = rxPayload;
   const byte *rxEnd = rxPayload + payloadLength;
-
+  
+  if (payloadLength < CallsignSize) return false;
+  
   // destination address
-  dstCall_ = decodeCall(rxPtr);
+  dstCall_ = AX25::Callsign(rxPtr, CallsignSize);
   rxPtr += CallsignSize;
   if (rxPtr >= rxEnd) return false;
 
   // source address
-  srcCall_ = decodeCall(rxPtr);
+  srcCall_ = AX25::Callsign(rxPtr, CallsignSize);
   rxPtr += CallsignSize;
   if (rxPtr >= rxEnd) return false;
 
@@ -106,7 +118,7 @@ bool Payload::parsePayload(const byte *rxPayload, int payloadLength)
   // digipeater addresses
   for (int i = 0; i < RptMaxCount; i++) {
     if ((rxPayload[(i + 2) * CallsignSize - 1] & 1) == 0) {
-      rptCalls_[i] = decodeCall(rxPtr);
+      rptCalls_[i] = AX25::Callsign(rxPtr, CallsignSize);
       rptCallsCount_++;
       rxPtr += CallsignSize;
       if (rxPtr >= rxEnd) return false;
@@ -129,7 +141,7 @@ bool Payload::parsePayload(const byte *rxPayload, int payloadLength)
   return true;
 }
 
-bool Payload::parseString(String inputText)
+bool Payload::fromString(String inputText)
 {
   int rptIndex = inputText.indexOf('>');
   int infoIndex = inputText.indexOf(':');
@@ -158,62 +170,6 @@ bool Payload::parseString(String inputText)
   }
   
   return true;
-}
-
-bool Payload::encodeCall(String inputText, byte *txPtr, int bufferLength)
-{
-  if (bufferLength < CallsignSize) return false;
-
-  String callsign = inputText;
-  byte ssid = 0;
-
-  int delimIndex = inputText.indexOf('-');
-  if (delimIndex + 1 >= inputText.length()) return false;
-
-  if (delimIndex != -1) {
-    callsign = inputText.substring(0, delimIndex);
-    ssid = inputText.substring(delimIndex + 1).toInt();
-  }
-
-  byte *ptr = txPtr;
-
-  memset(ptr, 0, bufferLength);
-
-  for (int i = 0; i < CallsignSize - 1; i++) {
-    if (i < callsign.length()) {
-      char c = callsign.charAt(i);
-      *(ptr++) = c << 1;
-    }
-    else {
-      *(ptr++) = char(' ') << 1;
-    }
-  }
-  *(txPtr + CallsignSize - 1) = ssid << 1;
-
-  return true;
-}
-
-String Payload::decodeCall(const byte *rxPtr)
-{
-  byte callsign[CallsignSize];
-  
-  const byte *ptr = rxPtr;
-
-  memset(callsign, 0, sizeof(callsign));
-    
-  for (int i = 0; i < CallsignSize - 1; i++) {
-    char c = *(ptr++) >> 1;
-    callsign[i] = (c == ' ') ? '\0' : c;
-  }
-  callsign[CallsignSize-1] = '\0';
-  byte ssid = (*ptr >> 1) & 0x0f;
-  
-  String result = String((char*)callsign);
-  
-  if (result.length() > 0 && ssid != 0) {
-    result += String("-") + String(ssid);
-  }
-  return result;
 }
 
 } // AX25

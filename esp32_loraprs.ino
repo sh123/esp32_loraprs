@@ -34,6 +34,7 @@ void initializeConfig() {
   cfg.EnableSignalReport = true;
   cfg.EnableAutoFreqCorrection = true;
   cfg.EnablePersistentAprsConnection = true;
+  cfg.EnableRfToIs = true;
   cfg.EnableIsToRf = false;
   cfg.EnableRepeater = false;
 }
