@@ -7,11 +7,11 @@ Can be used in two modes:
 - **LoRa APRS KISS client over bluetooth** 
   - you need to use **APRSDroid** application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth. By having two clients you can not only send your position, but also send and receive APRS messages
   - it is also possible to use **other KISS APRS clients** over Bluetooth serial, just use `rfcomm` on Linux to setup serial over Bluetooth and put up AX25 interface with `kissattach`, then use any existing Linux APRS clients, such as `Xastir` or even run `TCPIP` over AX25
-- **LoRa APRS iGate RX/TX server + digipeater**
-  - **RF to APRS-IS gating**, it will connect to WiFI and will forward received APRS positions from RF LoRAa into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations (could be enabled or disabled from config)
+- **LoRa APRS iGate RX/TX server + Digipeater**
+  - **RF to APRS-IS gating**, it will connect to WiFI and will forward received APRS positions from RF LoRa into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations (could be enabled or disabled from config)
   - **APRS-IS to RF gating**, it is possible to enable it together with the filter in the config, so APRS-IS data will be forwarded to RF
   - **RF digirepating** for basic `WIDEn-n` paths, `TRACE` and others are not supported yet
-  - **Self beaconing**, own station periodic beacon announcement to APRS-IS and RF
+  - **beaconing**, own station periodic beacon announcement to APRS-IS and RF
 
 # Compatible Boards
 All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 board is compatible then it should work, but there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section)
@@ -72,6 +72,8 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
     - https://github.com/sh123/aprsdroid/tree/aprsdroid_compressed_gradle
 - Polarization
   - Using **horizontal polarization** improves successful decoding probability and receiving range
+- Interference
+  - Monitor your planned frequency, such as 433.775 MHz for ISM device activity, if there is strong interference from other users tune it to minimize interference
 - Weather
   - Rain and high humidity levels decrease signal level by about **~3-6 dB**
 
