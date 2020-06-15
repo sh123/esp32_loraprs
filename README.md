@@ -1,14 +1,15 @@
-# LoRa APRS ESP32 APRSDroid bluetooth modem, LoRa APRS-IS RX/TX iGate with digirepeater
-Amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem, LoRa APRS-IS RX/TX iGate server over WiFI plus digirepeater
+# LoRa APRS ESP32 KISS APRSDroid bluetooth modem, LoRa APRS-IS RX/TX iGate with digirepeater
+Amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem + LoRa APRS-IS RX/TX iGate server over WiFI + digirepeater
 
 ![alt text](images/pinouts.png)
 
 Can be used in two modes: 
-- **as a LoRa APRS client**, you need to use APRSDroid application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth. By having two clients you can not only send your position, but also send and receive APRS messages.
-- **as a LoRa APRS iGate server**, which connects to your WiFI and forwards received LoRa APRS positions into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations (could be enabled or disabled). It also supports:
-  - **APRS-IS to RF gating**, so it is possible to enable it together with the filter in the config
+- **LoRa APRS KISS client over bluetooth**, you need to use APRSDroid application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth. By having two clients you can not only send your position, but also send and receive APRS messages. Alternatively, it is possible to use other KISS APRS clients over serial, just use `rfcomm` on Linux to setup serial over Bluetooth and put up AX25 interface with `kissattach`
+- **LoRa APRS iGate RX/TX server**
+  - **RF to APRS-IS gating**, it will connect to WiFI and will forward received APRS positions from RF LoRAa into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations (could be enabled or disabled from config)
+  - **APRS-IS to RF gating**, it is possible to enable it together with the filter in the config, so APRS-IS data will be forwarded to RF
   - **RF digirepating** for basic `WIDEn-n` paths, `TRACE` and others are not supported yet
-  - Own station periodic beacon announcement to APRS-IS and RF
+  - **Self beaconing**, own station periodic beacon announcement to APRS-IS and RF
 
 # Compatible Boards
 All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 board is compatible then it should work, but there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section)
