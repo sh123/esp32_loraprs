@@ -71,7 +71,7 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
   - **About 17km** maximum (non-reliable) between base and mobile station with antenna on the car roof
   - **About 20km** over the sea between base and handheld
 - Signal levels
-  - Successful decodes down to **-19.75dB** below the noise floor when using compressed APRS coordinates (smaller packets, about 50 bytes, 32 bytes without PATH, speed, altitude), see APRSDroid discussions on compressed corrdinates support and custom branches
+  - Successful decodes down to **-19.75dB** below the noise floor when using compressed APRS coordinates (smaller packets, about 50 bytes, **32 bytes without PATH, speed, altitude**), see APRSDroid discussions on compressed corrdinates support and custom branches
     - https://github.com/ge0rg/aprsdroid/pull/159
     - https://github.com/ge0rg/aprsdroid/issues/170
     - https://github.com/sh123/aprsdroid/tree/aprsdroid_compressed
