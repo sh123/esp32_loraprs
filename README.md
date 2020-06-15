@@ -39,7 +39,7 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
   - lora coding rate `cfg.LoraCodingRate`, 7
   - lora output power `cfg.LoraPower`, 20 (max 20 dBm ~ 100mW, change to lower value if needed)
   - sync word `cfg.LoraSync`, 0xf3
-- consider minimum decode level based on on BW + SF ![alt text](images/bandwidth_vs_sf.jpg)
+- consider minimum decode level based on on BW + SF and required throughput ![alt text](images/bandwidth_vs_sf.jpg)
 - use 80 MHz ESP32 frequency in Arduino SDK, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
 - uses LoRa **built-in checksum** calculation to drop broken packets
 - note, that there a is **significant frequency drift** on temperature changes for different modules
