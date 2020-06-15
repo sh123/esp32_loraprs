@@ -14,7 +14,13 @@ Can be used in two modes:
   - **beaconing**, own station periodic beacon announcement to APRS-IS and RF
 
 # Compatible Boards
-All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 board is compatible then it should work, but there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section)
+All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 board is compatible then it should work, but there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section), currently pinouts are connected from LoRa to ESP32-WROOM as:
+- SS: GPIO_5
+- RST: GPIO_26
+- DIO0: GPIO_14
+- MOSI: GPIO_23/VSPI_MOSI
+- MISO: GPIO_19/VSPI_MISO
+- SCK: GPIO_18/VSPI_SCK
 
 # Software Dependencies (install via libraries)
 - Arduino ESP32 library: https://github.com/espressif/arduino-esp32
