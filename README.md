@@ -65,6 +65,7 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 - Antennas
   - Client: rubber duck, halo, mobile antenna on a car roof
   - Server: 7 element UHF yagi indoors, vertical on the roof
+  - With such low power it is very important to have antenna SWR close to 1, many rubber duck antennas are claimed to be 433MHz, but they do not resonante at that frequency at all or resonate only when attached to its native large handheld transceiver, which has enough metal inside to behave like a counterpoise, these antennas have SWR 2 or higher. Check your antenna on antenna analyzer before using, add counterpoise if needed or better to use dipole or halo antenna for that matter
 - Range (20 KHz channel width and 9 spreading factor, also got similar results with 125 kHz and 12 SF)
   - **About 7 km** when server is 30m above the ground and client is 2m above the ground with rubber duck antenna or inside a car
   - **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground with rubber duck antenna
