@@ -40,7 +40,7 @@ void initializeConfig() {
   cfg.WifiKey = "<wifi key>";
 
   // configuration flags and features
-  cfg.EnableAutoFreqCorrection = true;  // automatic tune to any incoming packet frequency
+  cfg.EnableAutoFreqCorrection = false;  // automatic tune to any incoming packet frequency
   cfg.EnableSignalReport = true;  // signal report will be added to the comment sent to aprsis
   cfg.EnablePersistentAprsConnection = true; // keep aprsis connection open, otherwise connect on new data only
   cfg.EnableRfToIs = true;  // send data from rf to aprsis
