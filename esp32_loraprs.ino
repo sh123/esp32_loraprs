@@ -28,7 +28,7 @@ void initializeConfig() {
   cfg.AprsPort = 14580;
   cfg.AprsLogin = "NOCALL-10";
   cfg.AprsPass = "12345";
-  cfg.AprsFilter = "r/35.60/139.80/25";
+  cfg.AprsFilter = "r/35.60/139.80/25"; // multiple filters are space separated
   cfg.AprsRawBeacon = "NOCALL-10>APZMDM,WIDE1-1:!0000.00N/00000.00E#LoRA 433.775MHz/BW125/SF12/CR7/0xf3";
   cfg.AprsRawBeaconPeriodMinutes = 20;
 
