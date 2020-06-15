@@ -57,8 +57,8 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 # Test Results
 ![alt text](images/setup.png)
 - Antennas
-  - Client: rubber duck antenna or mobile antenna on a car roof
-  - Server: 7 element UHF yagi indoors
+  - Client: rubber duck, halo, mobile antenna on a car roof
+  - Server: 7 element UHF yagi indoors, vertical on the roof
 - Range (20 KHz channel width and 9 spreading factor, also got similar results with 125 kHz and 12 SF)
   - **About 7 km** when server is 30m above the ground and client is 2m above the ground with rubber duck antenna or inside a car
   - **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground with rubber duck antenna
