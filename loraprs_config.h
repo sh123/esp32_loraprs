@@ -20,7 +20,7 @@ struct Config
   String AprsHost;      // aprs server hostname, rotate.aprs2.net
   String AprsLogin;     // aprs callsign to use, e.g. MY0CAL-1
   String AprsPass;      // aprs login password
-  String AprsFilter;    // aprs filter, see http://www.aprs-is.net/javAPRSFilter.aspx
+  String AprsFilter;    // aprs filter, see http://www.aprs-is.net/javAPRSFilter.aspx, do not include filter directive, just space separated values
   String AprsRawBeacon; // aprs string for server beacon, e.g. NOCALL-1>APZMDM,WIDE1-1:!0000.00N/00000.00E#LoRA 433.775MHz/BW125/SF12/CR7/0xf3
   int AprsRawBeaconPeriodMinutes; // aprs beacon period
   
