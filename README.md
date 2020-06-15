@@ -4,9 +4,9 @@ Amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem + LoRa APRS-IS RX/
 ![alt text](images/pinouts.png)
 
 Can be used in two modes: 
-- **LoRa APRS KISS client over bluetooth**, 
+- **LoRa APRS KISS client over bluetooth** 
   - you need to use **APRSDroid** application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth. By having two clients you can not only send your position, but also send and receive APRS messages
-  - it is also possible to use **other KISS APRS clients** over serial, just use `rfcomm` on Linux to setup serial over Bluetooth and put up AX25 interface with `kissattach`, then use any existing Linux APRS clients, such as `Xastir` or even run `TCPIP` over AX25
+  - it is also possible to use **other KISS APRS clients** over Bluetooth serial, just use `rfcomm` on Linux to setup serial over Bluetooth and put up AX25 interface with `kissattach`, then use any existing Linux APRS clients, such as `Xastir` or even run `TCPIP` over AX25
 - **LoRa APRS iGate RX/TX server + digipeater**
   - **RF to APRS-IS gating**, it will connect to WiFI and will forward received APRS positions from RF LoRAa into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations (could be enabled or disabled from config)
   - **APRS-IS to RF gating**, it is possible to enable it together with the filter in the config, so APRS-IS data will be forwarded to RF
