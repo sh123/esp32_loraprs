@@ -73,7 +73,7 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 - Polarization
   - Using **horizontal polarization** improves successful decoding probability and receiving range
 - Interference
-  - Monitor your planned frequency, such as 433.775 MHz for ISM device activity, if there is strong interference from other users tune it to minimize interference
+  - Monitor your planned frequency, such as 433.775 MHz for ISM device activity, if there is strong interference from other users tune up or down it to minimize interference
 - Weather
   - Rain and high humidity levels decrease signal level by about **~3-6 dB**
 
