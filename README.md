@@ -36,9 +36,9 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
   - for server mode fill `cfg.AprsFilter`, see http://www.aprs-is.net/javAPRSFilter.aspx for various formats, do not include `filter` directive, just space separated values
   - change `cfg.LoraFreq` if you are planning to use different frequency or if planning to calibrate clients, currently it is set to **433.775MHz** as per https://vienna.iaru-r1.org/wp-content/uploads/2019/01/VIE19-C5-015-OEVSV-LORA-APRS-433-MHz.pdf
 - if you are planning to use different esp32 pinouts then modify loraprs.h
-  - lora module SS, **CfgPinSs**, pin 5
-  - lora module RST, **CfgPinRst**, pin 26
-  - lora module DIO0, **CfgPinDio0**, pin 14
+  - lora module SS, **CfgPinSs**, GPIO_5
+  - lora module RST, **CfgPinRst**, GPIO_26
+  - lora module DIO0, **CfgPinDio0**, GPIO_14
 - if you are planning to experiment with different bandwidths/spread factors then modify values in `initializeConfig()`, with current parameters APRS packet time on air is around **2 seconds** to decode with as lower level as possible, use https://github.com/tanupoo/lorawan_toa to make calculations
   - lora bandwidth `cfg.LoraBw`, 125 kHz (also tested with 20.6 KHz and SF9 with frequency correction)
   - lora spread factor `cfg.LoraSf`, 12 (should decode down to -20dB, choosen with the goal for minimum signal decode)
