@@ -7,7 +7,7 @@ Can be used in two modes:
 - **as a LoRa APRS client**, you need to use APRSDroid application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth. By having two clients you can not only send your position, but also send and receive APRS messages.
 - **as a LoRa APRS iGate server**, which connects to your WiFI and forwards received LoRa APRS positions into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations (could be enabled or disabled). It also supports:
   - **APRS-IS to RF gating**, so it is possible to enable it together with the filter in the config
-  - **RF digirepating** for basic `WIDEn-n` paths, `TRACE` and others are not supported yet
+  - **RF digirepating** for `WIDEn-n`, `TRACEn-n` new style paths, for `TRACE` will insert own callsign before digipeating
   - Own station periodic beacon announcement to APRS-IS and RF
 
 # Compatible Boards
@@ -35,7 +35,7 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
   - lora spread factor `cfg.LoraSf`, 12 (should decode down to -20dB, choosen with the goal for minimum signal decode)
   - lora coding rate `cfg.LoraCodingRate`, 7
   - lora output power `cfg.LoraPower`, 20 (max 20 dBm ~ 100mW, change to lower value if needed)
-  - sync word `cfg.LoraSync`, 0xf3
+  - sync word `cfg.LoraSync`, 0x3f
 - consider minimum decode level based on on BW + SF ![alt text](images/bandwidth_vs_sf.jpg)
 - use 80 MHz ESP32 frequency in Arduino SDK, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
 - uses LoRa **built-in checksum** calculation to drop broken packets

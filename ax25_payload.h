@@ -18,13 +18,15 @@ public:
   String ToString(String customComment);
   int ToBinary(byte *txPayload, int bufferLength) const;
 
-  bool Digirepeat(const String &ownCallsign);
+  bool Digirepeat(const Callsign &ownCallsign);
   void Dump();
 
 private:
   bool fromString(String inputText);
   bool fromBinary(const byte *rxPayload, int payloadLength);
   
+  bool InsertRptCallsign(const Callsign &rptCallsign, int index);
+
 private:
   enum AX25Ctrl {
     UI = 0x03

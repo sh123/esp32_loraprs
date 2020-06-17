@@ -16,11 +16,12 @@ public:
   Callsign(String inputText);
 
   inline bool IsValid() const { return isValid_; };
+  inline bool IsTrace() const { return call_.startsWith("TRACE"); }
   
   String ToString() const;
   bool ToBinary(byte *txPayload, int bufferLength) const;
 
-  bool Digirepeat(const String &ownCallsign);
+  bool Digirepeat();
   
 private:
   bool encode(byte *txPtr, int bufferLength) const;

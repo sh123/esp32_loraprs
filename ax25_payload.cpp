@@ -86,14 +86,32 @@ String Payload::ToString(String customComment)
   return txt + String("\n");
 }
 
-bool Payload::Digirepeat(const String &ownCallsign)
+bool Payload::Digirepeat(const Callsign &ownCallsign)
 {
-  for (int i = 0; i < rptCallsCount_; i++) {    
-    if (rptCalls_[i].Digirepeat(ownCallsign)) {
+  for (int i = 0; i < rptCallsCount_; i++) {   
+    if (rptCalls_[i].Digirepeat()) {
+      // if trace was digirepeated insert own callsign
+      if (rptCalls_[i].IsTrace()) {
+        InsertRptCallsign(ownCallsign, i);
+      }
       return true;
     }
   }
   return false;
+}
+
+bool Payload::InsertRptCallsign(const Callsign &rptCallsign, int index)
+{
+  if (rptCallsCount_ >= RptMaxCount 
+    || index >= RptMaxCount 
+    || index >= rptCallsCount_) return false;
+
+  for (int i = index; i < rptCallsCount_; i++) {
+    rptCalls_[i + 1] = rptCalls_[i];
+  }
+  rptCalls_[index] = rptCallsign;
+  rptCallsCount_++;
+  return true;
 }
 
 bool Payload::fromBinary(const byte *rxPayload, int payloadLength)

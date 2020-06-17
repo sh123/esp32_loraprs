@@ -16,7 +16,10 @@ void Service::setup(const Config &conf)
   // config
   isClient_ = conf.IsClientMode;
   loraFreq_ = conf.LoraFreq;
-  ownCallsign_ = conf.AprsLogin;
+  ownCallsign_ = AX25::Callsign(conf.AprsLogin);
+  if (!ownCallsign_.IsValid()) {
+    Serial.println("Own callsign is not valid");
+  }
   
   aprsLogin_ = String("user ") + conf.AprsLogin + String(" pass ") + 
     conf.AprsPass + String(" vers ") + CfgLoraprsVersion;

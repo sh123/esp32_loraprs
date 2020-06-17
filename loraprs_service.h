@@ -75,7 +75,7 @@ private:
   bool isClient_;
   long loraFreq_;
 
-  String ownCallsign_;
+  AX25::Callsign ownCallsign_;
 
   String aprsHost_;
   int aprsPort_;

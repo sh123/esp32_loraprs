@@ -54,11 +54,11 @@ String Callsign::ToString() const
   return result;
 }
 
-bool Callsign::Digirepeat(const String &ownCallsign)
+bool Callsign::Digirepeat()
 {
-  // only WIDE supported
-  if (call_.startsWith("WIDE*")) return false;
-  if (call_.startsWith("WIDE") && call_.length() >= 5) {
+  // only WIDE and TRACE supported
+  if (call_.startsWith("WIDE*") || call_.startsWith("TRACE*")) return false;
+  if ((call_.startsWith("WIDE") || call_.startsWith("TRACE")) && call_.length() >= 5) {
     char wideLevel = call_.charAt(4);
     if ((wideLevel == '1' || wideLevel == '2' || wideLevel == '3') && ssid_ > 0) {
       if (--ssid_ == 0) {
