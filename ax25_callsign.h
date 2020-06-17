@@ -17,6 +17,8 @@ public:
 
   inline bool IsValid() const { return isValid_; };
   inline bool IsTrace() const { return call_.startsWith("TRACE"); }
+  inline bool IsWide() const { return call_.startsWith("WIDE"); }
+  inline bool IsPath() const { return IsWide(); }
   
   String ToString() const;
   bool ToBinary(byte *txPayload, int bufferLength) const;
@@ -26,7 +28,7 @@ public:
 private:
   bool encode(byte *txPtr, int bufferLength) const;
 
-  bool fromString(String callsign);
+  bool fromString(const String &callsign);
   bool fromBinary(const byte *rxPtr, int payloadLength);
 
 private:

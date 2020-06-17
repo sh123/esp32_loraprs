@@ -56,11 +56,8 @@ String Callsign::ToString() const
 
 bool Callsign::Digirepeat()
 {
-  // only WIDE and TRACE supported
-  if (call_.startsWith("WIDE*") || call_.startsWith("TRACE*")) return false;
-  if ((call_.startsWith("WIDE") || call_.startsWith("TRACE")) && call_.length() >= 5) {
-    char wideLevel = call_.charAt(4);
-    if ((wideLevel == '1' || wideLevel == '2' || wideLevel == '3') && ssid_ > 0) {
+  if (IsPath()) {
+    if (ssid_ > 0) {
       if (--ssid_ == 0) {
         call_ += "*";
       }
@@ -92,8 +89,10 @@ bool Callsign::encode(byte *txPtr, int bufferLength) const
   return true;
 }
 
-bool Callsign::fromString(String callsign) 
-{  
+bool Callsign::fromString(const String &inputCallsign) 
+{
+  String callsign = inputCallsign;
+  
   // "ABCDEF-XX"
   if (callsign.length() > CallsignSize + 2 || callsign.length() == 0) return false;
 
@@ -120,22 +119,22 @@ bool Callsign::fromString(String callsign)
 bool Callsign::fromBinary(const byte *rxPtr, int length)
 {
   if (length < CallsignSize) return false;
-  
+
   byte callsign[CallsignSize];
-  
+
   const byte *ptr = rxPtr;
 
   memset(callsign, 0, sizeof(callsign));
-    
+
   for (int i = 0; i < CallsignSize - 1; i++) {
     char c = *(ptr++) >> 1;
     callsign[i] = (c == ' ') ? '\0' : c;
   }
   callsign[CallsignSize-1] = '\0';
-  
+
   ssid_ = (*ptr >> 1) & 0x0f;
   call_ = String((char*)callsign);
-  
+
   if (call_.length() == 0) return false;
 
   return true;

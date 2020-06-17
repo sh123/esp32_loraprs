@@ -167,9 +167,9 @@ void Service::sendBeacon()
       if (payload.IsValid()) {
         sendToLora(payload);
         if (enableRfToIs_) {
-          sendToAprsis(payload.ToString(String()));
+          sendToAprsis(payload.ToString());
         }
-        Serial.println("Sent beacon");
+        Serial.println("Periodic beacon is sent");
       }
       else {
         Serial.println("Beacon payload is invalid");
@@ -177,6 +177,7 @@ void Service::sendBeacon()
       previousBeaconMs_ = currentMs;
   }
 }
+
 void Service::sendToAprsis(String aprsMessage)
 {
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
@@ -185,7 +186,7 @@ void Service::sendToAprsis(String aprsMessage)
   if (needsAprsis() && !aprsisConn_.connected()) {
     reconnectAprsis();
   }
-  aprsisConn_.print(aprsMessage);
+  aprsisConn_.println(aprsMessage);
 
   if (!persistentConn_) {
     aprsisConn_.stop();
@@ -281,13 +282,15 @@ void Service::onLoraDataAvailable(int packetSize)
 
   if (payload.IsValid()) {
     String textPayload = payload.ToString(addSignalReport_ ? signalReport : String());
-    Serial.print(textPayload);
+    Serial.println(textPayload);
 
     if (enableRfToIs_ && !isClient_) {
       sendToAprsis(textPayload);
+      Serial.println("Packet sent to APRS-IS");
     }
     if (enableRepeater_ && payload.Digirepeat(ownCallsign_)) {
       sendToLora(payload);
+      Serial.println("Packet digirepeated");
     }
   }
   else {

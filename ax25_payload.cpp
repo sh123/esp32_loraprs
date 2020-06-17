@@ -83,7 +83,7 @@ String Payload::ToString(String customComment)
     txt += customComment;
   }
 
-  return txt + String("\n");
+  return txt;
 }
 
 bool Payload::Digirepeat(const Callsign &ownCallsign)

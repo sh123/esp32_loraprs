@@ -15,7 +15,7 @@ public:
 
   inline bool IsValid() const { return isValid_; }
   
-  String ToString(String customComment);
+  String ToString(String customComment=String());
   int ToBinary(byte *txPayload, int bufferLength) const;
 
   bool Digirepeat(const Callsign &ownCallsign);
