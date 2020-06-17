@@ -28,8 +28,8 @@ void initializeConfig() {
   cfg.AprsPort = 14580;
   cfg.AprsLogin = "NOCALL-10";
   cfg.AprsPass = "12345";
-  cfg.AprsFilter = "r/35.60/139.80/25";
-  cfg.AprsRawBeacon = "NOCALL-10>APZMDM,WIDE1-1:!0000.00N/00000.00E#LoRa 433.775MHz/BW125/SF12/CR7/0xf3";
+  cfg.AprsFilter = "r/35.60/139.80/25"; // multiple filters are space separated
+  cfg.AprsRawBeacon = "NOCALL-10>APZMDM,WIDE1-1:!0000.00N/00000.00E#LoRA 433.775MHz/BW125/SF12/CR7/0x3f";
   cfg.AprsRawBeaconPeriodMinutes = 20;
 
   // bluetooth device name
@@ -40,7 +40,7 @@ void initializeConfig() {
   cfg.WifiKey = "<wifi key>";
 
   // configuration flags and features
-  cfg.EnableAutoFreqCorrection = true;  // automatic tune to any incoming packet frequency
+  cfg.EnableAutoFreqCorrection = false;  // automatic tune to any incoming packet frequency
   cfg.EnableSignalReport = true;  // signal report will be added to the comment sent to aprsis
   cfg.EnablePersistentAprsConnection = true; // keep aprsis connection open, otherwise connect on new data only
   cfg.EnableRfToIs = true;  // send data from rf to aprsis
