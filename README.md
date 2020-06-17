@@ -38,7 +38,7 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
   - lora module SS, **CfgPinSs**, GPIO_5
   - lora module RST, **CfgPinRst**, GPIO_26
   - lora module DIO0, **CfgPinDio0**, GPIO_14
-- if you are planning to experiment with different bandwidths/spread factors then modify values in `initializeConfig()`, with current parameters APRS packet time on air is around **2 seconds** to decode with as lower level as possible, use https://github.com/tanupoo/lorawan_toa to make calculations
+- if you are planning to experiment with different bandwidths/spread factors then modify values in `initializeConfig()`, with current parameters APRS packet time on air is around **1-2 seconds** at 292bps, to decode with as lower level as possible with reasonable speed comparable to 300bps HF APRS, use https://github.com/tanupoo/lorawan_toa to make calculations
   - lora bandwidth `cfg.LoraBw`, 125 kHz (also tested with 20.6 KHz and SF9 with frequency correction)
   - lora spread factor `cfg.LoraSf`, 12 (should decode down to -20dB, choosen with the goal for minimum signal decode)
   - lora coding rate `cfg.LoraCodingRate`, 7
