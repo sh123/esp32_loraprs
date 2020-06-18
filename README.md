@@ -60,7 +60,7 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
    - `cfg.EnableBeacon` set to `true` to enable periodic beacons specified in `cfg.AprsRawBeacon` with period specified in `cfg.AprsRawBeaconPeriodMinutes` into RF and APRS-IS if `cfg.EnableRfToIs` is enabled
 
 # Protocol Compatibility
-This project is using classical `AX25` frames over LoRa and `AX25` frames are encapsulated into `KISS` frames when transferred over serial Bluetooth to phone or PC. It should enable interoperability with classical Linux APRS software and `kissattach`. Some LoRa ARPS implementations transfer plain text APRS messages over LoRa, as a result interoperability with this project is not guaranteed.
+This project is using classical `AX25` frames over LoRa with given LoRa parameters above and `AX25` frames are encapsulated into `KISS` frames when transferred over serial Bluetooth to phone or PC. It should enable interoperability with classical Linux APRS software and `kissattach`. Some LoRa ARPS implementations transfer plain text APRS messages over LoRa, as a result interoperability with this project is not guaranteed.
 
 # Test Results
 ![alt text](images/setup.png)
