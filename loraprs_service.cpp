@@ -262,39 +262,42 @@ void Service::onLoraDataAvailable(int packetSize)
   float rssi = LoRa.packetRssi();
   long frequencyError = LoRa.packetFrequencyError();
 
-  String signalReport = String(" ") +
-    String("rssi: ") +
-    String(snr < 0 ? rssi + snr : rssi) +
-    String("dBm, ") +
-    String("snr: ") +
-    String(snr) +
-    String("dB, ") +
-    String("err: ") +
-    String(frequencyError) +
-    String("Hz");
-
   if (autoCorrectFreq_) {
     loraFreq_ -= frequencyError;
     LoRa.setFrequency(loraFreq_);
   }
 
-  AX25::Payload payload(rxBuf, rxBufIndex);
+  if (!isClient_) {
+    
+    String signalReport = String(" ") +
+      String("rssi: ") +
+      String(snr < 0 ? rssi + snr : rssi) +
+      String("dBm, ") +
+      String("snr: ") +
+      String(snr) +
+      String("dB, ") +
+      String("err: ") +
+      String(frequencyError) +
+      String("Hz");
 
-  if (payload.IsValid()) {
-    String textPayload = payload.ToString(addSignalReport_ ? signalReport : String());
-    Serial.println(textPayload);
+    AX25::Payload payload(rxBuf, rxBufIndex);
 
-    if (enableRfToIs_ && !isClient_) {
-      sendToAprsis(textPayload);
-      Serial.println("Packet sent to APRS-IS");
+    if (payload.IsValid()) {
+      String textPayload = payload.ToString(addSignalReport_ ? signalReport : String());
+      Serial.println(textPayload);
+
+      if (enableRfToIs_) {
+        sendToAprsis(textPayload);
+        Serial.println("Packet sent to APRS-IS");
+      }
+      if (enableRepeater_ && payload.Digirepeat(ownCallsign_)) {
+        sendToLora(payload);
+        Serial.println("Packet digirepeated");
+      }
     }
-    if (enableRepeater_ && !isClient_ && payload.Digirepeat(ownCallsign_)) {
-      sendToLora(payload);
-      Serial.println("Packet digirepeated");
+    else {
+      Serial.println("Invalid or unsupported payload from LoRA");
     }
-  }
-  else {
-    Serial.println("Invalid or unsupported payload from LoRA");
   }
 }
 
