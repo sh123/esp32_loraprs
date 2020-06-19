@@ -288,7 +288,7 @@ void Service::onLoraDataAvailable(int packetSize)
       sendToAprsis(textPayload);
       Serial.println("Packet sent to APRS-IS");
     }
-    if (enableRepeater_ && payload.Digirepeat(ownCallsign_)) {
+    if (enableRepeater_ && !isClient && payload.Digirepeat(ownCallsign_)) {
       sendToLora(payload);
       Serial.println("Packet digirepeated");
     }
