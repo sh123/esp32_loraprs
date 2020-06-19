@@ -63,7 +63,7 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 This project is using classical `AX25` frames over LoRa (as defined in http://www.aprs.org/doc/APRS101.PDF page 12) with given LoRa parameters above and `AX25` frames are encapsulated into `KISS` frames when transferred over serial Bluetooth to phone or PC. It should enable interoperability with classical Linux APRS software and `kissattach`. Some LoRa ARPS implementations transfer plain text APRS messages over LoRa, as a result interoperability with this project is not guaranteed.
 
 # Alternative Linux Setup
-It is possible to use modem in client mode with other generic Linux ax25/aprs tools, such as `xastir`, use next procedure to set it up:
+It is possible to use modem **in client mode** with other generic Linux ax25/aprs tools, such as `xastir`, use next procedure to set it up:
 - Install required tools: ```sudo apt-get install ax25-tools ax25-apps xastir bluez bluez-tools```
 - Run bluetoothctl and pair to the modem: 
   ```
