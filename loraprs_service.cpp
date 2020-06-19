@@ -294,7 +294,7 @@ void Service::onLoraDataAvailable(int packetSize)
     }
   }
   else {
-    Serial.println("Invalid payload from LoRA");
+    Serial.println("Invalid or unsupported payload from LoRA");
   }
 }
 
