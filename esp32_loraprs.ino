@@ -20,7 +20,7 @@ void initializeConfig() {
   cfg.LoraBw = 125e3;
   cfg.LoraSf = 12;
   cfg.LoraCodingRate = 7;
-  cfg.LoraSync = 0x3f;
+  cfg.LoraSync = 0x34;
   cfg.LoraPower = 20;
 
   // aprs configuration
