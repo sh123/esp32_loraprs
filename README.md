@@ -72,7 +72,7 @@ It is possible to use modem **in client mode** with other generic Linux ax25/apr
   [bluetooth]# default-agent
   [NEW] Device 01:02:03:04:05:06 loraprs
   [bluetooth]# pair 01:02:03:04:05:06
-  Attempting to pair with 30:AE:A4:14:40:C2
+  Attempting to pair with 01:02:03:04:05:06
   Pairing successful
   [bluetooth]# exit
   ```
