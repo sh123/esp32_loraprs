@@ -4,7 +4,7 @@ Amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem + LoRa APRS-IS RX/
 Can be used in two modes: 
 - **LoRa APRS KISS client over bluetooth** 
   - you need to use **APRSDroid** application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth. By having two clients you can not only send your position, but also send and receive APRS messages
-  - it is also possible to use **other KISS APRS clients** over Bluetooth serial, just use `rfcomm` on Linux to setup serial over Bluetooth and put up AX25 interface with `kissattach`, then use any existing Linux APRS clients, such as `Xastir` or even run `TCPIP` over AX25
+  - it is also possible to use **other KISS APRS clients** over Bluetooth serial, just use `rfcomm` on Linux to setup serial over Bluetooth and put up AX25 interface with `kissattach`, then use any existing Linux APRS clients, such as `xastir`
 - **LoRa APRS iGate RX/TX server over WiFi + Digipeater**
   - **RF to APRS-IS gating**, it will connect to your WiFI and will forward received APRS positions from RF LoRa into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations (could be enabled or disabled from config). This way, it is also possible to setup portable iGate by connecting to your mobile phone's hotspot and provide power from the phone USB port by using OTA cable
   - **APRS-IS to RF gating**, it is possible to enable it together with the filter in the config, so APRS-IS data will be forwarded to RF
@@ -61,6 +61,31 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 
 # Protocol Compatibility
 This project is using classical `AX25` frames over LoRa (as defined in http://www.aprs.org/doc/APRS101.PDF page 12) with given LoRa parameters above and `AX25` frames are encapsulated into `KISS` frames when transferred over serial Bluetooth to phone or PC. It should enable interoperability with classical Linux APRS software and `kissattach`. Some LoRa ARPS implementations transfer plain text APRS messages over LoRa, as a result interoperability with this project is not guaranteed.
+
+# Alternative Linux Setup
+It is possible to use modem **in client mode** with other generic Linux ax25/aprs tools, such as `xastir`, use next procedure to set it up:
+- Install required tools: ```sudo apt-get install ax25-tools ax25-apps xastir bluez bluez-tools```
+- Run bluetoothctl and pair to the modem: 
+  ```
+  # bluetoothctl
+  [bluetooth]# agent on
+  [bluetooth]# default-agent
+  [NEW] Device 01:02:03:04:05:06 loraprs
+  [bluetooth]# pair 01:02:03:04:05:06
+  Attempting to pair with 30:AE:A4:14:40:C2
+  Pairing successful
+  [bluetooth]# exit
+  ```
+- Run `rfcomm` to setup serial over Bluetooth at `/dev/rfcomm0`: `sudo rfcomm bind 0 01:02:03:04:05:06`
+- At this stage you can already start using `xastir` or any other application, which can operate over KISS Serial TNC
+- Alternatively, you can setup `AX25` network interface with `sudo kissattach /dev/rfcomm0 ax25` command, but previously need to update `/etc/ax25/axports` with new line as `ax25    CALLSIGN-10        9600    255     1       comment`
+- Run `axlisten` to capture incoming and outgoing traffic as `sudo axlisten -a`
+- Use `beacon` utility to send custom packet as 
+  ```
+  # sudo beacon -c NOCALL-7 -d "BEACON WIDE3-3" ax25 "beacon over lora"
+  # sudo beacon -c NOCALL-7 -d "CQ WIDE1-1 WIDE2-1" ax25 "anyone on lora?"
+  # sudo beacon -c NOCALL-7 -d "APZMDM WIDE1-1" ax25 "!0000.00N/00000.00E#test position report"
+  ```
 
 # Test Results
 ![alt text](images/setup.png)
