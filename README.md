@@ -38,7 +38,7 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
   - lora module SS, **CfgPinSs**, GPIO_5
   - lora module RST, **CfgPinRst**, GPIO_26
   - lora module DIO0, **CfgPinDio0**, GPIO_14
-- if you are planning to experiment with different bandwidths/spread factors then modify values in `initializeConfig()`, with current parameters APRS packet time on air is around **2 seconds** to decode with as lower level as possible, use https://github.com/tanupoo/lorawan_toa to make calculations
+- if you are planning to experiment with different bandwidths/spread factors then modify values in `initializeConfig()`, with current parameters APRS packet time on air is around **1-2 seconds** @ 292bps/36Bps, to decode with as lower level as possible with reasonable speed (comparable to 300bps HF APRS), use https://github.com/tanupoo/lorawan_toa to make further calculations
   - lora bandwidth `cfg.LoraBw`, 125 kHz (also tested with 20.6 KHz and SF9 with frequency correction)
   - lora spread factor `cfg.LoraSf`, 12 (should decode down to -20dB, choosen with the goal for minimum signal decode)
   - lora coding rate `cfg.LoraCodingRate`, 7
@@ -59,12 +59,15 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
    - `cfg.EnableRepeater` set to `true` to enable packet repeater
    - `cfg.EnableBeacon` set to `true` to enable periodic beacons specified in `cfg.AprsRawBeacon` with period specified in `cfg.AprsRawBeaconPeriodMinutes` into RF and APRS-IS if `cfg.EnableRfToIs` is enabled
 
+# Protocol Compatibility
+This project is using classical `AX25` frames over LoRa (as defined in http://www.aprs.org/doc/APRS101.PDF page 12) with given LoRa parameters above and `AX25` frames are encapsulated into `KISS` frames when transferred over serial Bluetooth to phone or PC. It should enable interoperability with classical Linux APRS software and `kissattach`. Some LoRa ARPS implementations transfer plain text APRS messages over LoRa, as a result interoperability with this project is not guaranteed.
+
 # Test Results
 ![alt text](images/setup.png)
 - Antennas
   - Client: rubber duck, halo, mobile antenna on a car roof
   - Server: 7 element UHF yagi indoors, vertical on the roof
-  - With such low power it is very important to have antenna SWR close to 1, many rubber duck antennas are claimed to be 433MHz, but they do not resonate at that frequency at all or resonate only when attached to its native large handheld transceiver, which has enough metal inside to behave like a counterpoise, these antennas have SWR 2 or higher. Check your antenna on antenna analyzer before using, add counterpoise if needed or better to use dipole or halo home made antenna for that matter
+  - With such low power it is very important to have antenna SWR close to 1, many rubber duck antennas are claimed to be 433MHz, but they do not resonate at that frequency at all or resonate only when attached to its native large handheld transceiver, which has enough metal inside to behave as a counterpoise, these antennas have SWR 2 or higher. Check your antenna on antenna analyzer before using, add wire counterpoise if needed or better to use dipole or halo home made antenna for that matter
 - Range (20 KHz channel width and 9 spreading factor, also got similar results with 125 kHz and 12 SF)
   - **About 7 km** when server is 30m above the ground and client is 2m above the ground with rubber duck antenna or inside a car
   - **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground with rubber duck antenna
