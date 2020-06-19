@@ -82,9 +82,9 @@ It is possible to use modem in client mode with other generic Linux ax25/aprs to
 - Run `axlisten` to capture incoming and outgoing traffic as `sudo axlisten -a`
 - Use `beacon` utility to send custom packet as 
   ```
-  # sudo beacon -c NOCALL-7 -d BEACON WIDE3-3 ax25 "beacon over lora"
-  # sudo beacon -c NOCALL-7 -d CQ WIDE1-1 WIDE2-1 ax25 "anyone on lora?"
-  # sudo beacon -c NOCALL-7 -d APZMDM WIDE1-1 ax25 "!0000.00N/00000.00E#test position report"
+  # sudo beacon -c NOCALL-7 -d "BEACON WIDE3-3" ax25 "beacon over lora"
+  # sudo beacon -c NOCALL-7 -d "CQ WIDE1-1 WIDE2-1" ax25 "anyone on lora?"
+  # sudo beacon -c NOCALL-7 -d "APZMDM WIDE1-1" ax25 "!0000.00N/00000.00E#test position report"
   ```
 
 # Test Results
