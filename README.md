@@ -43,7 +43,7 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
   - lora spread factor `cfg.LoraSf`, 12 (should decode down to -20dB, choosen with the goal for minimum signal decode)
   - lora coding rate `cfg.LoraCodingRate`, 7
   - lora output power `cfg.LoraPower`, 20 (max 20 dBm ~ 100mW, change to lower value if needed)
-  - sync word `cfg.LoraSync`, 0x3f
+  - sync word `cfg.LoraSync`, 0x34
 - consider minimum decode level based on on BW + SF and required throughput ![alt text](images/bandwidth_vs_sf.jpg)
 - use 80 MHz ESP32 frequency in Arduino SDK, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
 - uses LoRa **built-in checksum** calculation to drop broken packets
@@ -78,14 +78,15 @@ It is possible to use modem **in client mode** with other generic Linux ax25/apr
   ```
 - Run `rfcomm` to setup serial over Bluetooth at `/dev/rfcomm0`: `sudo rfcomm bind 0 01:02:03:04:05:06`
 - At this stage you can already start using `xastir` or any other application, which can operate over KISS Serial TNC
-- Alternatively, you can setup `AX25` network interface with `sudo kissattach /dev/rfcomm0 ax25` command, but previously need to update `/etc/ax25/axports` with new line as `ax25    CALLSIGN-10        9600    255     1       comment`
+- Alternatively, you can setup `AX25` network interface with `sudo kissattach /dev/rfcomm0 ax25` command, but previously need to update `/etc/ax25/axports` with new line as `ax25    CALLSIGN-10        9600    255     1       comment`, you can also specify IP address if there is a need to run TCP/IP over AX25
 - Run `axlisten` to capture incoming and outgoing traffic as `sudo axlisten -a`
 - Use `beacon` utility to send custom packet as 
   ```
-  # sudo beacon -c NOCALL-7 -d "BEACON WIDE3-3" ax25 "beacon over lora"
-  # sudo beacon -c NOCALL-7 -d "CQ WIDE1-1 WIDE2-1" ax25 "anyone on lora?"
-  # sudo beacon -c NOCALL-7 -d "APZMDM WIDE1-1" ax25 "!0000.00N/00000.00E#test position report"
+  # sudo beacon -s -c NOCALL-7 -d "BEACON WIDE3-3" ax25 "beacon over lora"
+  # sudo beacon -s -c NOCALL-7 -d "CQ WIDE1-1 WIDE2-1" ax25 "anyone on lora?"
+  # sudo beacon -s -c NOCALL-7 -d "APZMDM WIDE1-1" ax25 "!0000.00N/00000.00E#test position report"
   ```
+- Connect to another client as `sudo axcall -s NOCALL-1 ax25 NOCALL-10`
 
 # Test Results
 ![alt text](images/setup.png)
