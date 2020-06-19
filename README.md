@@ -86,6 +86,7 @@ It is possible to use modem **in client mode** with other generic Linux ax25/apr
   # sudo beacon -c NOCALL-7 -d "CQ WIDE1-1 WIDE2-1" ax25 "anyone on lora?"
   # sudo beacon -c NOCALL-7 -d "APZMDM WIDE1-1" ax25 "!0000.00N/00000.00E#test position report"
   ```
+- Connect to another client with NET/ROM as `sudo axcall -s NOCALL-1 ax25 NOCALL-10`
 
 # Test Results
 ![alt text](images/setup.png)
