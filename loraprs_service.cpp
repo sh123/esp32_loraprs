@@ -153,12 +153,12 @@ void Service::loop()
     onLoraDataAvailable(packetSize);
   }
   if (needsBeacon()) {
-    sendBeacon();
+    sendPeriodicBeacon();
   }
-  delay(10);
+  delay(CfgPollDelayMs);
 }
 
-void Service::sendBeacon()
+void Service::sendPeriodicBeacon()
 {
   long currentMs = millis();
   
@@ -296,8 +296,6 @@ void Service::onLoraDataAvailable(int packetSize)
   else {
     Serial.println("Invalid payload from LoRA");
   }
-
-  delay(50);
 }
 
 void Service::kissResetState()
@@ -361,7 +359,6 @@ void Service::onBtDataAvailable()
         break;
     }
   }
-  delay(20);
 }
 
 } // LoraPrs

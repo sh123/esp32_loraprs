@@ -10,8 +10,8 @@ namespace AX25 {
 class Payload
 {
 public:
+  Payload(const String &textPayload);
   Payload(byte *rxPayload, int payloadLength);
-  Payload(String inputText);
 
   inline bool IsValid() const { return isValid_; }
   
@@ -22,7 +22,7 @@ public:
   void Dump();
 
 private:
-  bool fromString(String inputText);
+  bool fromString(const String &textPayload);
   bool fromBinary(const byte *rxPayload, int payloadLength);
   
   bool InsertRptCallsign(const Callsign &rptCallsign, int index);

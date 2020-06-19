@@ -13,7 +13,7 @@ public:
   Callsign& operator=(const Callsign &callsign);
   
   Callsign(const byte *rxPayload, int payloadLength);
-  Callsign(String inputText);
+  Callsign(const String &inputText);
 
   inline bool IsValid() const { return isValid_; };
   inline bool IsTrace() const { return call_.startsWith("TRACE"); }
@@ -26,8 +26,6 @@ public:
   bool Digirepeat();
   
 private:
-  bool encode(byte *txPtr, int bufferLength) const;
-
   bool fromString(const String &callsign);
   bool fromBinary(const byte *rxPtr, int payloadLength);
 

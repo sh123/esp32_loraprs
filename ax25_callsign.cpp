@@ -32,7 +32,7 @@ Callsign::Callsign(const byte *rxPayload, int payloadLength)
   isValid_ = fromBinary(rxPayload, payloadLength);
 }
 
-Callsign::Callsign(String callsign)
+Callsign::Callsign(const String &callsign)
   : isValid_(false)
   , call_()
   , ssid_(0)
@@ -42,7 +42,24 @@ Callsign::Callsign(String callsign)
 
 bool Callsign::ToBinary(byte *txPayload, int bufferLength) const
 {
-  return encode(txPayload, bufferLength);
+  if (bufferLength < CallsignSize) return false;
+
+  byte *ptr = txPayload;
+
+  memset(ptr, 0, bufferLength);
+
+  for (int i = 0; i < CallsignSize - 1; i++) {
+    if (i < call_.length()) {
+      char c = call_.charAt(i);
+      *(ptr++) = c << 1;
+    }
+    else {
+      *(ptr++) = char(' ') << 1;
+    }
+  }
+  *(txPayload + CallsignSize - 1) = ssid_ << 1;
+
+  return true;
 }
 
 String Callsign::ToString() const
@@ -65,28 +82,6 @@ bool Callsign::Digirepeat()
     }
   }
   return false;
-}
-
-bool Callsign::encode(byte *txPtr, int bufferLength) const
-{
-  if (bufferLength < CallsignSize) return false;
-
-  byte *ptr = txPtr;
-
-  memset(ptr, 0, bufferLength);
-
-  for (int i = 0; i < CallsignSize - 1; i++) {
-    if (i < call_.length()) {
-      char c = call_.charAt(i);
-      *(ptr++) = c << 1;
-    }
-    else {
-      *(ptr++) = char(' ') << 1;
-    }
-  }
-  *(txPtr + CallsignSize - 1) = ssid_ << 1;
-
-  return true;
 }
 
 bool Callsign::fromString(const String &inputCallsign) 

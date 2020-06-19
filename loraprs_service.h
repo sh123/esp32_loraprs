@@ -32,7 +32,7 @@ private:
   void onBtDataAvailable();
   void onAprsisDataAvailable();
 
-  void sendBeacon();
+  void sendPeriodicBeacon();
   
   void sendToAprsis(String aprsMessage);
   bool sendToLora(const AX25::Payload &payload);
@@ -65,6 +65,7 @@ private:
   };
 
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
+  const int CfgPollDelayMs = 10;
 
   const byte CfgPinSs = 5;
   const byte CfgPinRst = 26;
@@ -94,7 +95,6 @@ private:
   // state
   KissCmd kissCmd_;
   KissState kissState_;
-
   long previousBeaconMs_;
   
   // peripherals

@@ -8,10 +8,10 @@ Payload::Payload(byte *rxPayload, int payloadLength)
   isValid_ = fromBinary(rxPayload, payloadLength);
 }
 
-Payload::Payload(String inputText)
+Payload::Payload(const String &textPayload)
   : rptCallsCount_(0)
 {
-  isValid_ = fromString(inputText);
+  isValid_ = fromString(textPayload);
 }
 
 void Payload::Dump() 
@@ -164,8 +164,10 @@ bool Payload::fromBinary(const byte *rxPayload, int payloadLength)
   return true;
 }
 
-bool Payload::fromString(String inputText)
+bool Payload::fromString(const String &textPayload)
 {
+  String inputText = textPayload;
+  
   int rptIndex = inputText.indexOf('>');
   int infoIndex = inputText.indexOf(':');
 
