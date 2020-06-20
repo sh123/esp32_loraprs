@@ -89,7 +89,7 @@ It is possible to use modem **in client mode** with other generic Linux ax25/apr
 - Connect to another client as `sudo axcall -s NOCALL-1 ax25 NOCALL-10`
 
 # CSMA Usage (experimental)
-LoRa library, which is in use by this project does not implement CAD, but CSMAp is utilized by this project. TX path is executed only when there is no incoming data returned by `LoRa::parsePacket` and TX path is executed with probability p, configured by const `Loraprs::Service::CfgCsmaProbBoundary` in `loraprs_service.h`. Random value is picked between 0 and 255 and TX is executed only when it is lower than `CfgCsmaProbBoundary`.
+LoRa library, which is in use by this project does not implement CAD, but CSMAp is utilized by this project. TX path is executed only when there is no incoming data returned by `LoRa::parsePacket` and TX path is executed with probability p, configured by const `Loraprs::Service::CfgCsmaProbBoundary` in `loraprs_service.h`. Random value is picked between 0 and 255 and TX is executed only when it is lower than `CfgCsmaProbBoundary`. To decrease TX probability in case of high traffic use lower value.
 
 # Test Results
 ![alt text](images/setup.png)
