@@ -145,17 +145,19 @@ void Service::loop()
   if (needsAprsis() && !aprsisConn_.connected() && persistentConn_) {
     reconnectAprsis();
   }
+  // RX path
   if (int packetSize = LoRa.parsePacket()) {
     onLoraDataAvailable(packetSize);
   }
+  // TX path
   else if (random(0, 255) < CfgCsmaProbBoundary) {
     if (serialBt_.available()) {
       onBtDataAvailable();
     }
-    if (aprsisConn_.available() > 0) {
+    else if (aprsisConn_.available() > 0) {
       onAprsisDataAvailable();
     }
-    if (needsBeacon()) {
+    else if (needsBeacon()) {
       sendPeriodicBeacon();
     }
   }
