@@ -137,23 +137,27 @@ void Service::setupBt(const String &btName)
 
 void Service::loop()
 {
+  long r = random(0, 255);
+  
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
   if (needsAprsis() && !aprsisConn_.connected() && persistentConn_) {
     reconnectAprsis();
   }
-  if (aprsisConn_.available() > 0) {
-    onAprsisDataAvailable();
-  }
-  if (serialBt_.available()) {
-    onBtDataAvailable();
-  }
   if (int packetSize = LoRa.parsePacket()) {
     onLoraDataAvailable(packetSize);
   }
-  if (needsBeacon()) {
-    sendPeriodicBeacon();
+  else if (random(0, 255) < CfgCsmaProbBoundary) {
+    if (serialBt_.available()) {
+      onBtDataAvailable();
+    }
+    if (aprsisConn_.available() > 0) {
+      onAprsisDataAvailable();
+    }
+    if (needsBeacon()) {
+      sendPeriodicBeacon();
+    }
   }
   delay(CfgPollDelayMs);
 }

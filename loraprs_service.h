@@ -65,7 +65,12 @@ private:
   };
 
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
-  const int CfgPollDelayMs = 10;
+
+  // tune depending on TOA, higher value for higher time on air
+  const int CfgPollDelayMs = 500;
+
+  // tx when lower than this value from random 0..255, use lower value for high traffic
+  const long CfgCsmaProbBoundary = 100;
 
   const byte CfgPinSs = 5;
   const byte CfgPinRst = 26;
