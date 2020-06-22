@@ -64,6 +64,7 @@ This project is using classical `AX25` frames over LoRa (as defined in http://ww
 
 # Alternative Linux Setup
 It is possible to use modem **in client mode** with other generic Linux ax25/aprs tools, such as `xastir`, use next procedure to set it up:
+- AX25 howto: http://tldp.org/HOWTO/AX25-HOWTO/
 - Install required tools: ```sudo apt-get install ax25-tools ax25-apps xastir bluez bluez-tools```
 - Run bluetoothctl and pair to the modem: 
   ```
