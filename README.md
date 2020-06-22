@@ -66,7 +66,7 @@ This project is using classical `AX25` frames over LoRa (as defined in http://ww
 It is possible to use modem **in client mode** with other generic Linux ax25/aprs tools, such as `xastir`, use next procedure to set it up:
 - AX25 howto: http://tldp.org/HOWTO/AX25-HOWTO/
 - Install required tools: ```sudo apt-get install ax25-tools ax25-apps xastir bluez bluez-tools```
-- Run bluetoothctl and pair to the modem: 
+- Run bluetoothctl and pair with the modem: 
   ```
   # bluetoothctl
   [bluetooth]# agent on
@@ -79,7 +79,7 @@ It is possible to use modem **in client mode** with other generic Linux ax25/apr
   ```
 - Run `rfcomm` to setup serial over Bluetooth at `/dev/rfcomm0`: `sudo rfcomm bind 0 01:02:03:04:05:06`
 - At this stage you can already start using `xastir` or any other application, which can operate over KISS Serial TNC
-- Alternatively, you can setup `AX25` network interface with `sudo kissattach /dev/rfcomm0 ax25` command, but previously need to update `/etc/ax25/axports` with new line as `ax25    CALLSIGN-10        9600    255     1       comment`, you can also specify IP address if there is a need to run TCP/IP over AX25
+- You can setup `AX25` network interface with `sudo kissattach /dev/rfcomm0 ax25` command, but previously need to update `/etc/ax25/axports` with new line as `ax25    CALLSIGN-10        9600    255     1       comment`, you can also specify IP address if there is a need to run TCP/IP over AX25
 - Run `axlisten` to capture incoming and outgoing traffic as `sudo axlisten -a`
 - Use `beacon` utility to send custom packet as 
   ```
