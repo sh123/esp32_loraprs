@@ -98,7 +98,7 @@ LoRa library, which is in use by this project does not implement CAD, but CSMAp 
   - Client: rubber duck, halo, mobile antenna on a car roof
   - Server: 7 element UHF yagi indoors, vertical on the roof
   - With such low power it is very important to have antenna SWR close to 1, many rubber duck antennas are claimed to be 433MHz, but they do not resonate at that frequency at all or resonate only when attached to its native large handheld transceiver, which has enough metal inside to behave as a counterpoise, these antennas have SWR 2 or higher. Check your antenna on antenna analyzer before using, add wire counterpoise if needed or better to use dipole or halo home made antenna for that matter
-- Range (20 KHz channel width and 9 spreading factor, also got similar results with 125 kHz and 12 SF)
+- Range (20 KHz channel width and 9 spreading factor, also got similar results with 125 kHz and 12 SF), it will mostly depend on your base station elevation
   - **About 7 km** when server is 30m above the ground and client is 2m above the ground with rubber duck antenna or inside a car
   - **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground with rubber duck antenna
   - **About 17km** maximum (non-reliable) between base and mobile station with antenna on the car roof
