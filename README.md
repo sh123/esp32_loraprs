@@ -64,8 +64,9 @@ This project is using classical `AX25` frames over LoRa (as defined in http://ww
 
 # Alternative Linux Setup
 It is possible to use modem **in client mode** with other generic Linux ax25/aprs tools, such as `xastir`, use next procedure to set it up:
+- AX25 howto: http://tldp.org/HOWTO/AX25-HOWTO/
 - Install required tools: ```sudo apt-get install ax25-tools ax25-apps xastir bluez bluez-tools```
-- Run bluetoothctl and pair to the modem: 
+- Run bluetoothctl and pair with the modem: 
   ```
   # bluetoothctl
   [bluetooth]# agent on
@@ -78,7 +79,7 @@ It is possible to use modem **in client mode** with other generic Linux ax25/apr
   ```
 - Run `rfcomm` to setup serial over Bluetooth at `/dev/rfcomm0`: `sudo rfcomm bind 0 01:02:03:04:05:06`
 - At this stage you can already start using `xastir` or any other application, which can operate over KISS Serial TNC
-- Alternatively, you can setup `AX25` network interface with `sudo kissattach /dev/rfcomm0 ax25` command, but previously need to update `/etc/ax25/axports` with new line as `ax25    CALLSIGN-10        9600    255     1       comment`, you can also specify IP address if there is a need to run TCP/IP over AX25
+- You can setup `AX25` network interface with `sudo kissattach /dev/rfcomm0 ax25` command, but previously need to update `/etc/ax25/axports` with new line as `ax25    CALLSIGN-10        9600    255     1       comment`, you can also specify IP address if there is a need to run TCP/IP over AX25
 - Run `axlisten` to capture incoming and outgoing traffic as `sudo axlisten -a`
 - Use `beacon` utility to send custom packet as 
   ```
@@ -97,7 +98,7 @@ LoRa library, which is in use by this project does not implement CAD, but CSMAp 
   - Client: rubber duck, halo, mobile antenna on a car roof
   - Server: 7 element UHF yagi indoors, vertical on the roof
   - With such low power it is very important to have antenna SWR close to 1, many rubber duck antennas are claimed to be 433MHz, but they do not resonate at that frequency at all or resonate only when attached to its native large handheld transceiver, which has enough metal inside to behave as a counterpoise, these antennas have SWR 2 or higher. Check your antenna on antenna analyzer before using, add wire counterpoise if needed or better to use dipole or halo home made antenna for that matter
-- Range (20 KHz channel width and 9 spreading factor, also got similar results with 125 kHz and 12 SF)
+- Range (20 KHz channel width and 9 spreading factor, also got similar results with 125 kHz and 12 SF), it will mostly depend on your base station's antenna elevation
   - **About 7 km** when server is 30m above the ground and client is 2m above the ground with rubber duck antenna or inside a car
   - **About 13 km** when server is 30m above the ground and client is at some higher point ~40m above the ground with rubber duck antenna
   - **About 17km** maximum (non-reliable) between base and mobile station with antenna on the car roof
