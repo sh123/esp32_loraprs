@@ -98,8 +98,8 @@ private:
   bool enableBeacon_;
 
   // state
-  KissCmd kissCmd_;
   KissState kissState_;
+  KissCmd kissCmd_;
   long previousBeaconMs_;
   
   // peripherals

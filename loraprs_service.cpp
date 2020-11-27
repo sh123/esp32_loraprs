@@ -3,9 +3,9 @@
 namespace LoraPrs {
   
 Service::Service() 
-  : serialBt_()
-  , kissState_(KissState::Void)
+  : kissState_(KissState::Void)
   , kissCmd_(KissCmd::NoCmd)
+  , serialBt_()
 {
 }
 
