@@ -136,9 +136,7 @@ void Service::setupBt(const String &btName)
 }
 
 void Service::loop()
-{
-  long r = random(0, 255);
-  
+{ 
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
