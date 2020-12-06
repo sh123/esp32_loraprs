@@ -1,7 +1,7 @@
 # LoRa APRS ESP32 KISS APRSDroid bluetooth modem, LoRa APRS-IS RX/TX iGate with digipeater
 Amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem + LoRa APRS-IS RX/TX iGate server over WiFI + digipeater
 
-Can be used in two modes: 
+Can be used in several modes: 
 - **LoRa APRS KISS client over bluetooth** 
   - you need to use **APRSDroid** application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth. By having two clients you can not only send your position, but also send and receive APRS messages
   - it is also possible to use **other KISS APRS clients** over Bluetooth serial, just use `rfcomm` on Linux to setup serial over Bluetooth and put up AX25 interface with `kissattach`, then use any existing Linux APRS clients, such as `xastir`, see section below for alternative Linux usage
@@ -10,10 +10,14 @@ Can be used in two modes:
   - **APRS-IS to RF gating**, it is possible to enable it together with the filter in the config, so APRS-IS data will be forwarded to RF
   - **RF digirepating** for `WIDEn-n` new style paths
   - **Beaconing**, own station periodic beacon announcement to APRS-IS and RF
+- **LoRa Codec2 digital voice communication backend***
+ - just install https://github.com/sh123/codec2_talkie on you Android phone, pair with the modem and you can communicate by using digital voice Codec2
 
 # Compatible Boards
 All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 board is compatible then it should work, but there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section), currently pinouts are connected from LoRa to ESP32-WROOM as (SS/RST/DIO0 could be redefined in loraprs_service.h):
+
 ![alt text](images/pinouts.png)
+
 - SS: GPIO_5
 - RST: GPIO_26
 - DIO0: GPIO_14
