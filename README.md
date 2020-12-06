@@ -10,7 +10,7 @@ Can be used in several modes:
   - **APRS-IS to RF gating**, it is possible to enable it together with the filter in the config, so APRS-IS data will be forwarded to RF
   - **RF digirepating** for `WIDEn-n` new style paths
   - **Beaconing**, own station periodic beacon announcement to APRS-IS and RF
-- **LoRa Codec2 digital voice communication modem***
+- **LoRa Codec2 digital voice communication modem**
   - just install https://github.com/sh123/codec2_talkie on you Android phone, pair with the modem and you can communicate with each other by using digital voice Codec2
 
 # Compatible Boards
