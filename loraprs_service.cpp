@@ -148,19 +148,21 @@ void Service::loop()
     onLoraDataAvailable(packetSize);
   }
   // TX path
-  else if (random(0, 255) < CfgCsmaPersistence) {
-    if (serialBt_.available()) {
-      onBtDataAvailable();
-    }
-    else if (aprsisConn_.available() > 0) {
-      onAprsisDataAvailable();
-    }
-    else if (needsBeacon()) {
-      sendPeriodicBeacon();
-    }
-  }
   else {
-    delay(CfgCsmaSlotTimeMs);
+    if (random(0, 255) < CfgCsmaPersistence) {
+      if (serialBt_.available()) {
+        onBtDataAvailable();
+      }
+      else if (aprsisConn_.available() > 0) {
+        onAprsisDataAvailable();
+      }
+      else if (needsBeacon()) {
+        sendPeriodicBeacon();
+      }
+    }
+    else {
+      delay(CfgCsmaSlotTimeMs);
+    }
   }
   delay(CfgPollDelayMs);
 }
