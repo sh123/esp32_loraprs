@@ -1,5 +1,5 @@
 # LoRa APRS ESP32 KISS APRSDroid bluetooth modem, LoRa APRS-IS RX/TX iGate with digipeater
-Amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem + LoRa APRS-IS RX/TX iGate server over WiFI + digipeater + Codec2 DV modem with Android frontend application
+Amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem + LoRa APRS-IS RX/TX iGate server over WiFI + digipeater + Codec2 DV modem (in conjunction with Android frontend application)
 
 Can be used in several modes: 
 - **LoRa APRS KISS client over bluetooth** 
