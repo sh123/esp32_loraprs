@@ -68,7 +68,8 @@ private:
 
   const int CfgPollDelayMs = 10;
 
-  // tx when lower than this value from random 0..255, use lower value for high traffic
+  // tx when lower than this value from random 0..255
+  // use lower value for high traffic, use 255 for real time
   const long CfgCsmaPersistence = 100;
   const long CfgCsmaSlotTimeMs = 500;
 
