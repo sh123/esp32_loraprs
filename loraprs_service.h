@@ -66,7 +66,7 @@ private:
 
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
 
-  const int CfgPollDelayMs = 1;
+  const int CfgPollDelayMs = 5;
 
   // tx when lower than this value from random 0..255
   // use lower value for high traffic, use 255 for real time
