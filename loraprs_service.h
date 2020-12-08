@@ -37,6 +37,7 @@ private:
   void sendToAprsis(String aprsMessage);
   bool sendToLora(const AX25::Payload &payload);
 
+  bool loraBeginPacketAndWait();
   void kissResetState();
 
   inline bool needsAprsis() const { return !isClient_ && (enableRfToIs_ || enableIsToRf_); }
@@ -56,17 +57,20 @@ private:
     Void = 0,
     GetCmd,
     GetData,
+    GetP,
     Escape
   };
 
   enum KissCmd {
     Data = 0x00,
+    P = 0x02,
     NoCmd = 0x80
   };
 
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
 
   const int CfgPollDelayMs = 5;
+  const int CfgLoraTxWaitMs = 500;
 
   // tx when lower than this value from random 0..255
   // use lower value for high traffic, use 255 for real time
@@ -102,6 +106,7 @@ private:
   KissState kissState_;
   KissCmd kissCmd_;
   long previousBeaconMs_;
+  byte csmaP_;
   
   // peripherals
   BluetoothSerial serialBt_;

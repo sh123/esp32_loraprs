@@ -5,6 +5,7 @@ namespace LoraPrs {
 Service::Service() 
   : kissState_(KissState::Void)
   , kissCmd_(KissCmd::NoCmd)
+  , csmaP_(CfgCsmaPersistence)
   , serialBt_()
 {
 }
@@ -149,7 +150,7 @@ void Service::loop()
   }
   // TX path
   else {
-    if (random(0, 255) < CfgCsmaPersistence) {
+    if (random(0, 255) < csmaP_) {
       if (serialBt_.available()) {
         onBtDataAvailable();
       }
@@ -316,50 +317,77 @@ void Service::kissResetState()
   kissState_ = KissState::Void;
 }
 
+bool Service::loraBeginPacketAndWait()
+{
+  bool canSend = false;
+  for (int i = 0; i < CfgLoraTxWaitMs; i++) {
+    if (LoRa.beginPacket() == 1) {
+      return true;
+    }
+    delay(1);
+  }
+  return false;
+}
+
 void Service::onBtDataAvailable() 
 { 
   while (serialBt_.available()) {
-    byte txByte = serialBt_.read();
+    
+    int rxResult = serialBt_.read();
+    if (rxResult == -1) break;
+    
+    byte rxByte = (byte)rxResult;
 
     switch (kissState_) {
       case KissState::Void:
-        if (txByte == KissMarker::Fend) {
+        if (rxByte == KissMarker::Fend) {
           kissCmd_ = KissCmd::NoCmd;
           kissState_ = KissState::GetCmd;
         }
         break;
       case KissState::GetCmd:
-        if (txByte != KissMarker::Fend) {
-          if (txByte == KissCmd::Data) {
-            LoRa.beginPacket();
-            kissCmd_ = (KissCmd)txByte;
+        if (rxByte != KissMarker::Fend) {
+          if (rxByte == KissCmd::Data) {
+            if (!loraBeginPacketAndWait()) {
+              kissResetState();
+              return;
+            }
+            kissCmd_ = (KissCmd)rxByte;
             kissState_ = KissState::GetData;
+          }
+          else if (rxByte == KissCmd::P) {
+            kissCmd_ = (KissCmd)rxByte;
+            kissState_ = KissState::GetP;
           }
           else {
             kissResetState();
           }
         }
         break;
+      case KissState::GetP:
+        csmaP_ = rxByte;
+        kissState_ = KissState::GetData;
+        break;
       case KissState::GetData:
-        if (txByte == KissMarker::Fesc) {
+        if (rxByte == KissMarker::Fesc) {
           kissState_ = KissState::Escape;
         }
-        else if (txByte == KissMarker::Fend) {
+        else if (rxByte == KissMarker::Fend) {
           if (kissCmd_ == KissCmd::Data) {
-            LoRa.endPacket();
+            LoRa.endPacket(true);
           }
           kissResetState();
         }
-        else {
-          LoRa.write(txByte);
+        else if (kissCmd_ == KissCmd::Data) {
+          LoRa.write(rxByte);
         }
         break;
       case KissState::Escape:
-        if (txByte == KissMarker::Tfend) {
+        if (rxByte == KissMarker::Tfend) {
           LoRa.write(KissMarker::Fend);
           kissState_ = KissState::GetData;
         }
-        else if (txByte == KissMarker::Tfesc) {
+        else if (rxByte == KissMarker::Tfesc) {
           LoRa.write(KissMarker::Fesc);
           kissState_ = KissState::GetData;
         }
