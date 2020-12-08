@@ -148,7 +148,7 @@ void Service::loop()
     onLoraDataAvailable(packetSize);
   }
   // TX path
-  else if (random(0, 255) < CfgCsmaProbBoundary) {
+  else if (random(0, 255) < CfgCsmaPersistence) {
     if (serialBt_.available()) {
       onBtDataAvailable();
     }
@@ -158,6 +158,9 @@ void Service::loop()
     else if (needsBeacon()) {
       sendPeriodicBeacon();
     }
+  }
+  else {
+    delay(CfgCsmaSlotTimeMs);
   }
   delay(CfgPollDelayMs);
 }
