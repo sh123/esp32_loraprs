@@ -6,6 +6,7 @@ Service::Service()
   : kissState_(KissState::Void)
   , kissCmd_(KissCmd::NoCmd)
   , csmaP_(CfgCsmaPersistence)
+  , csmaSlotTime_(CfgCsmaSlotTimeMs)
   , serialBt_()
 {
 }
@@ -162,7 +163,7 @@ void Service::loop()
       }
     }
     else {
-      delay(CfgCsmaSlotTimeMs);
+      delay(csmaSlotTime_);
     }
   }
   delay(CfgPollDelayMs);
@@ -359,6 +360,10 @@ void Service::onBtDataAvailable()
             kissCmd_ = (KissCmd)rxByte;
             kissState_ = KissState::GetP;
           }
+          else if (rxByte == KissCmd::SlotTime) {
+            kissCmd_ = (KissCmd)rxByte;
+            kissState_ = KissState::GetSlotTime;
+          }
           else {
             kissResetState();
           }
@@ -366,6 +371,10 @@ void Service::onBtDataAvailable()
         break;
       case KissState::GetP:
         csmaP_ = rxByte;
+        kissState_ = KissState::GetData;
+        break;
+      case KissState::GetSlotTime:
+        csmaSlotTime_ = (long)rxByte * 10;
         kissState_ = KissState::GetData;
         break;
       case KissState::GetData:

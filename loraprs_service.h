@@ -58,12 +58,14 @@ private:
     GetCmd,
     GetData,
     GetP,
+    GetSlotTime,
     Escape
   };
 
   enum KissCmd {
     Data = 0x00,
     P = 0x02,
+    SlotTime = 0x03,
     NoCmd = 0x80
   };
 
@@ -107,6 +109,7 @@ private:
   KissCmd kissCmd_;
   long previousBeaconMs_;
   byte csmaP_;
+  long csmaSlotTime_;
   
   // peripherals
   BluetoothSerial serialBt_;
