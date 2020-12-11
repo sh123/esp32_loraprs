@@ -122,4 +122,5 @@ This modem could be used in conjuction with [Android Codec2 Walkie-Talkie](https
   - Monitor your planned frequency, such as 433.775 MHz for ISM device activity, if there is strong interference from other users tune up or down it to minimize interference
 - Weather
   - Rain and high humidity levels decrease signal level by about **~3-6 dB**
+- Could not get modems communicate with each other when using spreading factor 6
 
