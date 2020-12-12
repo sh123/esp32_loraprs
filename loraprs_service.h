@@ -22,7 +22,7 @@ public:
 
 private:
   void setupWifi(const String &wifiName, const String &wifiKey);
-  void setupLora(int loraFreq, int bw, byte sf, byte cr, byte pwr, byte sync);
+  void setupLora(int loraFreq, int bw, byte sf, byte cr, byte pwr, byte sync, bool enableCrc);
   void setupBt(const String &btName);
 
   void reconnectWifi();

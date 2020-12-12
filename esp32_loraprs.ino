@@ -13,7 +13,7 @@ auto watchdogLedTimer = timer_create_default();
 void initializeConfig() {
   
   // client/server mode switch
-  cfg.IsClientMode = false;
+  cfg.IsClientMode = true;
 
   // lora parameters
   cfg.LoraFreq = 433.775E6;
@@ -22,6 +22,7 @@ void initializeConfig() {
   cfg.LoraCodingRate = 7;
   cfg.LoraSync = 0x34;
   cfg.LoraPower = 20;
+  cfg.LoraEnableCrc = true; // set to false for speech data
 
   // aprs configuration
   cfg.AprsHost = "rotate.aprs2.net";

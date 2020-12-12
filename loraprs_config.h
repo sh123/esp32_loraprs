@@ -15,6 +15,7 @@ struct Config
   byte LoraCodingRate;  // lora coding rate, e.g. 7
   byte LoraSync;        // lora sync word/packet id, 0x3f
   byte LoraPower;       // lora power level in dbm, 20
+  bool LoraEnableCrc;   // lora crc check enabled
 
   int AprsPort;         // aprs server port, 14580
   String AprsHost;      // aprs server hostname, rotate.aprs2.net

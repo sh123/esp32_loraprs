@@ -44,7 +44,8 @@ void Service::setup(const Config &conf)
   enableBeacon_ = conf.EnableBeacon;
 
   // peripherals
-  setupLora(conf.LoraFreq, conf.LoraBw, conf.LoraSf, conf.LoraCodingRate, conf.LoraPower, conf.LoraSync);
+  setupLora(conf.LoraFreq, conf.LoraBw, conf.LoraSf, 
+    conf.LoraCodingRate, conf.LoraPower, conf.LoraSync, conf.LoraEnableCrc);
     
   if (needsWifi()) {
     setupWifi(conf.WifiSsid, conf.WifiKey);
@@ -104,7 +105,7 @@ bool Service::reconnectAprsis()
   return true;
 }
 
-void Service::setupLora(int loraFreq, int bw, byte sf, byte cr, byte pwr, byte sync)
+void Service::setupLora(int loraFreq, int bw, byte sf, byte cr, byte pwr, byte sync, bool enableCrc)
 {
   Serial.print("LoRa init...");
   
@@ -119,7 +120,9 @@ void Service::setupLora(int loraFreq, int bw, byte sf, byte cr, byte pwr, byte s
   LoRa.setSignalBandwidth(bw);
   LoRa.setCodingRate4(cr);
   LoRa.setTxPower(pwr);
-  LoRa.enableCrc();
+  if (enableCrc) {
+    LoRa.enableCrc();
+  }
   
   Serial.println("ok");  
 }
