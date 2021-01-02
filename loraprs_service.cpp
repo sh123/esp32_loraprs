@@ -310,7 +310,7 @@ void Service::onLoraDataAvailable(int packetSize)
       }
     }
     else {
-      Serial.println("Invalid or unsupported payload from LoRA");
+      Serial.println("Skipping non-AX25 payload");
     }
   }
 }
@@ -323,7 +323,6 @@ void Service::kissResetState()
 
 bool Service::loraBeginPacketAndWait()
 {
-  bool canSend = false;
   for (int i = 0; i < CfgLoraTxWaitMs; i++) {
     if (LoRa.beginPacket() == 1) {
       return true;
@@ -353,6 +352,7 @@ void Service::onBtDataAvailable()
         if (rxByte != KissMarker::Fend) {
           if (rxByte == KissCmd::Data) {
             if (!loraBeginPacketAndWait()) {
+              Serial.println("LoRa buffer overflow, dropping packet");
               kissResetState();
               return;
             }
