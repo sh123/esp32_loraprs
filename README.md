@@ -123,7 +123,7 @@ It is possible to use modem **in client mode** with other generic Linux ax25/apr
 - Polarization
   - Using **horizontal polarization** improves successful decoding probability and receiving range
 - Interference
-  - Monitor your planned frequency, such as 433.775 MHz for ISM device activity, if there is strong interference from other users tune up or down it to minimize interference
+  - Monitor your planned frequency, such as 433.775 MHz for ISM device activity, if there is strong interference from other users tune up or down it to minimize interference, it might be critical for long range
 - Weather
   - Rain and high humidity levels decrease signal level by about **~3-6 dB**
 - Could not get modems communicate with each other when using spreading factor 6
