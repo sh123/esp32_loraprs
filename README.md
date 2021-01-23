@@ -127,4 +127,5 @@ It is possible to use modem **in client mode** with other generic Linux ax25/apr
 - Weather
   - Rain and high humidity levels decrease signal level by about **~3-6 dB**
 - Could not get modems communicate with each other when using spreading factor 6
+- It might be useful to add additional pass band filter or broadcast FM radio reject filter
 
