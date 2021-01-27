@@ -1,4 +1,4 @@
-## Table of contents
+# Table of contents
 * [Introduction](#introduction)
 * [Compatible Boards](#compatible-boards)
 * [Software Dependencies](#software-dependencies)
