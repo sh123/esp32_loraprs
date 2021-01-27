@@ -1,4 +1,15 @@
-# LoRa APRS ESP32 KISS APRSDroid bluetooth modem, LoRa APRS-IS RX/TX iGate with digipeater
+## Table of contents
+* [Introduction](#introduction)
+* [Compatible Boards](#compatible-boards)
+* [Software Dependencies](#software-dependencies)
+* [Software Setup](#software-setup)
+* [Protocol Compatibility](#protocol-compatibility)
+* [Alternative Linux Setup](#alternative-linux-setup)
+* [CSMA Usage](#csma-usage)
+* [Digital voice with Codec2](#digital-voice-with-codec2)
+* [Test Results](#test-results)
+
+# Introduction
 Amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem + LoRa APRS-IS RX/TX iGate server over WiFI + digipeater + Codec2 DV modem (in conjunction with Android frontend application)
 
 Can be used in several modes: 
@@ -25,7 +36,8 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 - MISO: GPIO_19/VSPI_MISO
 - SCK: GPIO_18/VSPI_SCK
 
-# Software Dependencies (install via libraries)
+# Software Dependencies
+Install via libraries:
 - Arduino ESP32 library: https://github.com/espressif/arduino-esp32
 - LoRa arduino library: https://github.com/sandeepmistry/arduino-LoRa
 - Arduino Timer library: https://github.com/contrem/arduino-timer
@@ -97,7 +109,7 @@ It is possible to use modem **in client mode** with other generic Linux ax25/apr
 - LoRa library, which is in use by this project does not implement CAD, but CSMAp is utilized by this project as per KISS specification. TX path is executed only when there is no incoming data returned by `LoRa::parsePacket` and TX path is executed with probability p (CSMA persistence), configured by const `Loraprs::Service::CfgCsmaPersistence` in `loraprs_service.h`. Random value is selected between 0 and 255 and TX is executed only when it is lower than `CfgCsmaProbBoundary`. 
 - To decrease TX probability in case of high traffic use lower value. `Loraprs::ServiceCsmaSlotTimeMs` configures the amount of time in milliseconds to wait if transmission was not performed due to persistence, select lower value for lower TOA (time on air). It is also possible to dynamically override these parameters with KISS P 0x02 and SlotTime 0x03 command codes from the client.
 
-# Digital voice communication by using Codec2
+# Digital voice with Codec2
 - This modem could be used in conjuction with [Android Codec2 Walkie-Talkie](https://github.com/sh123/codec2_talkie), when application connects to the modem, instead of sending AX25 APRS packets it sends Codec2 speech encoded frames. This enables digital voice communicaiton between one or multiple modems. 
 - Select appropriate lora spread factor `cfg.LoraSf` and bandwidth `cfg.LoraBw` depending on Codec2 speech rate from 450-3200 bps. For example, if you are using 450 bps mode and 20 kHz bandwidth then set spreading factor to 6 or 7. See data rate table above. Note, that LoRa data rate must be at least 170% of codec bit rate to get speech stream without gaps.
 - When using modem for voice communication  `Loraprs::Service::CfgCsmaPersistence` must be set to maximum 255 value to disable CSMA, otherwise real time voice communication won't be guaranteed. Android codec2_talkie application automatically sets this parameter to 255 by using KISS P command code.
