@@ -10,6 +10,8 @@
 * [Test Results](#test-results)
 
 # Introduction
+![alt text](images/diagram.png)
+
 Amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem + LoRa APRS-IS RX/TX iGate server over WiFI + digipeater + Codec2 DV modem (in conjunction with Android frontend application)
 
 Can be used in several modes: 
