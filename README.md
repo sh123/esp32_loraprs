@@ -114,7 +114,7 @@ It is possible to use modem **in client mode** with other generic Linux ax25/apr
 
 # Digital voice with Codec2
 - This modem could be used in conjuction with [Android Codec2 Walkie-Talkie](https://github.com/sh123/codec2_talkie), when application connects to the modem, instead of sending AX25 APRS packets it sends Codec2 speech encoded frames. This enables digital voice communicaiton between one or multiple modems. 
-- Select appropriate lora spread factor `cfg.LoraSf` and bandwidth `cfg.LoraBw` depending on Codec2 speech rate from 450-3200 bps. For example, if you are using 450 bps mode and 20 kHz bandwidth then set spreading factor to 6 or 7. See data rate table above. Note, that LoRa data rate must be at least 170% of codec bit rate to get speech stream without gaps.
+- Select appropriate lora spread factor `cfg.LoraSf` and bandwidth `cfg.LoraBw` depending on Codec2 speech rate from 450-3200 bps. For example, if you are using 450 bps mode and 20 kHz bandwidth then set spreading factor to 6 or 7. See data rate table above.
 - When using modem for voice communication  `Loraprs::Service::CfgCsmaPersistence` must be set to maximum 255 value to disable CSMA, otherwise real time voice communication won't be guaranteed. Android codec2_talkie application automatically sets this parameter to 255 by using KISS P command code.
 - Also, it might be useful to disable CRC check for LoRa packets with `cfg.LoraEnableCrc` parameter equal to `false`. Some broken bits in one speech frame will cause audio being scrambled, it might be better then longer gap when complete packet is dropped.
 
