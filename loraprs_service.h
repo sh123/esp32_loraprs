@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include <LoRa.h>
 #include <WiFi.h>
+#include <cppQueue.h>
 
 #include "BluetoothSerial.h"
 #include "ax25_payload.h"
@@ -16,6 +17,7 @@ class Service
 {
 public:
   Service();
+  ~Service();
   
   void setup(const Config &conf);
   void loop();
@@ -28,16 +30,17 @@ private:
   void reconnectWifi();
   bool reconnectAprsis();
 
+  void processTx();
+  
   void onLoraDataAvailable(int packetSize);
-  void onBtDataAvailable();
   void onAprsisDataAvailable();
 
   void sendPeriodicBeacon();
-  
   void sendToAprsis(String aprsMessage);
-  bool sendToLora(const AX25::Payload &payload);
-
-  bool loraBeginPacketAndWait();
+  bool sendAX25ToLora(const AX25::Payload &payload);
+  
+  bool kissReceiveByte(unsigned char rxByte);
+  bool kissProcessCommand(unsigned char rxByte);
   void kissResetState();
 
   inline bool needsAprsis() const { return !isClient_ && (enableRfToIs_ || enableIsToRf_); }
@@ -72,7 +75,7 @@ private:
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
 
   const int CfgPollDelayMs = 5;
-  const int CfgLoraTxWaitMs = 2000;
+  const int CfgLoraTxQueueSize = 1024;
 
   // tx when lower than this value from random 0..255
   // use lower value for high traffic, use 255 for real time
@@ -110,6 +113,7 @@ private:
   long previousBeaconMs_;
   byte csmaP_;
   long csmaSlotTime_;
+  cppQueue *txQueue_;
   
   // peripherals
   BluetoothSerial serialBt_;

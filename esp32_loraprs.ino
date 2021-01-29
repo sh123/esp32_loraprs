@@ -3,52 +3,65 @@
 #include "loraprs_service.h"
 
 #define LED_BUILTIN         2
-#define LED_TOGGLE_PERIOD   1000
+#define LED_TOGGLE_PERIOD   1000  
 
-LoraPrs::Config cfg;
-LoraPrs::Service loraPrsService;
+#if __has_include("/tmp/esp32_loraprs_config.h")
+#pragma message("Using external config")
+#include "/tmp/esp32_loraprs_config.h"
+#else
+#pragma message("Using default config")
+#include "config.h"
+#endif
 
-auto watchdogLedTimer = timer_create_default();
+#if CFG_IS_CLIENT_MODE == true
+#pragma message("Configured for client mode")
+#else
+#pragma message("Configured for server mode")
+#endif
 
-void initializeConfig() {
+void initializeConfig(LoraPrs::Config &cfg) {
   
   // client/server mode switch
-  cfg.IsClientMode = true;
+  cfg.IsClientMode = CFG_IS_CLIENT_MODE;
 
   // lora parameters
-  cfg.LoraFreq = 433.775E6;
-  cfg.LoraBw = 125e3;
-  cfg.LoraSf = 12;
-  cfg.LoraCodingRate = 7;
+  cfg.LoraFreq = CFG_LORA_FREQ;
+  cfg.LoraBw = CFG_LORA_BW;
+  cfg.LoraSf = CFG_LORA_SF;
+  cfg.LoraCodingRate = CFG_LORA_CR;
   cfg.LoraSync = 0x34;
-  cfg.LoraPower = 20;
-  cfg.LoraEnableCrc = true; // set to false for speech data
+  cfg.LoraPower = CFG_LORA_PWR;
+  cfg.LoraEnableCrc = CFG_LORA_ENABLE_CRC; // set to false for speech data
 
   // aprs configuration
   cfg.AprsHost = "rotate.aprs2.net";
   cfg.AprsPort = 14580;
-  cfg.AprsLogin = "NOCALL-10";
-  cfg.AprsPass = "12345";
-  cfg.AprsFilter = "r/35.60/139.80/25"; // multiple filters are space separated
-  cfg.AprsRawBeacon = "NOCALL-10>APZMDM,WIDE1-1:!0000.00N/00000.00E#LoRA 433.775MHz/BW125/SF12/CR7/0x34";
+  cfg.AprsLogin = CFG_APRS_LOGIN;
+  cfg.AprsPass = CFG_APRS_PASS;
+  cfg.AprsFilter = CFG_APRS_FILTER; // multiple filters are space separated
+  cfg.AprsRawBeacon = CFG_APRS_RAW_BKN;
   cfg.AprsRawBeaconPeriodMinutes = 20;
 
   // bluetooth device name
-  cfg.BtName = "loraprs";
+  cfg.BtName = CFG_BT_NAME;
 
   // server mode wifi paramaters
-  cfg.WifiSsid = "<wifi ssid>";
-  cfg.WifiKey = "<wifi key>";
+  cfg.WifiSsid = CFG_WIFI_SSID;
+  cfg.WifiKey = CFG_WIFI_KEY;
 
   // configuration flags and features
-  cfg.EnableAutoFreqCorrection = false;  // automatic tune to any incoming packet frequency
+  cfg.EnableAutoFreqCorrection = CFG_FREQ_CORR;  // automatic tune to any incoming packet frequency
   cfg.EnableSignalReport = true;  // signal report will be added to the comment sent to aprsis
-  cfg.EnablePersistentAprsConnection = true; // keep aprsis connection open, otherwise connect on new data only
-  cfg.EnableRfToIs = true;  // send data from rf to aprsis
-  cfg.EnableIsToRf = false; // send data from aprsis to rf
-  cfg.EnableRepeater = false; // digirepeat incoming packets
-  cfg.EnableBeacon = false;  // enable periodic AprsRawBeacon beacon to rf and aprsis if rf to aprsis is enabled
+  cfg.EnablePersistentAprsConnection = CFG_PERSISTENT_APRS; // keep aprsis connection open, otherwise connect on new data only
+  cfg.EnableRfToIs = CFG_RF_TO_IS;  // send data from rf to aprsis
+  cfg.EnableIsToRf = CFG_IS_TO_RF; // send data from aprsis to rf
+  cfg.EnableRepeater = CFG_DIGIREPEAT; // digirepeat incoming packets
+  cfg.EnableBeacon = CFG_BEACON;  // enable periodic AprsRawBeacon beacon to rf and aprsis if rf to aprsis is enabled
 }
+
+LoraPrs::Service loraPrsService;
+
+auto watchdogLedTimer = timer_create_default();
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -56,9 +69,11 @@ void setup() {
 
   Serial.begin(115200);
   while (!Serial);
+  
+  LoraPrs::Config config;
 
-  initializeConfig();
-  loraPrsService.setup(cfg);
+  initializeConfig(config);
+  loraPrsService.setup(config);
 
   watchdogLedTimer.every(LED_TOGGLE_PERIOD, toggleWatchdogLed);
 }

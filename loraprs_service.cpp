@@ -7,8 +7,13 @@ Service::Service()
   , kissCmd_(KissCmd::NoCmd)
   , csmaP_(CfgCsmaPersistence)
   , csmaSlotTime_(CfgCsmaSlotTimeMs)
+  , txQueue_(new cppQueue(sizeof(unsigned char), CfgLoraTxQueueSize))
   , serialBt_()
 {
+}
+
+Service::~Service() {
+  delete txQueue_;
 }
 
 void Service::setup(const Config &conf)
@@ -141,13 +146,14 @@ void Service::setupBt(const String &btName)
 }
 
 void Service::loop()
-{ 
+{
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
   if (needsAprsis() && !aprsisConn_.connected() && persistentConn_) {
     reconnectAprsis();
   }
+
   // RX path
   if (int packetSize = LoRa.parsePacket()) {
     onLoraDataAvailable(packetSize);
@@ -155,14 +161,14 @@ void Service::loop()
   // TX path
   else {
     if (random(0, 255) < csmaP_) {
-      if (serialBt_.available()) {
-        onBtDataAvailable();
-      }
-      else if (aprsisConn_.available() > 0) {
+      if (aprsisConn_.available() > 0) {
         onAprsisDataAvailable();
       }
       else if (needsBeacon()) {
         sendPeriodicBeacon();
+      } 
+      else {
+        processTx();
       }
     }
     else {
@@ -179,7 +185,7 @@ void Service::sendPeriodicBeacon()
   if (previousBeaconMs_ == 0 || currentMs - previousBeaconMs_ >= aprsBeaconPeriodMinutes_ * 60 * 1000) {
       AX25::Payload payload(aprsBeacon_);
       if (payload.IsValid()) {
-        sendToLora(payload);
+        sendAX25ToLora(payload);
         if (enableRfToIs_) {
           sendToAprsis(payload.ToString());
         }
@@ -222,7 +228,7 @@ void Service::onAprsisDataAvailable()
   if (enableIsToRf_ && aprsisData.length() > 0) {
     AX25::Payload payload(aprsisData);
     if (payload.IsValid()) {
-      sendToLora(payload);
+      sendAX25ToLora(payload);
     }
     else {
       Serial.println("Invalid payload from APRSIS");
@@ -230,7 +236,7 @@ void Service::onAprsisDataAvailable()
   }
 }
 
-bool Service::sendToLora(const AX25::Payload &payload) 
+bool Service::sendAX25ToLora(const AX25::Payload &payload) 
 {
   byte buf[512];
   int bytesWritten = payload.ToBinary(buf, sizeof(buf));
@@ -305,12 +311,36 @@ void Service::onLoraDataAvailable(int packetSize)
         Serial.println("Packet sent to APRS-IS");
       }
       if (enableRepeater_ && payload.Digirepeat(ownCallsign_)) {
-        sendToLora(payload);
+        sendAX25ToLora(payload);
         Serial.println("Packet digirepeated");
       }
     }
     else {
       Serial.println("Skipping non-AX25 payload");
+    }
+  }
+}
+
+void Service::processTx() 
+{
+  while (serialBt_.available() || !txQueue_->isEmpty()) {
+
+    if (serialBt_.available()) {
+      int rxResult = serialBt_.read();
+      if (rxResult != -1) {
+        byte rxByte = (byte)rxResult;
+        if (!txQueue_->push((void *)&rxByte)) {
+          Serial.println("TX queue is full");
+        }
+      }
+    }
+    if (!txQueue_->isEmpty()) {
+      byte qRxByte;
+      if (txQueue_->peek((void *)&qRxByte)) {
+        if (kissReceiveByte(qRxByte)) {
+          txQueue_->drop();
+        }
+      }
     }
   }
 }
@@ -321,96 +351,81 @@ void Service::kissResetState()
   kissState_ = KissState::Void;
 }
 
-bool Service::loraBeginPacketAndWait()
-{
-  for (int i = 0; i < CfgLoraTxWaitMs; i++) {
-    if (LoRa.beginPacket() == 1) {
+bool Service::kissProcessCommand(unsigned char rxByte) {
+
+  switch (rxByte) {
+    case KissCmd::Data:
+      if (LoRa.beginPacket() == 0) return false;
+      kissState_ = KissState::GetData;
+      break;
+    case KissCmd::P:
+      kissState_ = KissState::GetP;
+      break;
+    case KissCmd::SlotTime:
+      kissState_ = KissState::GetSlotTime;
+      break;
+    default:
+      // unknown command
+      kissResetState();
       return true;
-    }
-    delay(1);
   }
-  return false;
+  kissCmd_ = (KissCmd)rxByte;
+  return true;
 }
 
-void Service::onBtDataAvailable() 
-{ 
-  while (serialBt_.available()) {
-    
-    int rxResult = serialBt_.read();
-    if (rxResult == -1) break;
-    
-    byte rxByte = (byte)rxResult;
+bool Service::kissReceiveByte(unsigned char rxByte) {
 
-    switch (kissState_) {
-      case KissState::Void:
-        if (rxByte == KissMarker::Fend) {
-          kissCmd_ = KissCmd::NoCmd;
-          kissState_ = KissState::GetCmd;
+  switch (kissState_) {
+    case KissState::Void:
+      if (rxByte == KissMarker::Fend) {
+        kissCmd_ = KissCmd::NoCmd;
+        kissState_ = KissState::GetCmd;
+      }
+      break;
+    case KissState::GetCmd:
+      if (rxByte != KissMarker::Fend) {
+        if (!kissProcessCommand(rxByte)) return false;
+      }
+      break;
+    case KissState::GetP:
+      csmaP_ = rxByte;
+      kissState_ = KissState::GetData;
+      break;
+    case KissState::GetSlotTime:
+      csmaSlotTime_ = (long)rxByte * 10;
+      kissState_ = KissState::GetData;
+      break;
+    case KissState::GetData:
+      if (rxByte == KissMarker::Fesc) {
+        kissState_ = KissState::Escape;
+      }
+      else if (rxByte == KissMarker::Fend) {
+        if (kissCmd_ == KissCmd::Data) {
+          LoRa.endPacket(true);
         }
-        break;
-      case KissState::GetCmd:
-        if (rxByte != KissMarker::Fend) {
-          if (rxByte == KissCmd::Data) {
-            if (!loraBeginPacketAndWait()) {
-              Serial.println("LoRa buffer overflow, dropping packet");
-              kissResetState();
-              return;
-            }
-            kissCmd_ = (KissCmd)rxByte;
-            kissState_ = KissState::GetData;
-          }
-          else if (rxByte == KissCmd::P) {
-            kissCmd_ = (KissCmd)rxByte;
-            kissState_ = KissState::GetP;
-          }
-          else if (rxByte == KissCmd::SlotTime) {
-            kissCmd_ = (KissCmd)rxByte;
-            kissState_ = KissState::GetSlotTime;
-          }
-          else {
-            kissResetState();
-          }
-        }
-        break;
-      case KissState::GetP:
-        csmaP_ = rxByte;
+        kissResetState();
+      }
+      else if (kissCmd_ == KissCmd::Data) {
+        LoRa.write(rxByte);
+      }
+      break;
+    case KissState::Escape:
+      if (rxByte == KissMarker::Tfend) {
+        LoRa.write(KissMarker::Fend);
         kissState_ = KissState::GetData;
-        break;
-      case KissState::GetSlotTime:
-        csmaSlotTime_ = (long)rxByte * 10;
+      }
+      else if (rxByte == KissMarker::Tfesc) {
+        LoRa.write(KissMarker::Fesc);
         kissState_ = KissState::GetData;
-        break;
-      case KissState::GetData:
-        if (rxByte == KissMarker::Fesc) {
-          kissState_ = KissState::Escape;
-        }
-        else if (rxByte == KissMarker::Fend) {
-          if (kissCmd_ == KissCmd::Data) {
-            LoRa.endPacket(true);
-          }
-          kissResetState();
-        }
-        else if (kissCmd_ == KissCmd::Data) {
-          LoRa.write(rxByte);
-        }
-        break;
-      case KissState::Escape:
-        if (rxByte == KissMarker::Tfend) {
-          LoRa.write(KissMarker::Fend);
-          kissState_ = KissState::GetData;
-        }
-        else if (rxByte == KissMarker::Tfesc) {
-          LoRa.write(KissMarker::Fesc);
-          kissState_ = KissState::GetData;
-        }
-        else {
-          kissResetState();
-        }
-        break;
-      default:
-        break;
-    }
+      }
+      else {
+        kissResetState();
+      }
+      break;
+    default:
+      break;
   }
+  return true;
 }
 
 } // LoraPrs

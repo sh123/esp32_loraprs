@@ -43,6 +43,7 @@ Install via libraries:
 - Arduino ESP32 library: https://github.com/espressif/arduino-esp32
 - LoRa arduino library: https://github.com/sandeepmistry/arduino-LoRa
 - Arduino Timer library: https://github.com/contrem/arduino-timer
+- cppQueue library: https://github.com/SMFSW/Queue
 
 # Software Setup
 - when setting up APRSDroid, use **"TNC (KISS)"** connection protocol in Connection Preferences -> Connection Protocol
