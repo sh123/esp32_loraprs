@@ -75,7 +75,7 @@ void Service::setupWifi(const String &wifiName, const String &wifiKey)
     WiFi.begin(wifiName.c_str(), wifiKey.c_str());
 
     while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
+      delay(CfgConnRetryMs);
       Serial.print(".");
     }
     Serial.println("ok");
@@ -89,7 +89,7 @@ void Service::reconnectWifi()
 
   while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0,0,0,0)) {
     WiFi.reconnect();
-    delay(500);
+    delay(CfgConnRetryMs);
     Serial.print(".");
   }
 
@@ -118,7 +118,7 @@ void Service::setupLora(int loraFreq, int bw, byte sf, byte cr, byte pwr, byte s
   
   while (!LoRa.begin(loraFreq)) {
     Serial.print(".");
-    delay(500);
+    delay(CfgConnRetryMs);
   }
   LoRa.setSyncWord(sync);
   LoRa.setSpreadingFactor(sf);
@@ -342,6 +342,7 @@ void Service::processTx()
         }
       }
     }
+    yield();
   }
 }
 
@@ -355,6 +356,7 @@ bool Service::kissProcessCommand(unsigned char rxByte) {
 
   switch (rxByte) {
     case KissCmd::Data:
+      delay(CfgPollDelayMs);  // LoRa may drop packet if removed
       if (LoRa.beginPacket() == 0) return false;
       kissState_ = KissState::GetData;
       break;

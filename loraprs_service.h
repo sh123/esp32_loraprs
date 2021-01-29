@@ -74,6 +74,7 @@ private:
 
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
 
+  const int CfgConnRetryMs = 500;
   const int CfgPollDelayMs = 5;
   const int CfgLoraTxQueueSize = 1024;
 
