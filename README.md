@@ -80,7 +80,7 @@ Install via libraries:
 
 # Protocol Compatibility
 - Make sure LoRa sync word and other LoRa parameters match
-- **Client** should be interoperable with other clients, which transmit raw text aprs messages, in this case select "TNC (plaintext TNC2)" in APRSDroid protocol options
+- **Client** should be interoperable with other clients, which transmit raw text APRS messages if bluetooth client sends them in this format to the modem
 - **Server** supports only classical `AX25` frames over LoRa (as defined in http://www.aprs.org/doc/APRS101.PDF page 12). It should enable interoperability with classical Linux APRS software, such as Xastir with `kissattach`. Some LoRa ARPS implementations transfer plain text APRS messages over LoRa, as a result **Server** will not be able to process these messages and gate them to APRS-IS, also clients won't be able to decode messages gated from APRS-IS to RF by the server. Server support for plaintext APRS messages is planned.
 
 # Alternative Linux Setup
