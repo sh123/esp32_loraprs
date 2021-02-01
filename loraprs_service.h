@@ -114,7 +114,7 @@ private:
   long previousBeaconMs_;
   byte csmaP_;
   long csmaSlotTime_;
-  std::shared_ptr<cppQueue>txQueue_;
+  std::shared_ptr<cppQueue>kissTxQueue_;
   
   // peripherals
   BluetoothSerial serialBt_;

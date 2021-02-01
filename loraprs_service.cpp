@@ -7,7 +7,7 @@ Service::Service()
   , kissCmd_(KissCmd::NoCmd)
   , csmaP_(CfgCsmaPersistence)
   , csmaSlotTime_(CfgCsmaSlotTimeMs)
-  , txQueue_(new cppQueue(sizeof(unsigned char), CfgLoraTxQueueSize))
+  , kissTxQueue_(new cppQueue(sizeof(unsigned char), CfgLoraTxQueueSize))
   , serialBt_()
 {
 }
@@ -329,22 +329,22 @@ void Service::onLoraDataAvailable(int packetSize)
 
 void Service::processTx() 
 {
-  while (serialBt_.available() || !txQueue_->isEmpty()) {
+  while (serialBt_.available() || !kissTxQueue_->isEmpty()) {
 
     if (serialBt_.available()) {
       int rxResult = serialBt_.read();
       if (rxResult != -1) {
         byte rxByte = (byte)rxResult;
-        if (!txQueue_->push((void *)&rxByte)) {
+        if (!kissTxQueue_->push((void *)&rxByte)) {
           Serial.println("TX queue is full");
         }
       }
     }
-    if (!txQueue_->isEmpty()) {
+    if (!kissTxQueue_->isEmpty()) {
       byte qRxByte;
-      if (txQueue_->peek((void *)&qRxByte)) {
+      if (kissTxQueue_->peek((void *)&qRxByte)) {
         if (kissReceiveByte(qRxByte)) {
-          txQueue_->drop();
+          kissTxQueue_->drop();
         }
       }
     }
