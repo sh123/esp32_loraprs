@@ -17,7 +17,6 @@ class Service
 {
 public:
   Service();
-  ~Service();
   
   void setup(const Config &conf);
   void loop();
@@ -77,6 +76,7 @@ private:
   const int CfgConnRetryMs = 500;
   const int CfgPollDelayMs = 5;
   const int CfgLoraTxQueueSize = 4096;
+  const int CfgWiFiConnRetryMaxTimes = 10;
 
   // tx when lower than this value from random 0..255
   // use lower value for high traffic, use 255 for real time
@@ -114,7 +114,7 @@ private:
   long previousBeaconMs_;
   byte csmaP_;
   long csmaSlotTime_;
-  cppQueue *txQueue_;
+  std::shared_ptr<cppQueue>txQueue_;
   
   // peripherals
   BluetoothSerial serialBt_;

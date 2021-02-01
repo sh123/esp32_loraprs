@@ -12,10 +12,6 @@ Service::Service()
 {
 }
 
-Service::~Service() {
-  delete txQueue_;
-}
-
 void Service::setup(const Config &conf)
 {
   previousBeaconMs_ = 0;
@@ -74,9 +70,14 @@ void Service::setupWifi(const String &wifiName, const String &wifiKey)
     WiFi.mode(WIFI_STA);
     WiFi.begin(wifiName.c_str(), wifiKey.c_str());
 
+    int retryCnt = 0;
     while (WiFi.status() != WL_CONNECTED) {
       delay(CfgConnRetryMs);
       Serial.print(".");
+      if (retryCnt++ >= CfgWiFiConnRetryMaxTimes) {
+        Serial.println("failed");
+        return;
+      }
     }
     Serial.println("ok");
     Serial.println(WiFi.localIP());
@@ -87,10 +88,15 @@ void Service::reconnectWifi()
 {
   Serial.print("WIFI re-connecting...");
 
+  int retryCnt = 0;
   while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0,0,0,0)) {
     WiFi.reconnect();
     delay(CfgConnRetryMs);
     Serial.print(".");
+    if (retryCnt++ >= CfgWiFiConnRetryMaxTimes) {
+      Serial.println("failed");
+      return;
+    }
   }
 
   Serial.println("ok");
@@ -231,7 +237,7 @@ void Service::onAprsisDataAvailable()
       sendAX25ToLora(payload);
     }
     else {
-      Serial.println("Invalid payload from APRSIS");
+      Serial.println("Unknown payload from APRSIS, ignoring...");
     }
   }
 }
