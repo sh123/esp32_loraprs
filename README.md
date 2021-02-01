@@ -79,7 +79,9 @@ Install via libraries:
    - `cfg.EnableBeacon` set to `true` to enable periodic beacons specified in `cfg.AprsRawBeacon` with period specified in `cfg.AprsRawBeaconPeriodMinutes` into RF and APRS-IS if `cfg.EnableRfToIs` is enabled
 
 # Protocol Compatibility
-This project is using classical `AX25` frames over LoRa (as defined in http://www.aprs.org/doc/APRS101.PDF page 12) with given LoRa parameters above and `AX25` frames are encapsulated into `KISS` frames when transferred over serial Bluetooth to phone or PC. It should enable interoperability with classical Linux APRS software and `kissattach`. Some LoRa ARPS implementations transfer plain text APRS messages over LoRa, as a result interoperability with this project is not guaranteed.
+- Make sure LoRa sync word and other LoRa parameters match
+- **Client** should be interoperable with other clients, which transmit raw text aprs messages, in this case select "TNC (plaintext TNC2)" in APRSDroid protocol options
+- **Server** is using classical `AX25` frames over LoRa (as defined in http://www.aprs.org/doc/APRS101.PDF page 12) with given LoRa parameters above and `AX25` frames are encapsulated into `KISS` frames when transferred over serial Bluetooth to phone or PC. It should enable interoperability with classical Linux APRS software and `kissattach`. Some LoRa ARPS implementations transfer plain text APRS messages over LoRa, as a result **Server** interoperability with this project is not guaranteed
 
 # Alternative Linux Setup
 It is possible to use modem **in client mode** with other generic Linux ax25/aprs tools, such as `xastir`, use next procedure to set it up:
