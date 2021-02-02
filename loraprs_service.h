@@ -26,7 +26,7 @@ private:
   void setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, bool enableCrc);
   void setupBt(const String &btName);
 
-  void reconnectWifi();
+  void reconnectWifi() const;
   bool reconnectAprsis();
 
   void processTx();
@@ -37,6 +37,7 @@ private:
   void sendPeriodicBeacon();
   void sendToAprsis(const String &aprsMessage);
   bool sendAX25ToLora(const AX25::Payload &payload);
+  void processIncomingRawPacketAsServer(const byte *packet, int packetLength);
   
   bool kissReceiveByte(unsigned char rxByte);
   bool kissProcessCommand(unsigned char rxByte);
@@ -91,20 +92,21 @@ private:
 
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
 
+  // module pinouts
+  const byte CfgPinSs = 5;
+  const byte CfgPinRst = 26;
+  const byte CfgPinDio0 = 14;
+
+  // processor config
   const int CfgConnRetryMs = 500;
   const int CfgPollDelayMs = 5;
   const int CfgLoraTxQueueSize = 4096;
   const int CfgWiFiConnRetryMaxTimes = 10;
 
-  // tx when lower than this value from random 0..255
-  // use lower value for high traffic, use 255 for real time
+  // csma paramters, use lower value for high traffic, use 255 for real time
   const long CfgCsmaPersistence = 100;
   const long CfgCsmaSlotTimeMs = 500;
-
-  const byte CfgPinSs = 5;
-  const byte CfgPinRst = 26;
-  const byte CfgPinDio0 = 14;
-
+  
 private:
   // config
   Config config_;

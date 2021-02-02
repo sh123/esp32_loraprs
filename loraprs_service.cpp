@@ -69,7 +69,7 @@ void Service::setupWifi(const String &wifiName, const String &wifiKey)
   }
 }
 
-void Service::reconnectWifi()
+void Service::reconnectWifi() const
 {
   Serial.print("WIFI re-connecting...");
 
@@ -268,9 +268,6 @@ void Service::onLoraDataAvailable(int packetSize)
   }
 
   serialBt_.write(KissMarker::Fend);
-
-  float snr = LoRa.packetSnr();
-  float rssi = LoRa.packetRssi();
   long frequencyError = LoRa.packetFrequencyError();
 
   if (config_.EnableAutoFreqCorrection) {
@@ -279,36 +276,44 @@ void Service::onLoraDataAvailable(int packetSize)
   }
 
   if (!config_.IsClientMode) {
+    processIncomingRawPacketAsServer(rxBuf, rxBufIndex);
+  }
+}
+
+void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLength) {
+
+  float snr = LoRa.packetSnr();
+  float rssi = LoRa.packetRssi();
+  long frequencyError = LoRa.packetFrequencyError();
+  
+  String signalReport = String(" ") +
+    String("rssi: ") +
+    String(snr < 0 ? rssi + snr : rssi) +
+    String("dBm, ") +
+    String("snr: ") +
+    String(snr) +
+    String("dB, ") +
+    String("err: ") +
+    String(frequencyError) +
+    String("Hz");
+
+  AX25::Payload payload(packet, packetLength);
+
+  if (payload.IsValid()) {
     
-    String signalReport = String(" ") +
-      String("rssi: ") +
-      String(snr < 0 ? rssi + snr : rssi) +
-      String("dBm, ") +
-      String("snr: ") +
-      String(snr) +
-      String("dB, ") +
-      String("err: ") +
-      String(frequencyError) +
-      String("Hz");
-
-    AX25::Payload payload(rxBuf, rxBufIndex);
-
-    if (payload.IsValid()) {
-      String textPayload = payload.ToString(config_.EnableSignalReport ? signalReport : String());
-      Serial.println(textPayload);
-
-      if (config_.EnableRfToIs) {
-        sendToAprsis(textPayload);
-        Serial.println("Packet sent to APRS-IS");
-      }
-      if (config_.EnableRepeater && payload.Digirepeat(ownCallsign_)) {
-        sendAX25ToLora(payload);
-        Serial.println("Packet digirepeated");
-      }
+    String textPayload = payload.ToString(config_.EnableSignalReport ? signalReport : String());
+    Serial.println(textPayload);
+  
+    if (config_.EnableRfToIs) {
+      sendToAprsis(textPayload);
+      Serial.println("Packet sent to APRS-IS");
     }
-    else {
-      Serial.println("Skipping non-AX25 payload");
+    if (config_.EnableRepeater && payload.Digirepeat(ownCallsign_)) {
+      sendAX25ToLora(payload);
+      Serial.println("Packet digirepeated");
     }
+  } else {
+    Serial.println("Skipping non-AX25 payload");
   }
 }
 

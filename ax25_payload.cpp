@@ -2,7 +2,7 @@
 
 namespace AX25 {
   
-Payload::Payload(byte *rxPayload, int payloadLength)
+Payload::Payload(const byte *rxPayload, int payloadLength)
   : rptCallsCount_(0)
 {
   isValid_ = fromBinary(rxPayload, payloadLength);
@@ -67,7 +67,7 @@ int Payload::ToBinary(byte *txPayload, int bufferLength) const
   return (int)(txPtr-txPayload);
 }
 
-String Payload::ToString(String customComment)
+String Payload::ToString(const String &customComment)
 {
   String txt = srcCall_.ToString() + String(">") + dstCall_.ToString();
 
