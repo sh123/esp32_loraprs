@@ -49,4 +49,4 @@ private:
 
 } // AX25
 
-#endif // APRSMSG_H
+#endif // AX25_PAYLOAD_H

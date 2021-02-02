@@ -40,4 +40,4 @@ private:
 
 } // AX25
 
-#endif // APRSMSG_H
+#endif // AX25_CALLSIGN_H
