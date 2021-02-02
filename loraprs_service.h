@@ -9,11 +9,12 @@
 
 #include "BluetoothSerial.h"
 #include "ax25_payload.h"
+#include "kiss_processor.h"
 #include "loraprs_config.h"
 
 namespace LoraPrs {
 
-class Service
+class Service : public Kiss::Processor
 {
 public:
   Service();
@@ -50,46 +51,18 @@ private:
   inline bool needsBt() const { return config_.IsClientMode; }
   inline bool needsBeacon() const { return !config_.IsClientMode && config_.EnableBeacon; }
 
+protected:
+  virtual bool onRigTxBegin();
+  virtual void onRigTx(byte data);
+  virtual void onRigTxEnd();
+
+  virtual void onSerialTx(byte data);
+  virtual bool onSerialRxHasData();
+  virtual bool onSerialRx(byte *data);
+
+  virtual void onControlCommand(Cmd cmd, byte value);
+  
 private:
-  enum KissMarker {
-    Fend = 0xc0,
-    Fesc = 0xdb,
-    Tfend = 0xdc,
-    Tfesc = 0xdd
-  };
-
-  enum KissState {
-    Void = 0,
-    GetCmd,
-    GetData,
-    GetP,
-    GetSlotTime,
-    Escape
-  };
-
-  enum KissCmd {
-    
-    // generic
-    Data = 0x00,
-    P = 0x02,
-    SlotTime = 0x03,
-    
-    // extended to modem
-    Frequency = 0x10,
-    Bandwidth = 0x11,
-    Power = 0x12,
-    SyncWord = 0x13,
-    SpreadingFactor = 0x14,
-    CodingRate = 0x15,
-    EnableCrc = 0x16,
-    
-    // extended events from modem
-    SignalLevel = 0x30,
-
-    // end of cmds
-    NoCmd = 0x80
-  };
-
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
 
   // module pinouts
@@ -100,7 +73,6 @@ private:
   // processor config
   const int CfgConnRetryMs = 500;
   const int CfgPollDelayMs = 5;
-  const int CfgLoraTxQueueSize = 4096;
   const int CfgWiFiConnRetryMaxTimes = 10;
   const int CfgMaxAX25PayloadSize = 512;
 
@@ -113,13 +85,9 @@ private:
   Config config_;
   byte csmaP_;
   long csmaSlotTime_;
+  long csmaSlotTimePrev_;
   String aprsLoginCommand_;
   AX25::Callsign ownCallsign_;
-
-  // kiss
-  KissState kissState_;
-  KissCmd kissCmd_;
-  std::shared_ptr<cppQueue>kissTxQueue_;
 
   // state
   long previousBeaconMs_;
