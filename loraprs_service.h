@@ -70,9 +70,9 @@ private:
   const int CfgWiFiConnRetryMaxTimes = 10;
   const int CfgMaxAX25PayloadSize = 512;
 
-  // csma paramters, use lower value for high traffic, use 255 for real time
-  const long CfgCsmaPersistence = 100;
-  const long CfgCsmaSlotTimeMs = 500;
+  // csma paramters, overriden with KISS commands
+  const long CfgCsmaPersistence = 100;  // 255 for real time, lower for higher traffic
+  const long CfgCsmaSlotTimeMs = 500;   // 0 for real time, otherwise set to average tx duration
   
 private:
   // config
