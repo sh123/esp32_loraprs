@@ -303,9 +303,9 @@ bool Service::onRigTxBegin()
   return (LoRa.beginPacket() == 1);
 }
 
-void Service::onRigTx(byte data)
+void Service::onRigTx(byte b)
 {
-  LoRa.write(data);
+  LoRa.write(b);
 }
 
 void Service::onRigTxEnd()
@@ -313,9 +313,9 @@ void Service::onRigTxEnd()
   LoRa.endPacket(true);
 }
 
-void Service::onSerialTx(byte data)
+void Service::onSerialTx(byte b)
 {
-  serialBt_.write(data);
+  serialBt_.write(b);
 }
 
 bool Service::onSerialRxHasData()
@@ -323,13 +323,13 @@ bool Service::onSerialRxHasData()
   return serialBt_.available();
 }
 
-bool Service::onSerialRx(byte *data)
+bool Service::onSerialRx(byte *b)
 {
   int rxResult = serialBt_.read();
   if (rxResult == -1) {
     return false;
   }
-  *data = (byte)rxResult;
+  *b = (byte)rxResult;
   return true;
 }
 

@@ -12,7 +12,7 @@ class Processor {
 public:
   Processor();
   
-  void serialSend(const byte *data, int dataLength);
+  void serialSend(const byte *b, int dataLength);
   void serialProcessRx();
 
 protected:
@@ -59,12 +59,12 @@ protected:
     
 protected:
   virtual bool onRigTxBegin() = 0;
-  virtual void onRigTx(byte data) = 0;
+  virtual void onRigTx(byte b) = 0;
   virtual void onRigTxEnd() = 0;
 
-  virtual void onSerialTx(byte data) = 0;
+  virtual void onSerialTx(byte b) = 0;
   virtual bool onSerialRxHasData() = 0;
-  virtual bool onSerialRx(byte *data) = 0;
+  virtual bool onSerialRx(byte *b) = 0;
 
   virtual void onControlCommand(Cmd cmd, byte value) = 0;
   /*

@@ -9,12 +9,12 @@ Processor::Processor()
 {
 }
 
-void Processor::serialSend(const byte *data, int dataLength) {
+void Processor::serialSend(const byte *b, int dataLength) {
   onSerialTx((byte)Marker::Fend);
   onSerialTx((byte)Cmd::Data);
 
   for (int i = 0; i < dataLength; i++) {
-    byte rxByte = data[i];
+    byte rxByte = b[i];
 
     if (rxByte == Marker::Fend) {
       onSerialTx((byte)Marker::Fesc);

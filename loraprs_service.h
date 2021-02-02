@@ -29,8 +29,6 @@ private:
 
   void reconnectWifi() const;
   bool reconnectAprsis();
-
-  void processTx();
   
   void onLoraDataAvailable(int packetSize);
   void onAprsisDataAvailable();
@@ -40,10 +38,6 @@ private:
   bool sendAX25ToLora(const AX25::Payload &payload);
   void processIncomingRawPacketAsServer(const byte *packet, int packetLength);
   
-  bool kissReceiveByte(unsigned char rxByte);
-  bool kissProcessCommand(unsigned char rxByte);
-  void kissResetState();
-
   inline bool needsAprsis() const { 
     return !config_.IsClientMode && (config_.EnableRfToIs || config_.EnableIsToRf); 
   }
@@ -53,12 +47,12 @@ private:
 
 protected:
   virtual bool onRigTxBegin();
-  virtual void onRigTx(byte data);
+  virtual void onRigTx(byte b);
   virtual void onRigTxEnd();
 
-  virtual void onSerialTx(byte data);
+  virtual void onSerialTx(byte b);
   virtual bool onSerialRxHasData();
-  virtual bool onSerialRx(byte *data);
+  virtual bool onSerialRx(byte *b);
 
   virtual void onControlCommand(Cmd cmd, byte value);
   
@@ -83,11 +77,13 @@ private:
 private:
   // config
   Config config_;
+  String aprsLoginCommand_;
+  AX25::Callsign ownCallsign_;
+
+  // csma
   byte csmaP_;
   long csmaSlotTime_;
   long csmaSlotTimePrev_;
-  String aprsLoginCommand_;
-  AX25::Callsign ownCallsign_;
 
   // state
   long previousBeaconMs_;
