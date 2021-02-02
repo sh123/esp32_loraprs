@@ -229,7 +229,7 @@ void Service::onAprsisDataAvailable()
 
 bool Service::sendAX25ToLora(const AX25::Payload &payload) 
 {
-  byte buf[512];
+  byte buf[CfgMaxAX25PayloadSize];
   int bytesWritten = payload.ToBinary(buf, sizeof(buf));
   if (bytesWritten <= 0) {
     Serial.println("Failed to serialize payload");

@@ -102,6 +102,7 @@ private:
   const int CfgPollDelayMs = 5;
   const int CfgLoraTxQueueSize = 4096;
   const int CfgWiFiConnRetryMaxTimes = 10;
+  const int CfgMaxAX25PayloadSize = 512;
 
   // csma paramters, use lower value for high traffic, use 255 for real time
   const long CfgCsmaPersistence = 100;
