@@ -116,7 +116,7 @@ bool Service::reconnectAprsis()
   return true;
 }
 
-void Service::setupLora(int loraFreq, int bw, byte sf, byte cr, byte pwr, byte sync, bool enableCrc)
+void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, bool enableCrc)
 {
   Serial.print("LoRa init...");
   

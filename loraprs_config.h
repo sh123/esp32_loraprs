@@ -10,11 +10,11 @@ struct Config
   bool IsClientMode;    // true - client mode, false - server mode
   
   long LoraFreq;        // lora frequency, e.g. 433.775e6
-  int LoraBw;           // lora bandwidth, e.g. 125e3
-  byte LoraSf;          // lora spreading factor, e.g. 12
-  byte LoraCodingRate;  // lora coding rate, e.g. 7
-  byte LoraSync;        // lora sync word/packet id, 0x3f
-  byte LoraPower;       // lora power level in dbm, 20
+  long LoraBw;          // lora bandwidth, e.g. 125e3
+  int LoraSf;           // lora spreading factor, e.g. 12
+  int LoraCodingRate;   // lora coding rate, e.g. 7
+  int LoraSync;         // lora sync word/packet id, 0x3f
+  int LoraPower;        // lora power level in dbm, 20
   bool LoraEnableCrc;   // lora crc check enabled
 
   int AprsPort;         // aprs server port, 14580
