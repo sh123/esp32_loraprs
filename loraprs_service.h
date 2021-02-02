@@ -35,7 +35,7 @@ private:
   void onAprsisDataAvailable();
 
   void sendPeriodicBeacon();
-  void sendToAprsis(String aprsMessage);
+  void sendToAprsis(const String &aprsMessage);
   bool sendAX25ToLora(const AX25::Payload &payload);
   
   bool kissReceiveByte(unsigned char rxByte);

@@ -189,7 +189,7 @@ void Service::sendPeriodicBeacon()
   }
 }
 
-void Service::sendToAprsis(String aprsMessage)
+void Service::sendToAprsis(const String &aprsMessage)
 {
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
