@@ -42,10 +42,12 @@ private:
   bool kissProcessCommand(unsigned char rxByte);
   void kissResetState();
 
-  inline bool needsAprsis() const { return !isClient_ && (enableRfToIs_ || enableIsToRf_); }
+  inline bool needsAprsis() const { 
+    return !config_.IsClientMode && (config_.EnableRfToIs || config_.EnableIsToRf); 
+  }
   inline bool needsWifi() const { return needsAprsis(); }
-  inline bool needsBt() const { return isClient_; }
-  inline bool needsBeacon() const { return !isClient_ && enableBeacon_; }
+  inline bool needsBt() const { return config_.IsClientMode; }
+  inline bool needsBeacon() const { return !config_.IsClientMode && config_.EnableBeacon; }
 
 private:
   enum KissMarker {
@@ -65,9 +67,25 @@ private:
   };
 
   enum KissCmd {
+    
+    // generic
     Data = 0x00,
     P = 0x02,
     SlotTime = 0x03,
+    
+    // extended to modem
+    Frequency = 0x10,
+    Bandwidth = 0x11,
+    Power = 0x12,
+    SyncWord = 0x13,
+    SpreadingFactor = 0x14,
+    CodingRate = 0x15,
+    EnableCrc = 0x16,
+    
+    // extended events from modem
+    SignalLevel = 0x30,
+
+    // end of cmds
     NoCmd = 0x80
   };
 
@@ -89,33 +107,20 @@ private:
 
 private:
   // config
-  bool isClient_;
-  long loraFreq_;
-
-  AX25::Callsign ownCallsign_;
-
-  String aprsHost_;
-  int aprsPort_;
-  String aprsLogin_;
-  String aprsBeacon_;
-  int aprsBeaconPeriodMinutes_;
-
-  bool autoCorrectFreq_;
-  bool addSignalReport_;
-  bool persistentConn_;
-  bool enableRfToIs_;
-  bool enableIsToRf_;
-  bool enableRepeater_;
-  bool enableBeacon_;
-
-  // state
-  KissState kissState_;
-  KissCmd kissCmd_;
-  long previousBeaconMs_;
+  Config config_;
   byte csmaP_;
   long csmaSlotTime_;
+  String aprsLoginCommand_;
+  AX25::Callsign ownCallsign_;
+
+  // kiss
+  KissState kissState_;
+  KissCmd kissCmd_;
   std::shared_ptr<cppQueue>kissTxQueue_;
-  
+
+  // state
+  long previousBeaconMs_;
+    
   // peripherals
   BluetoothSerial serialBt_;
   WiFiClient aprsisConn_;

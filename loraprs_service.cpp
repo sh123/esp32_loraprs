@@ -3,10 +3,10 @@
 namespace LoraPrs {
   
 Service::Service() 
-  : kissState_(KissState::Void)
-  , kissCmd_(KissCmd::NoCmd)
-  , csmaP_(CfgCsmaPersistence)
+  : csmaP_(CfgCsmaPersistence)
   , csmaSlotTime_(CfgCsmaSlotTimeMs)
+  , kissState_(KissState::Void)
+  , kissCmd_(KissCmd::NoCmd)
   , kissTxQueue_(new cppQueue(sizeof(unsigned char), CfgLoraTxQueueSize))
   , serialBt_()
 {
@@ -14,56 +14,41 @@ Service::Service()
 
 void Service::setup(const Config &conf)
 {
+  config_ = conf;  
   previousBeaconMs_ = 0;
 
-  // config
-  isClient_ = conf.IsClientMode;
-  loraFreq_ = conf.LoraFreq;
-  ownCallsign_ = AX25::Callsign(conf.AprsLogin);
+  ownCallsign_ = AX25::Callsign(config_.AprsLogin);
   if (!ownCallsign_.IsValid()) {
     Serial.println("Own callsign is not valid");
   }
   
-  aprsLogin_ = String("user ") + conf.AprsLogin + String(" pass ") + 
-    conf.AprsPass + String(" vers ") + CfgLoraprsVersion;
-  if (conf.AprsFilter.length() > 0) {
-    aprsLogin_ += String(" filter ") + conf.AprsFilter;
+  aprsLoginCommand_ = String("user ") + config_.AprsLogin + String(" pass ") + 
+    config_.AprsPass + String(" vers ") + CfgLoraprsVersion;
+  if (config_.AprsFilter.length() > 0) {
+    aprsLoginCommand_ += String(" filter ") + config_.AprsFilter;
   }
-  aprsLogin_ += String("\n");
+  aprsLoginCommand_ += String("\n");
   
-  aprsHost_ = conf.AprsHost;
-  aprsPort_ = conf.AprsPort;
-  aprsBeacon_ = conf.AprsRawBeacon;
-  aprsBeaconPeriodMinutes_ = conf.AprsRawBeaconPeriodMinutes;
-  
-  autoCorrectFreq_ = conf.EnableAutoFreqCorrection;
-  addSignalReport_ = conf.EnableSignalReport;
-  persistentConn_ = conf.EnablePersistentAprsConnection;
-  enableRfToIs_ = conf.EnableRfToIs;
-  enableIsToRf_ = conf.EnableIsToRf;
-  enableRepeater_ = conf.EnableRepeater;
-  enableBeacon_ = conf.EnableBeacon;
-
   // peripherals
-  setupLora(conf.LoraFreq, conf.LoraBw, conf.LoraSf, 
-    conf.LoraCodingRate, conf.LoraPower, conf.LoraSync, conf.LoraEnableCrc);
+  setupLora(config_.LoraFreq, config_.LoraBw, config_.LoraSf, 
+    config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraEnableCrc);
     
   if (needsWifi()) {
-    setupWifi(conf.WifiSsid, conf.WifiKey);
+    setupWifi(config_.WifiSsid, config_.WifiKey);
   }
 
-  if (needsBt() || conf.BtName.length() > 0) {
-    setupBt(conf.BtName);
+  if (needsBt() || config_.BtName.length() > 0) {
+    setupBt(config_.BtName);
   }
   
-  if (needsAprsis() && persistentConn_) {
+  if (needsAprsis() && config_.EnablePersistentAprsConnection) {
     reconnectAprsis();
   }
 }
 
 void Service::setupWifi(const String &wifiName, const String &wifiKey)
 {
-  if (!isClient_) {
+  if (!config_.IsClientMode) {
     Serial.print("WIFI connecting to " + wifiName);
 
     WiFi.setHostname("loraprs");
@@ -106,13 +91,13 @@ bool Service::reconnectAprsis()
 {
   Serial.print("APRSIS connecting...");
   
-  if (!aprsisConn_.connect(aprsHost_.c_str(), aprsPort_)) {
-    Serial.println("Failed to connect to " + aprsHost_ + ":" + aprsPort_);
+  if (!aprsisConn_.connect(config_.AprsHost.c_str(), config_.AprsPort)) {
+    Serial.println("Failed to connect to " + config_.AprsHost + ":" + config_.AprsPort);
     return false;
   }
   Serial.println("ok");
 
-  aprsisConn_.print(aprsLogin_);
+  aprsisConn_.print(aprsLoginCommand_);
   return true;
 }
 
@@ -156,7 +141,7 @@ void Service::loop()
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
-  if (needsAprsis() && !aprsisConn_.connected() && persistentConn_) {
+  if (needsAprsis() && !aprsisConn_.connected() && config_.EnablePersistentAprsConnection) {
     reconnectAprsis();
   }
 
@@ -187,12 +172,12 @@ void Service::loop()
 void Service::sendPeriodicBeacon()
 {
   long currentMs = millis();
-  
-  if (previousBeaconMs_ == 0 || currentMs - previousBeaconMs_ >= aprsBeaconPeriodMinutes_ * 60 * 1000) {
-      AX25::Payload payload(aprsBeacon_);
+
+  if (previousBeaconMs_ == 0 || currentMs - previousBeaconMs_ >= config_.AprsRawBeaconPeriodMinutes * 60 * 1000) {
+      AX25::Payload payload(config_.AprsRawBeacon);
       if (payload.IsValid()) {
         sendAX25ToLora(payload);
-        if (enableRfToIs_) {
+        if (config_.EnableRfToIs) {
           sendToAprsis(payload.ToString());
         }
         Serial.println("Periodic beacon is sent");
@@ -214,7 +199,7 @@ void Service::sendToAprsis(String aprsMessage)
   }
   aprsisConn_.println(aprsMessage);
 
-  if (!persistentConn_) {
+  if (!config_.EnablePersistentAprsConnection) {
     aprsisConn_.stop();
   }
 }
@@ -231,7 +216,7 @@ void Service::onAprsisDataAvailable()
     aprsisData += c;
   }
 
-  if (enableIsToRf_ && aprsisData.length() > 0) {
+  if (config_.EnableIsToRf && aprsisData.length() > 0) {
     AX25::Payload payload(aprsisData);
     if (payload.IsValid()) {
       sendAX25ToLora(payload);
@@ -288,12 +273,12 @@ void Service::onLoraDataAvailable(int packetSize)
   float rssi = LoRa.packetRssi();
   long frequencyError = LoRa.packetFrequencyError();
 
-  if (autoCorrectFreq_) {
-    loraFreq_ -= frequencyError;
-    LoRa.setFrequency(loraFreq_);
+  if (config_.EnableAutoFreqCorrection) {
+    config_.LoraFreq -= frequencyError;
+    LoRa.setFrequency(config_.LoraFreq);
   }
 
-  if (!isClient_) {
+  if (!config_.IsClientMode) {
     
     String signalReport = String(" ") +
       String("rssi: ") +
@@ -309,14 +294,14 @@ void Service::onLoraDataAvailable(int packetSize)
     AX25::Payload payload(rxBuf, rxBufIndex);
 
     if (payload.IsValid()) {
-      String textPayload = payload.ToString(addSignalReport_ ? signalReport : String());
+      String textPayload = payload.ToString(config_.EnableSignalReport ? signalReport : String());
       Serial.println(textPayload);
 
-      if (enableRfToIs_) {
+      if (config_.EnableRfToIs) {
         sendToAprsis(textPayload);
         Serial.println("Packet sent to APRS-IS");
       }
-      if (enableRepeater_ && payload.Digirepeat(ownCallsign_)) {
+      if (config_.EnableRepeater && payload.Digirepeat(ownCallsign_)) {
         sendAX25ToLora(payload);
         Serial.println("Packet digirepeated");
       }
