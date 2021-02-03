@@ -150,7 +150,8 @@ void Service::loop()
   }
   // TX path, Serial -> Rig
   else {
-    if (millis() > csmaSlotTimePrev_ + csmaSlotTime_ && random(0, 255) < csmaP_) {
+    long currentTime = millis();
+    if (currentTime > csmaSlotTimePrev_ + csmaSlotTime_ && random(0, 255) < csmaP_) {
       if (aprsisConn_.available() > 0) {
         onAprsisDataAvailable();
       }
@@ -160,7 +161,7 @@ void Service::loop()
       else {
         serialProcessRx();
       }
-      csmaSlotTimePrev_ = millis();
+      csmaSlotTimePrev_ = currentTime;
     }
   }
   delay(CfgPollDelayMs);
