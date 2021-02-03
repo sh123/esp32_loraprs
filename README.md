@@ -87,7 +87,7 @@ Install via libraries:
 - **Server** supports only classical `AX25` frames over LoRa (as defined in http://www.aprs.org/doc/APRS101.PDF page 12). It should enable interoperability with classical Linux APRS software, such as Xastir with `kissattach`. Some LoRa ARPS implementations transfer plain text APRS messages over LoRa, as a result **Server** will not be able to process these messages and gate them to APRS-IS, also clients won't be able to decode messages gated from APRS-IS to RF by the server
 
 # Alternative Linux Setup
-It is possible to use modem **in client mode** with other generic Linux ax25/aprs tools, such as `xastir`, use next procedure to set it up:
+It is possible to use modem **in client mode** with other generic Linux AX25/APRS tools on PC or Raspberry, such as [Xastir](https://xastir.org/index.php/Main_Page), use next procedure to set it up:
 - AX25 howto: http://tldp.org/HOWTO/AX25-HOWTO/
 - Install required tools: ```sudo apt-get install ax25-tools ax25-apps xastir bluez bluez-tools```
 - Run bluetoothctl and pair with the modem: 
