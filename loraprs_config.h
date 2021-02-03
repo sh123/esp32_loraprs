@@ -17,6 +17,10 @@ struct Config
   int LoraPower;        // lora power level in dbm, 20
   bool LoraEnableCrc;   // lora crc check enabled
 
+  byte LoraPinSs;
+  byte LoraPinRst;
+  byte LoraPinDio0;
+
   int AprsPort;         // aprs server port, 14580
   String AprsHost;      // aprs server hostname, rotate.aprs2.net
   String AprsLogin;     // aprs callsign to use, e.g. N0CALL-1

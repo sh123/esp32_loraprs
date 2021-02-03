@@ -59,11 +59,6 @@ protected:
 private:
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
 
-  // module pinouts
-  const byte CfgPinSs = 5;
-  const byte CfgPinRst = 26;
-  const byte CfgPinDio0 = 14;
-
   // processor config
   const int CfgConnRetryMs = 500;
   const int CfgPollDelayMs = 5;

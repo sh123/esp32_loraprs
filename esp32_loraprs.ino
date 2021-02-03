@@ -3,7 +3,9 @@
 #include "loraprs_service.h"
 
 #define LED_BUILTIN         2
-#define LED_TOGGLE_PERIOD   1000  
+#define LED_TOGGLE_PERIOD   1000
+
+//#define BOARD_T_BEAM
 
 #if __has_include("/tmp/esp32_loraprs_config.h")
 #pragma message("Using external config")
@@ -32,6 +34,11 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.LoraSync = 0x34;
   cfg.LoraPower = CFG_LORA_PWR;
   cfg.LoraEnableCrc = CFG_LORA_ENABLE_CRC; // set to false for speech data
+
+  // lora pinouts
+  cfg.LoraPinSs = CFG_LORA_PIN_SS;
+  cfg.LoraPinRst = CFG_LORA_PIN_RST;
+  cfg.LoraPinDio0 = CFG_LORA_PIN_DIO0;
 
   // aprs configuration
   cfg.AprsHost = "rotate.aprs2.net";

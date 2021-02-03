@@ -1,5 +1,15 @@
 #define CFG_IS_CLIENT_MODE    true
 
+#ifdef BOARD_T_BEAM
+#define CFG_LORA_PIN_SS       18
+#define CFG_LORA_PIN_RST      23
+#define CFG_LORA_PIN_DIO0     26
+#else
+#define CFG_LORA_PIN_SS       5
+#define CFG_LORA_PIN_RST      26
+#define CFG_LORA_PIN_DIO0     14
+#endif
+
 #define CFG_LORA_FREQ         433.775E6
 #define CFG_LORA_BW           125e3
 #define CFG_LORA_SF           12
