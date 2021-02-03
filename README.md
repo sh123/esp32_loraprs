@@ -39,7 +39,7 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 - SCK: GPIO_18/VSPI_SCK
 
 Known to work on:
-- **T-Beam LoRa**, requires pinout redefinition in `loraprs_service.h`, see (Discussion)[https://github.com/sh123/esp32_loraprs/issues/11]
+- **T-Beam LoRa**, requires pinout redefinition in `loraprs_service.h`, see [Discussion](https://github.com/sh123/esp32_loraprs/issues/11)
 
 # Software Dependencies
 Install via libraries:
