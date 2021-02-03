@@ -264,7 +264,7 @@ void Service::onLoraDataAvailable(int packetSize)
 void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLength) {
 
   float snr = LoRa.packetSnr();
-  float rssi = LoRa.packetRssi();
+  int rssi = LoRa.packetRssi();
   long frequencyError = LoRa.packetFrequencyError();
   
   String signalReport = String(" ") +
