@@ -5,7 +5,7 @@
 #define LED_BUILTIN         2
 #define LED_TOGGLE_PERIOD   1000
 
-//#define BOARD_T_BEAM
+//#define BOARD_T_BEAM  // enable for TTG T-Beam board support
 
 #if __has_include("/tmp/esp32_loraprs_config.h")
 #pragma message("Using external config")
