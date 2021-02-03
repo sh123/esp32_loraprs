@@ -40,7 +40,10 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 
 Supported:
 - **T-Beam LoRa**, uncomment `#define BOARD_T_BEAM` in `esp32_loraprs.ino` see [Discussion](https://github.com/sh123/esp32_loraprs/issues/11)
-
+  - Uses different pinout mapping as
+    - SS: GPIO_18
+    - RST: GPIO_23
+    - DIO0: GPIO_26
 
 # Software Dependencies
 Install via libraries:
