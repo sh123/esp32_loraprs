@@ -24,7 +24,7 @@ Can be used in several modes:
   - **RF digirepating** for `WIDEn-n` new style paths
   - **Beaconing**, own station periodic beacon announcement to APRS-IS and RF
 - **LoRa Codec2 digital voice communication modem**
-  - just install https://github.com/sh123/codec2_talkie on you Android phone, pair with the modem and you can communicate with each other by using digital voice [Codec2](http://www.rowetel.com/?page_id=452)
+  - just install [Codec2 Walkie-Talkie](https://github.com/sh123/codec2_talkie) on you Android phone, pair with the modem and you can communicate with each other by using digital voice [Codec2](http://www.rowetel.com/?page_id=452)
 
 # Compatible Boards
 All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 board is compatible then it should work, but there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section), currently pinouts are connected from LoRa to ESP32-WROOM as (SS/RST/DIO0 could be redefined in loraprs_service.h):
@@ -37,6 +37,9 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 - MOSI: GPIO_23/VSPI_MOSI
 - MISO: GPIO_19/VSPI_MISO
 - SCK: GPIO_18/VSPI_SCK
+
+Known to work on:
+- **T-Beam LoRa**, requires pinout redefinition in `loraprs_service.h`, see [Discussion](https://github.com/sh123/esp32_loraprs/issues/11)
 
 # Software Dependencies
 Install via libraries:
@@ -84,7 +87,7 @@ Install via libraries:
 - **Server** supports only classical `AX25` frames over LoRa (as defined in http://www.aprs.org/doc/APRS101.PDF page 12). It should enable interoperability with classical Linux APRS software, such as Xastir with `kissattach`. Some LoRa ARPS implementations transfer plain text APRS messages over LoRa, as a result **Server** will not be able to process these messages and gate them to APRS-IS, also clients won't be able to decode messages gated from APRS-IS to RF by the server
 
 # Alternative Linux Setup
-It is possible to use modem **in client mode** with other generic Linux ax25/aprs tools, such as `xastir`, use next procedure to set it up:
+It is possible to use modem **in client mode** with other generic Linux AX25/APRS tools on PC or Raspberry, such as [Xastir](https://xastir.org/index.php/Main_Page), use next procedure to set it up:
 - AX25 howto: http://tldp.org/HOWTO/AX25-HOWTO/
 - Install required tools: ```sudo apt-get install ax25-tools ax25-apps xastir bluez bluez-tools```
 - Run bluetoothctl and pair with the modem: 
