@@ -33,12 +33,12 @@ protected:
   };
 
   enum Cmd {
-    
+
     // generic
     Data = 0x00,
     P = 0x02,
     SlotTime = 0x03,
-    
+
     // extended to modem
     Frequency = 0x10,
     Bandwidth = 0x11,
@@ -47,9 +47,10 @@ protected:
     SpreadingFactor = 0x14,
     CodingRate = 0x15,
     EnableCrc = 0x16,
-    
+
     // extended events from modem
-    SignalLevel = 0x30,
+    SignalLevelRssi = 0x30,
+    SignalLevelSnr = 0x31,
 
     // end of cmds
     NoCmd = 0x80
