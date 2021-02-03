@@ -40,6 +40,11 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 
 Known to work on:
 - **T-Beam LoRa**, requires pinout redefinition in `loraprs_service.h`, see [Discussion](https://github.com/sh123/esp32_loraprs/issues/11)
+```
+  const byte CfgPinSs = 18; //5;
+  const byte CfgPinRst = 23; //26;
+  const byte CfgPinDio0 = 26; //14;
+```
 
 # Software Dependencies
 Install via libraries:
