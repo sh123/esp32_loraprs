@@ -27,7 +27,7 @@ Can be used in several modes:
   - just install [Codec2 Walkie-Talkie](https://github.com/sh123/codec2_talkie) on you Android phone, pair with the modem and you can communicate with each other by using digital voice [Codec2](http://www.rowetel.com/?page_id=452)
 
 # Compatible Boards
-All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 board is compatible then it should work, but there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section), currently pinouts are connected from LoRa to ESP32-WROOM as (SS/RST/DIO0 could be redefined in loraprs_service.h):
+All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 board is compatible then it should work, but there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section), currently pinouts are connected from LoRa to ESP32-WROOM as (SS/RST/DIO0 could be redefined in config.h):
 
 ![alt text](images/pinouts.png)
 
@@ -38,13 +38,9 @@ All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 boa
 - MISO: GPIO_19/VSPI_MISO
 - SCK: GPIO_18/VSPI_SCK
 
-Known to work on:
-- **T-Beam LoRa**, requires pinout redefinition in `loraprs_service.h`, see [Discussion](https://github.com/sh123/esp32_loraprs/issues/11)
-```
-  const byte CfgPinSs = 18; //5;
-  const byte CfgPinRst = 23; //26;
-  const byte CfgPinDio0 = 26; //14;
-```
+Supported:
+- **T-Beam LoRa**, uncomment `#define BOARD_T_BEAM` in `esp32_loraprs.ino` see [Discussion](https://github.com/sh123/esp32_loraprs/issues/11)
+
 
 # Software Dependencies
 Install via libraries:
@@ -61,10 +57,10 @@ Install via libraries:
   - for server mode fill `cfg.AprsLogin` and `cfg.AprsPass` with APRS-IS login callsign and pass
   - for server mode fill `cfg.AprsFilter`, see http://www.aprs-is.net/javAPRSFilter.aspx for various formats, do not include `filter` directive, just space separated values
   - change `cfg.LoraFreq` if you are planning to use different frequency or if planning to calibrate clients, currently it is set to **433.775MHz** as per https://vienna.iaru-r1.org/wp-content/uploads/2019/01/VIE19-C5-015-OEVSV-LORA-APRS-433-MHz.pdf
-- if you are planning to use different esp32 pinouts then modify loraprs_service.h
-  - lora module SS, **CfgPinSs**, GPIO_5
-  - lora module RST, **CfgPinRst**, GPIO_26
-  - lora module DIO0, **CfgPinDio0**, GPIO_14
+- if you are planning to use different esp32 pinouts then modify config.h
+  - lora module SS, **CFG_LORA_PIN_SS**, GPIO_5
+  - lora module RST, **CFG_LORA_PIN_RST**, GPIO_26
+  - lora module DIO0, **CFG_LORA_PIN_DIO0**, GPIO_14
 - if you are planning to experiment with different bandwidths/spread factors then modify values in `initializeConfig()`, with current parameters APRS packet time on air is around **1-2 seconds** @ 292bps/36Bps, to decode with as lower level as possible with reasonable speed (comparable to 300bps HF APRS), use https://github.com/tanupoo/lorawan_toa or https://www.rfwireless-world.com/calculators/LoRa-Data-Rate-Calculator.html to make further calculations
   - lora bandwidth `cfg.LoraBw`, 125 kHz (also tested with 20.6 KHz and SF9 with frequency correction)
   - lora spread factor `cfg.LoraSf`, 12 (should decode down to -20dB, choosen with the goal for minimum signal decode)
