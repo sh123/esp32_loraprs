@@ -53,6 +53,7 @@ Install via libraries:
 - cppQueue library: https://github.com/SMFSW/Queue
 
 # Software Setup
+- **NB! select next partition scheme for esp32 in Arduino IDE Tools menu:** "Minimal SPIFFS (1.9 MB APP with OTA/190 KB SPIFFS)"
 - when setting up APRSDroid, use **"TNC (KISS)"** connection protocol in Connection Preferences -> Connection Protocol
 - go to esp32_loraprs.ino and make next changes based on your requirements in `initializeConfig()`
   - set `cfg.IsClientMode` to `false` if you are planning to run server mode for APRS-IS iGate / Digipeater
