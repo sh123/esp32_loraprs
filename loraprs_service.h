@@ -6,6 +6,7 @@
 #include <LoRa.h>
 #include <WiFi.h>
 #include <cppQueue.h>
+#include <endian.h>
 
 #include "BluetoothSerial.h"
 #include "ax25_payload.h"
@@ -33,6 +34,7 @@ private:
   void onLoraDataAvailable(int packetSize);
   void onAprsisDataAvailable();
 
+  void sendSignalReportEvent(int rssi, float snr);
   void sendPeriodicBeacon();
   void sendToAprsis(const String &aprsMessage);
   bool sendAX25ToLora(const AX25::Payload &payload);
@@ -55,7 +57,24 @@ protected:
   virtual bool onSerialRx(byte *b);
 
   virtual void onControlCommand(Cmd cmd, byte value);
+  virtual void onRadioControlCommand(const std::vector<byte> &command);
+
+private:
+  struct LoraSignalLevelEvent {
+    int rssi;
+    int snr;
+  } __attribute__((packed));
   
+  struct LoraControlCommand {
+    long freq;
+    long bw;
+    int sf;
+    int cr;
+    int pwr;
+    int sync;
+    bool crc;
+  } __attribute__((packed));
+
 private:
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
 
@@ -65,7 +84,7 @@ private:
   const int CfgWiFiConnRetryMaxTimes = 10;
   const int CfgMaxAX25PayloadSize = 512;
 
-  // csma paramters, overriden with KISS commands
+  // csma parameters, overriden with KISS commands
   const long CfgCsmaPersistence = 100;  // 255 for real time, lower for higher traffic
   const long CfgCsmaSlotTimeMs = 500;   // 0 for real time, otherwise set to average tx duration
   

@@ -13,8 +13,8 @@ struct Config
   long LoraBw;          // lora bandwidth, e.g. 125e3
   int LoraSf;           // lora spreading factor, e.g. 12
   int LoraCodingRate;   // lora coding rate, e.g. 7
-  int LoraSync;         // lora sync word/packet id, 0x3f
   int LoraPower;        // lora power level in dbm, 20
+  int LoraSync;         // lora sync word/packet id, 0x3f
   bool LoraEnableCrc;   // lora crc check enabled
 
   byte LoraPinSs;       // lora ss pin
@@ -41,6 +41,7 @@ struct Config
   bool EnableIsToRf;                    // true - enable APRS-IS to RF submission
   bool EnableRepeater;                  // true - digirepeat incoming packets based on WIDEn-n paths
   bool EnableBeacon;                    // true - send AprsRawBeacon to RF and APRS-IS if EnableRfToIs is true
+  bool EnableKissExtensions;            // true - enable kiss extensions for radio control and signal reports
 };
 
 } // LoraPrs

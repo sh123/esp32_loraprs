@@ -25,7 +25,7 @@ void initializeConfig(LoraPrs::Config &cfg) {
   
   // client/server mode switch
   cfg.IsClientMode = CFG_IS_CLIENT_MODE;
-
+  
   // lora parameters
   cfg.LoraFreq = CFG_LORA_FREQ;
   cfg.LoraBw = CFG_LORA_BW;
@@ -64,6 +64,7 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.EnableIsToRf = CFG_IS_TO_RF; // send data from aprsis to rf
   cfg.EnableRepeater = CFG_DIGIREPEAT; // digirepeat incoming packets
   cfg.EnableBeacon = CFG_BEACON;  // enable periodic AprsRawBeacon beacon to rf and aprsis if rf to aprsis is enabled
+  cfg.EnableKissExtensions = CFG_KISS_EXTENSIONS; // radio control and signal reports
 }
 
 LoraPrs::Service loraPrsService;

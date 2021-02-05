@@ -40,22 +40,20 @@ protected:
     SlotTime = 0x03,
 
     // extended to modem
-    Frequency = 0x10,
-    Bandwidth = 0x11,
-    Power = 0x12,
-    SyncWord = 0x13,
-    SpreadingFactor = 0x14,
-    CodingRate = 0x15,
-    EnableCrc = 0x16,
+    RadioControl = 0x10,
 
-    // extended events from modem
-    SignalLevelRssi = 0x30,
-    SignalLevelSnr = 0x31,
+    // extended from modem
+    RadioSignalLevel = 0x30,
 
     // end of cmds
     NoCmd = 0x80
   };
 
+  enum DataType {
+      Raw = 0,
+      Control
+  };
+  
   const int CfgTxQueueSize = 4096;
     
 protected:
@@ -68,20 +66,20 @@ protected:
   virtual bool onSerialRx(byte *b) = 0;
 
   virtual void onControlCommand(Cmd cmd, byte value) = 0;
-  /*
-  virtual void onControlCommand(Cmd cmd, int value) = 0;
-  virtual void onControlCommand(Cmd cmd, long value) = 0;
-  */
+  virtual void onRadioControlCommand(const std::vector<byte> &command) = 0;
 
 private:
-  bool receiveByte(unsigned char rxByte);
-  bool processCommand(unsigned char rxByte);
+  bool receiveByte(byte rxByte);
+  void processData(byte rxByte);
+  bool processCommand(byte rxByte);
   void resetState();
-  
+
 private:
   Cmd cmd_;
+  DataType dataType_;
   State state_;
   std::shared_ptr<cppQueue> txQueue_;
+  std::vector<byte> cmdBuffer_;
 };
   
 } // Kiss

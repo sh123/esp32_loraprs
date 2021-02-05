@@ -225,6 +225,16 @@ void Service::onAprsisDataAvailable()
   }
 }
 
+void Service::sendSignalReportEvent(int rssi, float snr)
+{
+  struct LoraSignalLevelEvent event;
+
+  event.rssi = htobe16(rssi);
+  event.snr = htobe16(snr * 100);
+
+  serialSend((const byte *)&event, sizeof(LoraSignalLevelEvent));
+}
+
 bool Service::sendAX25ToLora(const AX25::Payload &payload) 
 {
   byte buf[CfgMaxAX25PayloadSize];
@@ -250,12 +260,16 @@ void Service::onLoraDataAvailable(int packetSize)
   }
   serialSend(rxBuf, rxBufIndex);
   long frequencyError = LoRa.packetFrequencyError();
-
+  
   if (config_.EnableAutoFreqCorrection) {
     config_.LoraFreq -= frequencyError;
     LoRa.setFrequency(config_.LoraFreq);
   }
 
+  if (config_.EnableKissExtensions) {
+    sendSignalReportEvent(LoRa.packetRssi(), LoRa.packetSnr());
+  }
+  
   if (!config_.IsClientMode) {
     processIncomingRawPacketAsServer(rxBuf, rxBufIndex);
   }
@@ -347,5 +361,23 @@ void Service::onControlCommand(Cmd cmd, byte value)
       break;
   }
 }
-  
+
+void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
+
+  if (config_.EnableKissExtensions && rawCommand.size() == sizeof(LoraControlCommand)) {
+    const struct LoraControlCommand * controlCommand = reinterpret_cast<const struct LoraControlCommand*>(rawCommand.data());
+    
+    config_.LoraFreq = be32toh(controlCommand->freq);
+    config_.LoraBw = be32toh(controlCommand->bw);
+    config_.LoraSf = be16toh(controlCommand->sf);
+    config_.LoraCodingRate = be16toh(controlCommand->cr);
+    config_.LoraPower = be16toh(controlCommand->pwr);
+    config_.LoraSync = be16toh(controlCommand->sync);
+    config_.LoraEnableCrc = controlCommand->crc;
+
+    setupLora(config_.LoraFreq, config_.LoraBw, config_.LoraSf, 
+      config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraEnableCrc);
+  }
+}
+
 } // LoraPrs

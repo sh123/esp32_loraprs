@@ -33,3 +33,4 @@
 #define CFG_RF_TO_IS          true
 #define CFG_IS_TO_RF          false
 #define CFG_BEACON            false
+#define CFG_KISS_EXTENSIONS   false
