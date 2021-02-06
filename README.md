@@ -7,6 +7,7 @@
 * [Alternative Linux Setup](#alternative-linux-setup)
 * [CSMA Usage](#csma-usage)
 * [Digital voice with Codec2](#digital-voice-with-codec2)
+* [KISS command extensions](#kiss-command-extensions)
 * [Test Results](#test-results)
 
 # Introduction
@@ -127,6 +128,27 @@ It is possible to use modem **in client mode** with other generic Linux AX25/APR
 - Select appropriate lora spread factor `cfg.LoraSf` and bandwidth `cfg.LoraBw` depending on Codec2 speech rate from 450-3200 bps. For example, if you are using 450 bps mode and 20 kHz bandwidth then set spreading factor to 6 or 7. See data rate table above.
 - When using modem for voice communication  `Loraprs::Service::CfgCsmaPersistence` must be set to maximum 255 value to disable CSMA, otherwise real time voice communication won't be guaranteed. Android codec2_talkie application automatically sets this parameter to 255 by using KISS P command code.
 - Also, it might be useful to disable CRC check for LoRa packets with `cfg.LoraEnableCrc` parameter equal to `false`. Some broken bits in one speech frame will cause audio being scrambled, it might be better then longer gap when complete packet is dropped.
+
+# KISS command extensions
+When `EnableKissExtensions` configuration parameter is set to `true` modem will send signal level reports through KISS command `0x30` and client application will be able to control modem by using KISS command `0x10`, this way client application (such as [Codec2 Walkie-Talkie](https://github.com/sh123/codec2_talkie)) can display signal levels and change modem parameters dynamically.
+
+Payloads are sent and expected as big endian and defined as:
+```
+  struct LoraSignalLevelEvent {
+    int16_t rssi;
+    int16_t snr;
+  } __attribute__((packed));
+  
+  struct LoraControlCommand {
+    uint32_t freq;
+    uint32_t bw;
+    uint16_t sf;
+    uint16_t cr;
+    uint16_t pwr;
+    uint16_t sync;
+    uint8_t crc;
+  } __attribute__((packed));
+```
 
 # Test Results
 ![alt text](images/setup.png)
