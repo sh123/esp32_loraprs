@@ -130,7 +130,7 @@ It is possible to use modem **in client mode** with other generic Linux AX25/APR
 - Also, it might be useful to disable CRC check for LoRa packets with `cfg.LoraEnableCrc` parameter equal to `false`. Some broken bits in one speech frame will cause audio being scrambled, it might be better then longer gap when complete packet is dropped.
 
 # KISS command extensions
-When `EnableKissExtensions` configuration parameter is set to `true` modem will send signal level reports through KISS command `0x30` and client application will be able to control modem by using KISS command `0x10`, this way client application can display signal levels and change modem parameters dynamically.
+When `EnableKissExtensions` configuration parameter is set to `true` modem will send signal level reports through KISS command `0x30` and client application will be able to control modem by using KISS command `0x10`, this way client application (such as [Codec2 Walkie-Talkie](https://github.com/sh123/codec2_talkie)) can display signal levels and change modem parameters dynamically.
 
 Payloads are sent and expected as big endian and defined as:
 ```
