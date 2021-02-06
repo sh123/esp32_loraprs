@@ -24,7 +24,8 @@ protected:
   };
 
   enum State {
-    Void = 0,
+    GetStart = 0,
+    GetEnd,
     GetCmd,
     GetData,
     GetP,
@@ -72,12 +73,10 @@ private:
   bool receiveByte(byte rxByte);
   void processData(byte rxByte);
   bool processCommand(byte rxByte);
-  void resetState();
 
 private:
-  Cmd cmd_;
-  DataType dataType_;
   State state_;
+  DataType dataType_;
   std::shared_ptr<cppQueue> txQueue_;
   std::vector<byte> cmdBuffer_;
 };
