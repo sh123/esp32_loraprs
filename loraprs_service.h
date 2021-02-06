@@ -83,6 +83,7 @@ private:
   const int CfgPollDelayMs = 5;
   const int CfgWiFiConnRetryMaxTimes = 10;
   const int CfgMaxAX25PayloadSize = 512;
+  const int CfgFreqCorrMinHz = 150;
 
   // csma parameters, overriden with KISS commands
   const long CfgCsmaPersistence = 100;  // 255 for real time, lower for higher traffic

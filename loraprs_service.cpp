@@ -269,7 +269,7 @@ void Service::onLoraDataAvailable(int packetSize)
   serialSend(Cmd::Data, rxBuf, rxBufIndex);
   long frequencyError = LoRa.packetFrequencyError();
   
-  if (config_.EnableAutoFreqCorrection) {
+  if (config_.EnableAutoFreqCorrection && abs(frequencyError) > CfgFreqCorrMinHz) {
     config_.LoraFreq -= frequencyError;
     LoRa.setFrequency(config_.LoraFreq);
   }
