@@ -102,7 +102,14 @@ bool Service::reconnectAprsis()
 
 void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, bool enableCrc)
 {
-  Serial.print("LoRa init...");
+  Serial.print("LoRa init: ");
+  Serial.print(loraFreq); Serial.print(", ");
+  Serial.print(bw); Serial.print(", ");
+  Serial.print(sf); Serial.print(", ");
+  Serial.print(cr); Serial.print(", ");
+  Serial.print(pwr); Serial.print(", ");
+  Serial.print(sync, 16); Serial.print(", ");
+  Serial.print(enableCrc); Serial.print("...");
   
   LoRa.setPins(config_.LoraPinSs, config_.LoraPinRst, config_.LoraPinDio0);
   
