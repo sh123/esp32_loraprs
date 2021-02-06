@@ -2,7 +2,6 @@
 #include "WiFi.h"
 #include "loraprs_service.h"
 
-#define LED_BUILTIN         2
 #define LED_TOGGLE_PERIOD   1000
 
 //#define BOARD_T_BEAM  // enable for TTG T-Beam board support
@@ -19,6 +18,12 @@
 #pragma message("Configured for client mode")
 #else
 #pragma message("Configured for server mode")
+#endif
+
+#ifdef BOARD_T_BEAM
+#define LED_BUILTIN         4
+#else
+#define LED_BUILTIN         2
 #endif
 
 void initializeConfig(LoraPrs::Config &cfg) {
