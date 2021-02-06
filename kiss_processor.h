@@ -8,13 +8,7 @@
 namespace Kiss {
 
 class Processor {
-
-public:
-  Processor();
   
-  void serialSend(const byte *b, int dataLength);
-  void serialProcessRx();
-
 protected:
   enum Marker {
     Fend = 0xc0,
@@ -54,9 +48,15 @@ protected:
       Raw = 0,
       Control
   };
-  
+
   const int CfgTxQueueSize = 4096;
-    
+
+public:
+  Processor();
+  
+  void serialSend(Cmd cmd, const byte *b, int dataLength);
+  void serialProcessRx();
+
 protected:
   virtual bool onRigTxBegin() = 0;
   virtual void onRigTx(byte b) = 0;

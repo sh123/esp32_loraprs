@@ -8,9 +8,9 @@ Processor::Processor()
 {
 }
 
-void Processor::serialSend(const byte *b, int dataLength) {
+void Processor::serialSend(Cmd cmd, const byte *b, int dataLength) {
   onSerialTx((byte)Marker::Fend);
-  onSerialTx((byte)Cmd::Data);
+  onSerialTx((byte)cmd);
 
   for (int i = 0; i < dataLength; i++) {
     byte rxByte = b[i];
@@ -26,6 +26,7 @@ void Processor::serialSend(const byte *b, int dataLength) {
     else {
       onSerialTx(rxByte);
     }
+    yield();
   }
 
   onSerialTx((byte)Marker::Fend);

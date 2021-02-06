@@ -61,18 +61,18 @@ protected:
 
 private:
   struct LoraSignalLevelEvent {
-    int rssi;
-    int snr;
+    int16_t rssi;
+    int16_t snr;
   } __attribute__((packed));
   
   struct LoraControlCommand {
-    long freq;
-    long bw;
-    int sf;
-    int cr;
-    int pwr;
-    int sync;
-    bool crc;
+    uint32_t freq;
+    uint32_t bw;
+    uint16_t sf;
+    uint16_t cr;
+    uint16_t pwr;
+    uint16_t sync;
+    uint8_t crc;
   } __attribute__((packed));
 
 private:

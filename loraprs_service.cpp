@@ -232,7 +232,7 @@ void Service::sendSignalReportEvent(int rssi, float snr)
   event.rssi = htobe16(rssi);
   event.snr = htobe16(snr * 100);
 
-  serialSend((const byte *)&event, sizeof(LoraSignalLevelEvent));
+  serialSend(Cmd::RadioSignalLevel, (const byte *)&event, sizeof(LoraSignalLevelEvent));
 }
 
 bool Service::sendAX25ToLora(const AX25::Payload &payload) 
@@ -257,8 +257,9 @@ void Service::onLoraDataAvailable(int packetSize)
   while (LoRa.available()) {
     byte rxByte = LoRa.read();
     rxBuf[rxBufIndex++] = rxByte;
+    yield();
   }
-  serialSend(rxBuf, rxBufIndex);
+  serialSend(Cmd::Data, rxBuf, rxBufIndex);
   long frequencyError = LoRa.packetFrequencyError();
   
   if (config_.EnableAutoFreqCorrection) {
