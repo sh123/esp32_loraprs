@@ -4,8 +4,6 @@
 
 #define LED_TOGGLE_PERIOD   1000
 
-//#define BOARD_T_BEAM  // enable for TTG T-Beam board support
-
 #if __has_include("/tmp/esp32_loraprs_config.h")
 #pragma message("Using external config")
 #include "/tmp/esp32_loraprs_config.h"
@@ -18,10 +16,6 @@
 #pragma message("Configured for client mode")
 #else
 #pragma message("Configured for server mode")
-#endif
-
-#ifndef LED_BUILTIN
-#define LED_BUILTIN         2
 #endif
 
 void initializeConfig(LoraPrs::Config &cfg) {
@@ -75,8 +69,8 @@ LoraPrs::Service loraPrsService;
 auto watchdogLedTimer = timer_create_default();
 
 void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, 1);
+  pinMode(BUILTIN_LED, OUTPUT);
+  digitalWrite(BUILTIN_LED, 1);
 
   Serial.begin(115200);
   while (!Serial);
@@ -95,6 +89,6 @@ void loop() {
 }
 
 bool toggleWatchdogLed(void *) {
-  digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+  digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
   return true;
 }

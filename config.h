@@ -1,14 +1,19 @@
+// change pinouts if not defined through native board LORA_* definitions
+#ifndef LORA_CS
+#define LORA_CS               5
+#define LORA_RST              26
+#define LORA_IRQ              14
+#endif
+
+#ifndef BUILTIN_LED
+#define BUILTIN_LED           2
+#endif
+
 #define CFG_IS_CLIENT_MODE    true
 
-#ifdef BOARD_T_BEAM
-#define CFG_LORA_PIN_SS       18
-#define CFG_LORA_PIN_RST      23
-#define CFG_LORA_PIN_DIO0     26
-#else
-#define CFG_LORA_PIN_SS       5
-#define CFG_LORA_PIN_RST      26
-#define CFG_LORA_PIN_DIO0     14
-#endif
+#define CFG_LORA_PIN_SS       LORA_CS
+#define CFG_LORA_PIN_RST      LORA_RST
+#define CFG_LORA_PIN_DIO0     LORA_IRQ
 
 #define CFG_LORA_FREQ         433.775E6
 #define CFG_LORA_BW           125e3
