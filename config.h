@@ -1,11 +1,13 @@
 // change pinouts if not defined through native board LORA_* definitions
 #ifndef LORA_CS
+#pragma message("LoRa pin definitions are not found, redefining...")
 #define LORA_CS               5
 #define LORA_RST              26
 #define LORA_IRQ              14
 #endif
 
 #ifndef BUILTIN_LED
+#pragma message("BUILDIN_LED is not found, defining as 2")
 #define BUILTIN_LED           2
 #endif
 
