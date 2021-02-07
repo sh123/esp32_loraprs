@@ -20,9 +20,7 @@
 #pragma message("Configured for server mode")
 #endif
 
-#ifdef BOARD_T_BEAM
-#define LED_BUILTIN         4
-#else
+#ifndef LED_BUILTIN
 #define LED_BUILTIN         2
 #endif
 
@@ -30,7 +28,7 @@ void initializeConfig(LoraPrs::Config &cfg) {
   
   // client/server mode switch
   cfg.IsClientMode = CFG_IS_CLIENT_MODE;
-  
+
   // lora parameters
   cfg.LoraFreq = CFG_LORA_FREQ;
   cfg.LoraBw = CFG_LORA_BW;
