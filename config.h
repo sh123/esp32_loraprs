@@ -1,3 +1,5 @@
+#define LED_TOGGLE_PERIOD     1000
+
 #define SERIAL_BAUD_RATE      115200
 
 // change pinouts if not defined through native board LORA_* definitions
