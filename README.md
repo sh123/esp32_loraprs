@@ -62,7 +62,7 @@ Install via libraries:
 - cppQueue library: https://github.com/SMFSW/Queue
 
 # Software Setup
-- **nb! select next partition scheme for esp32 in Arduino IDE Tools menu:** "Minimal SPIFFS (1.9 MB APP with OTA/190 KB SPIFFS)"
+- **NB! select next partition scheme for ESP32 in Arduino IDE Tools menu:** "Minimal SPIFFS (1.9 MB APP with OTA/190 KB SPIFFS)"
   - for boards, which do not have this option, need to modify `~/.arduino15/packages/esp32/hardware/esp32/1.0.4/boards.txt` and add required partition option
 - **use 80 MHz ESP32 frequency** in Arduino SDK, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
 - when setting up APRSDroid, use **"TNC (KISS)"** connection protocol in Connection Preferences -> Connection Protocol
