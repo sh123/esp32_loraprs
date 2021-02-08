@@ -20,7 +20,7 @@ Can be used in several modes:
   - you need to use **APRSDroid** application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth. By having two clients you can not only send your position, but also send and receive APRS messages
   - it is also possible to use **other KISS APRS clients** over Bluetooth serial, just use `rfcomm` on Linux to setup serial over Bluetooth and put up AX25 interface with `kissattach`, then use any existing Linux APRS clients, such as `xastir`, see section below for alternative Linux usage
 - **LoRa APRS iGate RX/TX server over WiFi + Digipeater**
-  - **RF to APRS-IS gating**, it will connect to your WiFI and will forward received APRS positions from RF LoRa into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations (could be enabled or disabled from config). This way, it is also possible to setup portable iGate by connecting to your mobile phone's hotspot and provide power from the phone USB port by using OTA cable
+  - **RF to APRS-IS gating**, it will connect to your WiFI and will forward received APRS positions from RF LoRa into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations (could be enabled or disabled from config). This way, it is also possible to setup portable iGate by connecting to your mobile phone's hotspot and provide power from the phone USB port by using USB-OTG cable
   - **APRS-IS to RF gating**, it is possible to enable it together with the filter in the config, so APRS-IS data will be forwarded to RF
   - **RF digirepating** for `WIDEn-n` new style paths
   - **Beaconing**, own station periodic beacon announcement to APRS-IS and RF
@@ -38,9 +38,9 @@ Common SPI:
 - MOSI: GPIO_23/VSPI_MOSI
 - MISO: GPIO_19/VSPI_MISO
 - SCK: GPIO_18/VSPI_SCK
-- SS/CS/NSS: GPIO_5
 
 Board specific:
+- SS/CS/NSS: GPIO_5
 - RST/RESET: GPIO_26
 - DIO0/IRQ: GPIO_14
 
@@ -62,7 +62,7 @@ Install via libraries:
 - cppQueue library: https://github.com/SMFSW/Queue
 
 # Software Setup
-- **nb! select next partition scheme for esp32 in Arduino IDE Tools menu:** "Minimal SPIFFS (1.9 MB APP with OTA/190 KB SPIFFS)"
+- **NB! select next partition scheme for ESP32 in Arduino IDE Tools menu:** "Minimal SPIFFS (1.9 MB APP with OTA/190 KB SPIFFS)"
   - for boards, which do not have this option, need to modify `~/.arduino15/packages/esp32/hardware/esp32/1.0.4/boards.txt` and add required partition option
 - **use 80 MHz ESP32 frequency** in Arduino SDK, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
 - when setting up APRSDroid, use **"TNC (KISS)"** connection protocol in Connection Preferences -> Connection Protocol
