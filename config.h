@@ -1,7 +1,6 @@
 // change pinouts if not defined through native board LORA_* definitions
-#ifndef LORA_CS
+#ifndef LORA_RST
 #pragma message("LoRa pin definitions are not found, redefining...")
-#define LORA_CS               5
 #define LORA_RST              26
 #define LORA_IRQ              14
 #endif
@@ -13,7 +12,7 @@
 
 #define CFG_IS_CLIENT_MODE    true
 
-#define CFG_LORA_PIN_SS       LORA_CS
+#define CFG_LORA_PIN_SS       SS
 #define CFG_LORA_PIN_RST      LORA_RST
 #define CFG_LORA_PIN_DIO0     LORA_IRQ
 
