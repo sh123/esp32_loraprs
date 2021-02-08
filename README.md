@@ -40,9 +40,9 @@ Common SPI:
 - SCK: GPIO_18/VSPI_SCK
 
 Board specific:
-- SS: GPIO_5
-- RST: GPIO_26
-- DIO0: GPIO_14
+- SS/CS/NSS: GPIO_5
+- RST/RESET: GPIO_26
+- DIO0/IRQ: GPIO_14
 
 Supported/Tested, just select board in Arduino IDE->Tools->Board, no need to redefine pinouts:
 - **T-Beam LoRa**
