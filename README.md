@@ -171,6 +171,6 @@ Payloads are sent and expected as big endian and defined as:
   - Monitor your planned frequency, such as 433.775 MHz for ISM device activity, if there is strong interference from other users tune up or down it to minimize interference, it might be critical for long range
 - Weather
   - Rain and high humidity levels decrease signal level by about **~3-6 dB**
-- Could not get modems communicate with each other when using spreading factor 6
+- Could not get modems communicate with each other when using spreading factor 6, need to use implicit LoRa header mode
 - It might be useful to add additional pass band filter or broadcast FM radio reject filter, it seem to improve sensitivity when using external base antenna
 
