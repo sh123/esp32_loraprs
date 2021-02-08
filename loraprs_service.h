@@ -60,12 +60,7 @@ protected:
   virtual void onRadioControlCommand(const std::vector<byte> &command);
 
 private:
-  struct SignalLevelEvent {
-    int16_t rssi;
-    int16_t snr;
-  } __attribute__((packed));
-  
-  struct ControlCommand {
+  struct SetHardware {
     uint32_t freq;
     uint32_t bw;
     uint16_t sf;
@@ -75,6 +70,11 @@ private:
     uint8_t crc;
   } __attribute__((packed));
 
+  struct SignalReport {
+    int16_t rssi;
+    int16_t snr;
+  } __attribute__((packed));
+  
 private:
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
 

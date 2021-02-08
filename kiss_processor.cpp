@@ -65,7 +65,7 @@ bool Processor::processCommand(byte rxByte) {
       state_ = State::GetData;
       dataType_ = DataType::Raw;
       break;
-    case Cmd::RadioControl:
+    case Cmd::SetHardware:
       state_ = State::GetData;
       dataType_ = DataType::Control;
       cmdBuffer_.clear();

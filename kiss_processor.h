@@ -28,19 +28,11 @@ protected:
   };
 
   enum Cmd {
-
-    // generic
     Data = 0x00,
     P = 0x02,
     SlotTime = 0x03,
-
-    // extended to modem
-    RadioControl = 0x10,
-
-    // extended from modem
-    RadioSignalLevel = 0x30,
-
-    // end of cmds
+    SetHardware = 0x06,
+    SignalReport = 0x07,
     NoCmd = 0x80
   };
 

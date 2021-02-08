@@ -234,12 +234,12 @@ void Service::onAprsisDataAvailable()
 
 void Service::sendSignalReportEvent(int rssi, float snr)
 {
-  struct SignalLevelEvent event;
+  struct SignalReport signalReport;
 
-  event.rssi = htobe16(rssi);
-  event.snr = htobe16(snr * 100);
+  signalReport.rssi = htobe16(rssi);
+  signalReport.snr = htobe16(snr * 100);
 
-  serialSend(Cmd::RadioSignalLevel, (const byte *)&event, sizeof(SignalLevelEvent));
+  serialSend(Cmd::SignalReport, (const byte *)&signalReport, sizeof(SignalReport));
 }
 
 bool Service::sendAX25ToLora(const AX25::Payload &payload) 
@@ -372,16 +372,16 @@ void Service::onControlCommand(Cmd cmd, byte value)
 
 void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
 
-  if (config_.EnableKissExtensions && rawCommand.size() == sizeof(ControlCommand)) {
-    const struct ControlCommand * controlCommand = reinterpret_cast<const struct ControlCommand*>(rawCommand.data());
+  if (config_.EnableKissExtensions && rawCommand.size() == sizeof(SetHardware)) {
+    const struct SetHardware * setHardware = reinterpret_cast<const struct SetHardware*>(rawCommand.data());
     
-    config_.LoraFreq = be32toh(controlCommand->freq);
-    config_.LoraBw = be32toh(controlCommand->bw);
-    config_.LoraSf = be16toh(controlCommand->sf);
-    config_.LoraCodingRate = be16toh(controlCommand->cr);
-    config_.LoraPower = be16toh(controlCommand->pwr);
-    config_.LoraSync = be16toh(controlCommand->sync);
-    config_.LoraEnableCrc = controlCommand->crc;
+    config_.LoraFreq = be32toh(setHardware->freq);
+    config_.LoraBw = be32toh(setHardware->bw);
+    config_.LoraSf = be16toh(setHardware->sf);
+    config_.LoraCodingRate = be16toh(setHardware->cr);
+    config_.LoraPower = be16toh(setHardware->pwr);
+    config_.LoraSync = be16toh(setHardware->sync);
+    config_.LoraEnableCrc = setHardware->crc;
 
     setupLora(config_.LoraFreq, config_.LoraBw, config_.LoraSf, 
       config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraEnableCrc);
