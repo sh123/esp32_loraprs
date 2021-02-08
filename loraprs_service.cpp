@@ -234,12 +234,12 @@ void Service::onAprsisDataAvailable()
 
 void Service::sendSignalReportEvent(int rssi, float snr)
 {
-  struct LoraSignalLevelEvent event;
+  struct SignalLevelEvent event;
 
   event.rssi = htobe16(rssi);
   event.snr = htobe16(snr * 100);
 
-  serialSend(Cmd::RadioSignalLevel, (const byte *)&event, sizeof(LoraSignalLevelEvent));
+  serialSend(Cmd::RadioSignalLevel, (const byte *)&event, sizeof(SignalLevelEvent));
 }
 
 bool Service::sendAX25ToLora(const AX25::Payload &payload) 
@@ -372,8 +372,8 @@ void Service::onControlCommand(Cmd cmd, byte value)
 
 void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
 
-  if (config_.EnableKissExtensions && rawCommand.size() == sizeof(LoraControlCommand)) {
-    const struct LoraControlCommand * controlCommand = reinterpret_cast<const struct LoraControlCommand*>(rawCommand.data());
+  if (config_.EnableKissExtensions && rawCommand.size() == sizeof(ControlCommand)) {
+    const struct ControlCommand * controlCommand = reinterpret_cast<const struct ControlCommand*>(rawCommand.data());
     
     config_.LoraFreq = be32toh(controlCommand->freq);
     config_.LoraBw = be32toh(controlCommand->bw);

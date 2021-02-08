@@ -60,12 +60,12 @@ protected:
   virtual void onRadioControlCommand(const std::vector<byte> &command);
 
 private:
-  struct LoraSignalLevelEvent {
+  struct SignalLevelEvent {
     int16_t rssi;
     int16_t snr;
   } __attribute__((packed));
   
-  struct LoraControlCommand {
+  struct ControlCommand {
     uint32_t freq;
     uint32_t bw;
     uint16_t sf;
