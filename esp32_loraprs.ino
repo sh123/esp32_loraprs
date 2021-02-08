@@ -72,7 +72,7 @@ void setup() {
   pinMode(BUILTIN_LED, OUTPUT);
   digitalWrite(BUILTIN_LED, 1);
 
-  Serial.begin(115200);
+  Serial.begin(SERIAL_BAUD_RATE);
   while (!Serial);
   
   LoraPrs::Config config;
