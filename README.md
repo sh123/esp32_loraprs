@@ -38,9 +38,9 @@ Common SPI:
 - MOSI: GPIO_23/VSPI_MOSI
 - MISO: GPIO_19/VSPI_MISO
 - SCK: GPIO_18/VSPI_SCK
+- SS/CS/NSS: GPIO_5
 
 Board specific:
-- SS/CS/NSS: GPIO_5
 - RST/RESET: GPIO_26
 - DIO0/IRQ: GPIO_14
 
@@ -50,7 +50,6 @@ Supported/Tested, just select board in **Arduino IDE->Tools->Board**, no need to
 Need to redefine pinouts in config.h:
 - **Heltec WiFi LoRa 32 (v2)** (screen is not used), redefine pinouts as
    ```
-   #define LORA_CS               18
    #define LORA_RST              14
    #define LORA_IRQ              26
    ```
