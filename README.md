@@ -34,6 +34,12 @@ If your ESP32 board is compatible or has build in LoRa module then it should wor
 
 ![alt text](images/pinouts.png)
 
+Common SPI:
+- MOSI: GPIO_23/VSPI_MOSI
+- MISO: GPIO_19/VSPI_MISO
+- SCK: GPIO_18/VSPI_SCK
+
+Board specific:
 - SS: GPIO_5
 - RST: GPIO_26
 - DIO0: GPIO_14
