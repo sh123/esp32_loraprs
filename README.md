@@ -28,19 +28,18 @@ Can be used in several modes:
   - just install [Codec2 Walkie-Talkie](https://github.com/sh123/codec2_talkie) on you Android phone, pair with the modem and you can communicate with each other by using digital voice [Codec2](http://www.rowetel.com/?page_id=452)
 
 # Compatible Boards
-All work was done on ESP32-WROOM with custom made LoRa shield, if your ESP32 board is compatible then it should work, but there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section), currently pinouts are connected from LoRa to ESP32-WROOM as (SS/RST/DIO0 could be redefined in config.h):
+All work was done on ESP32-WROOM with custom made LoRa shield, Arduino Board is "ESP32 Dev Module".
+
+If your ESP32 board is compatible or has build in LoRa module then it should work without redefining pinouts, for custom shields there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section), currently pinouts are connected from LoRa to ESP32-WROOM as (SS/RST/DIO0 could be redefined in config.h):
 
 ![alt text](images/pinouts.png)
 
 - SS: GPIO_5
 - RST: GPIO_26
 - DIO0: GPIO_14
-- MOSI: GPIO_23/VSPI_MOSI
-- MISO: GPIO_19/VSPI_MISO
-- SCK: GPIO_18/VSPI_SCK
 
-Supported/Tested:
-- **T-Beam LoRa**,
+Supported/Tested, just select board in Arduino IDE->Tools->Board, no need to redefine pinouts:
+- **T-Beam LoRa**
 - **WIFI LoRa 32 (V2)**
 
 # Software Dependencies
