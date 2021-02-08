@@ -46,7 +46,7 @@ Board specific:
 
 Supported/Tested, just select board in **Arduino IDE->Tools->Board**, no need to redefine pinouts:
 - **T-Beam LoRa**
-- **Heltec WiFi LoRa 32 (v2)**
+- **Heltec WiFi LoRa 32 (v2)** (screen is not used)
 
 # Software Dependencies
 Install via libraries:
