@@ -47,7 +47,12 @@ Board specific:
 Supported/Tested, just select board in **Arduino IDE->Tools->Board**, no need to redefine pinouts:
 - **T-Beam LoRa**
 Need to redefine pinouts in config.h:
-- **Heltec WiFi LoRa 32 (v2)** (screen is not used)
+- **Heltec WiFi LoRa 32 (v2)** (screen is not used), redefine pinouts as
+   ```
+   #define LORA_CS               18
+   #define LORA_RST              14
+   #define LORA_IRQ              26
+   ```
 
 # Software Dependencies
 Install via libraries:
