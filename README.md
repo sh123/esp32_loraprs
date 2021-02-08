@@ -44,9 +44,9 @@ Board specific:
 - RST/RESET: GPIO_26
 - DIO0/IRQ: GPIO_14
 
-Supported/Tested, just select board in Arduino IDE->Tools->Board, no need to redefine pinouts:
+Supported/Tested, just select board in **Arduino IDE->Tools->Board**, no need to redefine pinouts:
 - **T-Beam LoRa**
-- **WIFI LoRa 32 (V2)**
+- **Heltec WiFi LoRa 32 (v2)**
 
 # Software Dependencies
 Install via libraries:
