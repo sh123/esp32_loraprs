@@ -16,11 +16,11 @@
 Amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem + LoRa APRS-IS RX/TX iGate server over WiFI + digipeater + Codec2 DV modem (in conjunction with Android frontend application)
 
 Can be used in two modes, mode seleciton is done by changing `cfg.IsClientMode` or `CFG_IS_CLIENT_MODE` define in `config.h`:
-- **LoRa APRS KISS client over bluetooth** (WiFi and iGate are switched off)
+- **LoRa APRS KISS client over bluetooth**, WiFi and iGate are switched off, mobile or portable usage (/M, /P)
   - you need to use **APRSDroid** application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth
   - by having two APRSDroid clients you can not only send your position, but also **send and receive APRS messages**
   - it is also possible to use **other KISS APRS clients** over Bluetooth serial, just use `rfcomm` on Linux to setup serial over Bluetooth and put up AX25 interface with `kissattach`, then use any existing Linux APRS clients, such as `xastir`, see section below for alternative Linux usage
-- **LoRa APRS iGate RX/TX server over WiFi + Digipeater**
+- **LoRa APRS iGate RX/TX server over WiFi + Digipeater**, stationary usage at home
   - **RF to APRS-IS gating**, it will connect to your WiFI and will forward received APRS positions from RF LoRa into the APRS-IS network, it also reports client signal level, by appending it into the APRS comment, so you can see your signal reports in different locations (could be enabled or disabled from config). This way, it is also possible to setup portable iGate by connecting to your mobile phone's hotspot and provide power from the phone USB port by using USB-OTG cable
   - **APRS-IS to RF gating**, it is possible to enable it together with the filter in the config, so APRS-IS data will be forwarded to RF
   - **RF digirepating** for `WIDEn-n` new style paths
@@ -28,7 +28,7 @@ Can be used in two modes, mode seleciton is done by changing `cfg.IsClientMode` 
   - if `cfg.BtName` is NOT set to empty string then server mode also allows to connect with KISS bluetooth client and use it simulatenously with iGate functionality, e.g. when stationary at home and want to use DV Codec2 Walkie-Talkie voice communication
   
 Modem could be also used for **LoRa Codec2 digital voice DV communication**
-  - just install [Codec2 Walkie-Talkie](https://github.com/sh123/codec2_talkie) on you Android phone, pair with the modem and you can communicate with each other by using digital voice [Codec2](http://www.rowetel.com/?page_id=452)
+  - just install [Codec2 Walkie-Talkie](https://github.com/sh123/codec2_talkie) on you Android phone, pair with the modem and you can communicate with each other by using digital voice [Codec2](http://www.rowetel.com/?page_id=452), also modem can be controlled from this application (frequency change, bandwidth, spreading factor, etc)
 
 # Compatible Boards
 All work was done on ESP32-WROOM with custom made LoRa shield, Arduino Board is "ESP32 Dev Module".
