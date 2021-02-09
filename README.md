@@ -44,12 +44,12 @@ Board specific:
 - RST/RESET: GPIO_26
 - DIO0/IRQ: GPIO_14
 
-Supported/Tested, just select board in **Arduino IDE->Tools->Board**, no need to redefine pinouts:
+Supported, just select board in **Arduino IDE->Tools->Board**, no need to redefine pinouts:
 - **T-Beam LoRa**
 - **LoPy**, **LoPy4**
 - **TTGO LoRa32 v1**
 
-Need to redefine pinouts in config.h:
+Require LoRa module pinout definitions in `config.h`:
 - **Heltec WiFi LoRa 32 (v2)** (screen is not used), redefine pinouts as
    ```
    #define LORA_RST              14
