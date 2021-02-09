@@ -16,7 +16,7 @@
 Amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem + LoRa APRS-IS RX/TX iGate server over WiFI + digipeater + Codec2 DV modem (in conjunction with Android frontend application)
 
 Can be used in several modes: 
-- **LoRa APRS KISS client over bluetooth** 
+- **LoRa APRS KISS client over bluetooth** (WiFi is not used in this configuration)
   - you need to use **APRSDroid** application (https://aprsdroid.org), connect to the modem using bluetooth, data will be re-transmitted through the LoRa radio, this is similar to APRSDroid micromodem - https://unsigned.io/micromodem/, received data will be sent back to the APRSDroid using bluetooth. By having two clients you can not only send your position, but also send and receive APRS messages
   - it is also possible to use **other KISS APRS clients** over Bluetooth serial, just use `rfcomm` on Linux to setup serial over Bluetooth and put up AX25 interface with `kissattach`, then use any existing Linux APRS clients, such as `xastir`, see section below for alternative Linux usage
 - **LoRa APRS iGate RX/TX server over WiFi + Digipeater**
