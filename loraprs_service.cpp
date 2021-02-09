@@ -219,6 +219,10 @@ void Service::onAprsisDataAvailable()
     Serial.print(c);
     if (c == '\n') break;
     aprsisData += c;
+    if (aprsisData.length() >= CfgMaxAprsInMessageSize) {
+      Serial.println("APRS-IS incoming message is too long, skipping tail");
+      break;
+    }
   }
 
   if (config_.EnableIsToRf && aprsisData.length() > 0) {
