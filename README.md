@@ -46,6 +46,8 @@ Board specific:
 
 Supported/Tested, just select board in **Arduino IDE->Tools->Board**, no need to redefine pinouts:
 - **T-Beam LoRa**
+- **LoPy**, **LoPy4**
+- **TTGO LoRa32 v1**
 
 Need to redefine pinouts in config.h:
 - **Heltec WiFi LoRa 32 (v2)** (screen is not used), redefine pinouts as
