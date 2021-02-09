@@ -37,23 +37,23 @@ If your ESP32 board is compatible or has build in LoRa module then it should wor
 
 ![alt text](images/pinouts.png)
 
-Common SPI:
-- MOSI: GPIO_23/VSPI_MOSI
-- MISO: GPIO_19/VSPI_MISO
-- SCK: GPIO_18/VSPI_SCK
+Pinouts:
+- Common SPI:
+  - MOSI: GPIO_23/VSPI_MOSI
+  - MISO: GPIO_19/VSPI_MISO
+  - SCK: GPIO_18/VSPI_SCK
+- Board specific:
+  - SS/CS/NSS: GPIO_5
+  - RST/RESET: GPIO_26
+  - DIO0/IRQ: GPIO_14
 
-Board specific:
-- SS/CS/NSS: GPIO_5
-- RST/RESET: GPIO_26
-- DIO0/IRQ: GPIO_14
-
-Supported, just select board in **Arduino IDE->Tools->Board**, no need to redefine pinouts:
-- **T-Beam LoRa**
-- **LoPy**, **LoPy4**
-- **TTGO LoRa32 v1**
+Supported (built-in screen is not used), just select board in **Arduino IDE->Tools->Board**, no need to redefine pinouts:
+  - **T-Beam LoRa**
+  - **LoPy**, **LoPy4**
+  - **TTGO LoRa32 v1**
 
 Require LoRa module pinout definitions in `config.h`:
-- **Heltec WiFi LoRa 32 (v2)** (screen is not used), redefine pinouts as
+- **Heltec WiFi LoRa 32 (v2)**, redefine pinouts as
    ```
    #define LORA_RST              14
    #define LORA_IRQ              26
