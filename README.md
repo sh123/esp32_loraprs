@@ -25,7 +25,7 @@ Can be used in two modes, mode seleciton is done by changing `cfg.IsClientMode` 
   - **APRS-IS to RF gating**, it is possible to enable it together with the filter in the config, so APRS-IS data will be forwarded to RF
   - **RF digirepating** for `WIDEn-n` new style paths
   - **Beaconing**, own station periodic beacon announcement to APRS-IS and RF
-  - if `cfg.BtName` is NOT set to empty string then server mode also allows to connect with KISS bluetooth client and use it simulatenously with iGate functionality when stationary at home
+  - if `cfg.BtName` is NOT set to empty string then server mode also allows to connect with KISS bluetooth client and use it simulatenously with iGate functionality, e.g. when stationary at home and want to use DV Codec2 Walkie-Talkie voice communication
   
 Modem could be also used for **LoRa Codec2 digital voice DV communication**
   - just install [Codec2 Walkie-Talkie](https://github.com/sh123/codec2_talkie) on you Android phone, pair with the modem and you can communicate with each other by using digital voice [Codec2](http://www.rowetel.com/?page_id=452)
