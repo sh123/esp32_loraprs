@@ -47,6 +47,8 @@ Pinouts:
   - RST/RESET: GPIO_26
   - DIO0/IRQ: GPIO_14
 
+![alt text](images/tracker.jpg)
+
 Supported (built-in screen is not used), just select board in **Arduino IDE->Tools->Board**, no need to redefine pinouts:
   - **T-Beam LoRa**
   - **LoPy**, **LoPy4**
