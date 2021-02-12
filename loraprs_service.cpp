@@ -175,13 +175,11 @@ void Service::loop()
       if (aprsisConn_.available() > 0) {
         onAprsisDataAvailable();
       }
-      else if (needsBeacon()) {
+      if (needsBeacon()) {
         sendPeriodicBeacon();
-      } 
-      else {
-        if (processSerialToRig() && config_.LoraUseIsr) {
-          LoRa.receive();
-        }
+      }
+      if (processSerialToRig() && config_.LoraUseIsr) {
+        LoRa.receive();
       }
       csmaSlotTimePrev_ = currentTime;
     }
