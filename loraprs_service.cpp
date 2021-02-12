@@ -171,7 +171,7 @@ void Service::loop()
   if (!isRigToSerialProcessed) {
 
     long currentTime = millis();
-    if (currentTime > csmaSlotTimePrev_ + csmaSlotTime_ && random(0, 255) < csmaP_) {
+    if (currentTime > csmaSlotTimePrev_ + csmaSlotTime_ && random(0, 254) < csmaP_) {
       if (aprsisConn_.available() > 0) {
         onAprsisDataAvailable();
       }
