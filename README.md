@@ -102,6 +102,7 @@ Install via libraries:
    - `cfg.EnableIsToRf` set to `true` to forward APRS-IS traffic to RF, see also `cfg.AprsFilter` for traffic filtering
    - `cfg.EnableRepeater` set to `true` to enable packet repeater
    - `cfg.EnableBeacon` set to `true` to enable periodic beacons specified in `cfg.AprsRawBeacon` with period specified in `cfg.AprsRawBeaconPeriodMinutes` into RF and APRS-IS if `cfg.EnableRfToIs` is enabled
+   - `cfg.LoraUseIsr` set to `true` to enable LoRa incoming packet handling using interrupts in continous RX mode suitable for speech data, otherwise set to `false` for single packet polling mode
 
 # Protocol Compatibility
 - Make sure LoRa sync word and other LoRa parameters match
