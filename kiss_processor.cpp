@@ -102,7 +102,7 @@ bool Processor::processRigToSerial()
 
 bool Processor::processSerialToRig()
 {
-  bool isProcessed = false;
+  bool allProcessed = false;
 
   while (onSerialRxHasData() || !serialToRigQueue_.isEmpty()) {
     byte rxByte;
@@ -116,14 +116,14 @@ bool Processor::processSerialToRig()
     if (!serialToRigQueue_.isEmpty()) {
       rxByte = serialToRigQueue_.pop();
       if (receiveByte(rxByte)) {
-        isProcessed = true;
+        allProcessed = true;
       } else {
         serialToRigQueue_.push(rxByte);
       }
     }
     yield();
   }
-  return isProcessed;
+  return allProcessed;
 }
 
 bool Processor::processCommand(byte rxByte) {

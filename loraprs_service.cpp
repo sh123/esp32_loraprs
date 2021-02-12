@@ -175,7 +175,7 @@ void Service::loop()
       if (aprsisConn_.available() > 0) {
         onAprsisDataAvailable();
       }
-      else if (needsBeacon()) {
+      else if (needsBeacon()) {s
         sendPeriodicBeacon();
       } 
       else {
