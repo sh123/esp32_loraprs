@@ -20,6 +20,7 @@ struct Config
   byte LoraPinSs;       // lora ss pin
   byte LoraPinRst;      // lora rst pin
   byte LoraPinDio0;     // lora dio0 pin
+  bool LoraUseIsr;      // true to use interrupts
 
   int AprsPort;         // aprs server port, 14580
   String AprsHost;      // aprs server hostname, rotate.aprs2.net

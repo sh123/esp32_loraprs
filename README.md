@@ -66,7 +66,7 @@ Install via libraries:
 - Arduino ESP32 library: https://github.com/espressif/arduino-esp32
 - LoRa arduino library: https://github.com/sandeepmistry/arduino-LoRa
 - Arduino Timer library: https://github.com/contrem/arduino-timer
-- cppQueue library: https://github.com/SMFSW/Queue
+- CircularBuffer library: https://github.com/rlogiacco/CircularBuffer
 
 # Software Setup
 - **NB! select next partition scheme for ESP32 in Arduino IDE Tools menu:** "Minimal SPIFFS (1.9 MB APP with OTA/190 KB SPIFFS)"

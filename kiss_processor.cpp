@@ -1,19 +1,22 @@
 #include "kiss_processor.h"
 
 namespace Kiss {
-  
+
+CircularBuffer<uint8_t, Processor::CfgSerialToRigQueueSize> Processor::serialToRigQueue_;
+CircularBuffer<uint8_t, Processor::CfgRigToSerialQueueSize> Processor::rigToSerialQueue_;
+CircularBuffer<uint8_t, Processor::CfgRigToSerialQueueSize> Processor::rigToSerialQueueIndex_;
+
 Processor::Processor()
   : state_(State::GetStart)
-  , txQueue_(new cppQueue(sizeof(unsigned char), CfgTxQueueSize))
 {
 }
 
-void Processor::serialSend(Cmd cmd, const byte *b, int dataLength) {
+void Processor::serialSend(Cmd cmd, const byte *packet, int packetLength) {
   onSerialTx((byte)Marker::Fend);
   onSerialTx((byte)cmd);
 
-  for (int i = 0; i < dataLength; i++) {
-    byte rxByte = b[i];
+  for (int i = 0; i < packetLength; i++) {
+    byte rxByte = packet[i];
 
     if (rxByte == Marker::Fend) {
       onSerialTx((byte)Marker::Fesc);
@@ -26,33 +29,101 @@ void Processor::serialSend(Cmd cmd, const byte *b, int dataLength) {
     else {
       onSerialTx(rxByte);
     }
-    yield();
   }
 
   onSerialTx((byte)Marker::Fend);
 }
-  
-void Processor::serialProcessRx() 
+
+void ICACHE_RAM_ATTR Processor::serialQueueIsr(Cmd cmd, const byte *packet, int packetLength) {
+  if (!rigToSerialQueueIndex_.unshift(packetLength)) {
+    Serial.println("Rig to serial queue is full!");
+    return;
+  }
+  for (int i = 0; i < packetLength; i++) {
+    if (!rigToSerialQueue_.unshift(packet[i])) {
+      Serial.println("Rig to serial queue is full!");
+      return;
+    }
+  }
+}
+
+void Processor::rigQueue(Cmd cmd, const byte *packet, int packetLength) {
+  bool result = 1;
+  result &= serialToRigQueue_.unshift(Marker::Fend);
+  result &= serialToRigQueue_.unshift(cmd);
+
+  for (int i = 0; i < packetLength; i++) {
+    byte rxByte = packet[i];
+
+    if (rxByte == Marker::Fend) {
+      result &= serialToRigQueue_.unshift(Marker::Fesc);
+      result &= serialToRigQueue_.unshift(Marker::Tfend);
+    }
+    else if (rxByte == Marker::Fesc) {
+      result &= serialToRigQueue_.unshift(Marker::Fesc);
+      result &= serialToRigQueue_.unshift(Marker::Tfesc);
+    }
+    else {
+      result &= serialToRigQueue_.unshift(rxByte);
+    }
+  }
+
+  result &= serialToRigQueue_.unshift(Marker::Fend);
+
+  if (!result) {
+    Serial.println("Serial to rig queue overflow!");
+  }
+}
+
+bool Processor::processRigToSerial() 
+{  
+  bool isProcessed = false;
+
+  if (rigToSerialQueueIndex_.isEmpty()) {
+    return isProcessed;
+  }
+
+  while (!rigToSerialQueueIndex_.isEmpty()) {
+    
+    int rxPacketSize = rigToSerialQueueIndex_.pop();
+    byte buf[rxPacketSize];
+
+    for (int i = 0; i < rxPacketSize; i++) {
+      buf[i] = rigToSerialQueue_.pop();
+    }
+    serialSend(Cmd::Data, buf, rxPacketSize);
+    onRigPacket(&buf, rxPacketSize);
+
+    isProcessed = true;
+    yield();
+  }
+  return isProcessed;
+}
+
+bool Processor::processSerialToRig()
 {
-  while (onSerialRxHasData() || !txQueue_->isEmpty()) {
+  bool isProcessed = false;
+
+  while (onSerialRxHasData() || !serialToRigQueue_.isEmpty()) {
     byte rxByte;
-    if (onSerialRxHasData()) {      
+    if (onSerialRxHasData()) {
       if (onSerialRx(&rxByte)) {
-        if (!txQueue_->push((void *)&rxByte)) {
-          Serial.println("TX queue is full");
-          break;
-        }
+          if (!serialToRigQueue_.unshift(rxByte)) {
+            Serial.println("Serial to rig buffer is full!");
+          }
       }
     }
-    if (!txQueue_->isEmpty()) {
-      if (txQueue_->peek((void *)&rxByte)) {
-        if (receiveByte(rxByte)) {
-          txQueue_->drop();
-        }
+    if (!serialToRigQueue_.isEmpty()) {
+      rxByte = serialToRigQueue_.pop();
+      if (receiveByte(rxByte)) {
+        isProcessed = true;
+      } else {
+        serialToRigQueue_.push(rxByte);
       }
     }
     yield();
   }
+  return isProcessed;
 }
 
 bool Processor::processCommand(byte rxByte) {

@@ -2,8 +2,10 @@
 #define KISS_PROCESSOR_H
 
 #include <Arduino.h>
-#include <cppQueue.h>
 #include <memory>
+
+#define CIRCULAR_BUFFER_INT_SAFE
+#include <CircularBuffer.h>
 
 namespace Kiss {
 
@@ -41,19 +43,26 @@ protected:
       Control
   };
 
-  const int CfgTxQueueSize = 4096;
+  static const int CfgSerialToRigQueueSize = 4096;
+  static const int CfgRigToSerialQueueSize = 4096;
 
 public:
   Processor();
   
-  void serialSend(Cmd cmd, const byte *b, int dataLength);
-  void serialProcessRx();
+  void serialSend(Cmd cmd, const byte *packet, int packetLength);
+  static void ICACHE_RAM_ATTR serialQueueIsr(Cmd cmd, const byte *packet, int packetLength);
+
+  void rigQueue(Cmd cmd, const byte *packet, int packetLength);
+
+  bool processRigToSerial();
+  bool processSerialToRig();
 
 protected:
   virtual bool onRigTxBegin() = 0;
   virtual void onRigTx(byte b) = 0;
   virtual void onRigTxEnd() = 0;
-
+  virtual void onRigPacket(void *packet, int packetLength) = 0;
+  
   virtual void onSerialTx(byte b) = 0;
   virtual bool onSerialRxHasData() = 0;
   virtual bool onSerialRx(byte *b) = 0;
@@ -69,8 +78,11 @@ private:
 private:
   State state_;
   DataType dataType_;
-  std::shared_ptr<cppQueue> txQueue_;
   std::vector<byte> cmdBuffer_;
+
+  static CircularBuffer<uint8_t, CfgSerialToRigQueueSize> serialToRigQueue_;
+  static CircularBuffer<uint8_t, CfgRigToSerialQueueSize> rigToSerialQueue_;
+  static CircularBuffer<uint8_t, CfgRigToSerialQueueSize> rigToSerialQueueIndex_;
 };
   
 } // Kiss

@@ -5,7 +5,6 @@
 #include <SPI.h>
 #include <LoRa.h>
 #include <WiFi.h>
-#include <cppQueue.h>
 #include <endian.h>
 
 #include "BluetoothSerial.h"
@@ -30,8 +29,10 @@ private:
 
   void reconnectWifi() const;
   bool reconnectAprsis();
+
+  static ICACHE_RAM_ATTR void onLoraDataAvailableIsr(int packetSize);
   
-  void onLoraDataAvailable(int packetSize);
+  void loraReceive(int packetSize);
   void onAprsisDataAvailable();
 
   void sendSignalReportEvent(int rssi, float snr);
@@ -51,7 +52,8 @@ protected:
   virtual bool onRigTxBegin();
   virtual void onRigTx(byte b);
   virtual void onRigTxEnd();
-
+  virtual void onRigPacket(void *packet, int packetLength);
+  
   virtual void onSerialTx(byte b);
   virtual bool onSerialRxHasData();
   virtual bool onSerialRx(byte *b);
@@ -79,12 +81,13 @@ private:
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
 
   // processor config
-  const int CfgConnRetryMs = 500;
-  const int CfgPollDelayMs = 5;
-  const int CfgWiFiConnRetryMaxTimes = 10;
-  const int CfgMaxAX25PayloadSize = 512;
-  const int CfgFreqCorrMinHz = 150;
-  const int CfgMaxAprsInMessageSize = 255;
+  const int CfgConnRetryMs = 500;           // connection retry delay, e.g. wifi
+  const int CfgPollDelayMs = 5;             // main loop delay
+  const int CfgWiFiConnRetryMaxTimes = 10;  // wifi number of connection retries
+  const int CfgMaxAX25PayloadSize = 512;    // maximum ax25 payload size
+  const int CfgFreqCorrMinHz = 1000;        // correct if deviation is larger than this number
+                                            // NB! small value causes frequent corrections, which locks LoRa ISR
+  const int CfgMaxAprsInMessageSize = 255;  // maximum aprsis to rf message size
 
   // csma parameters, overriden with KISS commands
   const long CfgCsmaPersistence = 100;  // 255 for real time, lower for higher traffic

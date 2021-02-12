@@ -20,18 +20,18 @@ void Service::setup(const Config &conf)
   if (!ownCallsign_.IsValid()) {
     Serial.println("Own callsign is not valid");
   }
-  
+
   aprsLoginCommand_ = String("user ") + config_.AprsLogin + String(" pass ") + 
     config_.AprsPass + String(" vers ") + CfgLoraprsVersion;
   if (config_.AprsFilter.length() > 0) {
     aprsLoginCommand_ += String(" filter ") + config_.AprsFilter;
   }
   aprsLoginCommand_ += String("\n");
-  
+
   // peripherals
   setupLora(config_.LoraFreq, config_.LoraBw, config_.LoraSf, 
     config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraEnableCrc);
-    
+
   if (needsWifi()) {
     setupWifi(config_.WifiSsid, config_.WifiKey);
   }
@@ -39,7 +39,7 @@ void Service::setup(const Config &conf)
   if (needsBt() || config_.BtName.length() > 0) {
     setupBt(config_.BtName);
   }
-  
+
   if (needsAprsis() && config_.EnablePersistentAprsConnection) {
     reconnectAprsis();
   }
@@ -125,8 +125,12 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   if (enableCrc) {
     LoRa.enableCrc();
   }
-  
-  Serial.println("ok");  
+
+  if (config_.LoraUseIsr) {
+    LoRa.onReceive(onLoraDataAvailableIsr);
+    LoRa.receive();
+  }
+  Serial.println("ok");
 }
 
 void Service::setupBt(const String &btName)
@@ -152,11 +156,20 @@ void Service::loop()
   }
 
   // RX path, Rig -> Serial
-  if (int packetSize = LoRa.parsePacket()) {
-    onLoraDataAvailable(packetSize);
+  bool isRigToSerialProcessed = false;
+
+  if (config_.LoraUseIsr) {
+    isRigToSerialProcessed = processRigToSerial();
+  } else {
+     if (int packetSize = LoRa.parsePacket()) {
+        loraReceive(packetSize);
+        isRigToSerialProcessed = true;
+     }
   }
+
   // TX path, Serial -> Rig
-  else {
+  if (!isRigToSerialProcessed) {
+
     long currentTime = millis();
     if (currentTime > csmaSlotTimePrev_ + csmaSlotTime_ && random(0, 255) < csmaP_) {
       if (aprsisConn_.available() > 0) {
@@ -166,12 +179,26 @@ void Service::loop()
         sendPeriodicBeacon();
       } 
       else {
-        serialProcessRx();
+        if (processSerialToRig() && config_.LoraUseIsr) {
+          LoRa.receive();
+        }
       }
       csmaSlotTimePrev_ = currentTime;
     }
   }
   delay(CfgPollDelayMs);
+}
+
+ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr(int packetSize)
+{
+  // TODO, move to separate ESP32 task
+  int rxBufIndex = 0;
+  byte rxBuf[packetSize];
+
+  for (int i = 0; i < packetSize; i++) {
+    rxBuf[rxBufIndex++] = LoRa.read();
+  }
+  serialQueueIsr(Cmd::Data, rxBuf, rxBufIndex);
 }
 
 void Service::sendPeriodicBeacon()
@@ -212,7 +239,7 @@ void Service::sendToAprsis(const String &aprsMessage)
 void Service::onAprsisDataAvailable()
 {
   String aprsisData;
-  
+
   while (aprsisConn_.available() > 0) {
     char c = aprsisConn_.read();
     if (c == '\r') continue;
@@ -231,7 +258,7 @@ void Service::onAprsisDataAvailable()
       sendAX25ToLora(payload);
     }
     else {
-      Serial.println("Unknown payload from APRSIS, ignoring...");
+      Serial.println("Unknown payload from APRSIS, ignoring");
     }
   }
 }
@@ -246,7 +273,7 @@ void Service::sendSignalReportEvent(int rssi, float snr)
   serialSend(Cmd::SignalReport, (const byte *)&signalReport, sizeof(SignalReport));
 }
 
-bool Service::sendAX25ToLora(const AX25::Payload &payload) 
+bool Service::sendAX25ToLora(const AX25::Payload &payload)
 {
   byte buf[CfgMaxAX25PayloadSize];
   int bytesWritten = payload.ToBinary(buf, sizeof(buf));
@@ -254,63 +281,69 @@ bool Service::sendAX25ToLora(const AX25::Payload &payload)
     Serial.println("Failed to serialize payload");
     return false;
   }
-  LoRa.beginPacket();
-  LoRa.write(buf, bytesWritten);
-  LoRa.endPacket();
+  rigQueue(Cmd::Data, buf, bytesWritten);
   return true;
 }
 
-void Service::onLoraDataAvailable(int packetSize)
-{
-  int rxBufIndex = 0;
-  byte rxBuf[packetSize];
-
-  while (LoRa.available()) {
-    byte rxByte = LoRa.read();
-    rxBuf[rxBufIndex++] = rxByte;
-    yield();
-  }
-  serialSend(Cmd::Data, rxBuf, rxBufIndex);
+void Service::onRigPacket(void *packet, int packetLength)
+{  
   long frequencyError = LoRa.packetFrequencyError();
-  
+
   if (config_.EnableAutoFreqCorrection && abs(frequencyError) > CfgFreqCorrMinHz) {
     config_.LoraFreq -= frequencyError;
+    Serial.print("Correcting frequency: "); Serial.println(frequencyError);
     LoRa.setFrequency(config_.LoraFreq);
+    if (config_.LoraUseIsr) {
+      LoRa.idle();
+      LoRa.receive();
+    }
   }
 
   if (config_.EnableKissExtensions) {
     sendSignalReportEvent(LoRa.packetRssi(), LoRa.packetSnr());
   }
-  
+
   if (!config_.IsClientMode) {
-    processIncomingRawPacketAsServer(rxBuf, rxBufIndex);
+    processIncomingRawPacketAsServer((const byte*)packet, packetLength);
   }
+}
+
+void Service::loraReceive(int packetSize)
+{
+  int rxBufIndex = 0;
+  byte rxBuf[packetSize];
+
+  while (LoRa.available()) {
+    rxBuf[rxBufIndex++] = LoRa.read();
+  }
+  serialSend(Cmd::Data, rxBuf, rxBufIndex);
+  onRigPacket(rxBuf, rxBufIndex);
 }
 
 void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLength) {
 
-  float snr = LoRa.packetSnr();
-  int rssi = LoRa.packetRssi();
-  long frequencyError = LoRa.packetFrequencyError();
-  
-  String signalReport = String(" ") +
-    String("rssi: ") +
-    String(snr < 0 ? rssi + snr : rssi) +
-    String("dBm, ") +
-    String("snr: ") +
-    String(snr) +
-    String("dB, ") +
-    String("err: ") +
-    String(frequencyError) +
-    String("Hz");
-
   AX25::Payload payload(packet, packetLength);
 
   if (payload.IsValid()) {
+
+    float snr = LoRa.packetSnr();
+    int rssi = LoRa.packetRssi();
+    long frequencyError = LoRa.packetFrequencyError();
+    
+    String signalReport = String(" ") +
+      String("rssi: ") +
+      String(snr < 0 ? rssi + snr : rssi) +
+      String("dBm, ") +
+      String("snr: ") +
+      String(snr) +
+      String("dB, ") +
+      String("err: ") +
+      String(frequencyError) +
+      String("Hz");
     
     String textPayload = payload.ToString(config_.EnableSignalReport ? signalReport : String());
     Serial.println(textPayload);
-  
+
     if (config_.EnableRfToIs) {
       sendToAprsis(textPayload);
       Serial.println("Packet sent to APRS-IS");
@@ -326,7 +359,7 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
 
 bool Service::onRigTxBegin()
 {
-  delay(CfgPollDelayMs);  // LoRa may drop packet if removed
+  delay(CfgPollDelayMs);
   return (LoRa.beginPacket() == 1);
 }
 
