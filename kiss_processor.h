@@ -49,10 +49,10 @@ protected:
 public:
   Processor();
   
-  void serialSend(Cmd cmd, const byte *packet, int packetLength);
-  static void ICACHE_RAM_ATTR serialQueueIsr(Cmd cmd, const byte *packet, int packetLength);
+  void sendRigToSerial(Cmd cmd, const byte *packet, int packetLength);
+  static void ICACHE_RAM_ATTR queueRigToSerialIsr(Cmd cmd, const byte *packet, int packetLength);
 
-  void rigQueue(Cmd cmd, const byte *packet, int packetLength);
+  void queueSerialToRig(Cmd cmd, const byte *packet, int packetLength);
 
   bool processRigToSerial();
   bool processSerialToRig();

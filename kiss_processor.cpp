@@ -11,7 +11,7 @@ Processor::Processor()
 {
 }
 
-void Processor::serialSend(Cmd cmd, const byte *packet, int packetLength) {
+void Processor::sendRigToSerial(Cmd cmd, const byte *packet, int packetLength) {
   onSerialTx((byte)Marker::Fend);
   onSerialTx((byte)cmd);
 
@@ -34,7 +34,7 @@ void Processor::serialSend(Cmd cmd, const byte *packet, int packetLength) {
   onSerialTx((byte)Marker::Fend);
 }
 
-void ICACHE_RAM_ATTR Processor::serialQueueIsr(Cmd cmd, const byte *packet, int packetLength) {
+void ICACHE_RAM_ATTR Processor::queueRigToSerialIsr(Cmd cmd, const byte *packet, int packetLength) {
   if (!rigToSerialQueueIndex_.unshift(packetLength)) {
     Serial.println("Rig to serial queue is full!");
     return;
@@ -47,7 +47,7 @@ void ICACHE_RAM_ATTR Processor::serialQueueIsr(Cmd cmd, const byte *packet, int 
   }
 }
 
-void Processor::rigQueue(Cmd cmd, const byte *packet, int packetLength) {
+void Processor::queueSerialToRig(Cmd cmd, const byte *packet, int packetLength) {
   bool result = 1;
   result &= serialToRigQueue_.unshift(Marker::Fend);
   result &= serialToRigQueue_.unshift(cmd);
@@ -91,7 +91,7 @@ bool Processor::processRigToSerial()
     for (int i = 0; i < rxPacketSize; i++) {
       buf[i] = rigToSerialQueue_.pop();
     }
-    serialSend(Cmd::Data, buf, rxPacketSize);
+    sendRigToSerial(Cmd::Data, buf, rxPacketSize);
     onRigPacket(&buf, rxPacketSize);
 
     isProcessed = true;

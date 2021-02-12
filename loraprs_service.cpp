@@ -198,7 +198,7 @@ ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr(int packetSize)
   for (int i = 0; i < packetSize; i++) {
     rxBuf[rxBufIndex++] = LoRa.read();
   }
-  serialQueueIsr(Cmd::Data, rxBuf, rxBufIndex);
+  queueRigToSerialIsr(Cmd::Data, rxBuf, rxBufIndex);
 }
 
 void Service::sendPeriodicBeacon()
@@ -270,7 +270,7 @@ void Service::sendSignalReportEvent(int rssi, float snr)
   signalReport.rssi = htobe16(rssi);
   signalReport.snr = htobe16(snr * 100);
 
-  serialSend(Cmd::SignalReport, (const byte *)&signalReport, sizeof(SignalReport));
+  sendRigToSerial(Cmd::SignalReport, (const byte *)&signalReport, sizeof(SignalReport));
 }
 
 bool Service::sendAX25ToLora(const AX25::Payload &payload)
@@ -281,7 +281,7 @@ bool Service::sendAX25ToLora(const AX25::Payload &payload)
     Serial.println("Failed to serialize payload");
     return false;
   }
-  rigQueue(Cmd::Data, buf, bytesWritten);
+  queueSerialToRig(Cmd::Data, buf, bytesWritten);
   return true;
 }
 
@@ -316,7 +316,7 @@ void Service::loraReceive(int packetSize)
   while (LoRa.available()) {
     rxBuf[rxBufIndex++] = LoRa.read();
   }
-  serialSend(Cmd::Data, rxBuf, rxBufIndex);
+  sendRigToSerial(Cmd::Data, rxBuf, rxBufIndex);
   onRigPacket(rxBuf, rxBufIndex);
 }
 
