@@ -395,9 +395,11 @@ void Service::onControlCommand(Cmd cmd, byte value)
 {
   switch (cmd) {
     case Cmd::P:
+      Serial.print("CSMA P: "); Serial.println(value);
       csmaP_ = value;
       break;
     case Cmd::SlotTime:
+      Serial.print("CSMA SlotTime: "); Serial.println(value);
       csmaSlotTime_ = (long)value * 10;
       break;
     default:
