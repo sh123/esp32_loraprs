@@ -197,4 +197,5 @@ Payloads for commands are sent and expected as big endian and defined as:
 - It might be useful to add additional pass band filter or broadcast FM radio reject filter, it seem to improve sensitivity when using external base antenna
 
 # TODO
+- Support for more devices and devices with built-in OLED screen (merge from [branch](https://github.com/RadioHome/esp32_loraprs/tree/oled))
 - Investigate support for [M17 Protocol](http://m17project.org) reflector gating in addition to APRS-IS when M17 protocol is used by the client application
