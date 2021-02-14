@@ -422,6 +422,8 @@ void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
 
     setupLora(config_.LoraFreq, config_.LoraBw, config_.LoraSf, 
       config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraEnableCrc);
+  } else {
+    Serial.println("Radio control command of wrong size");
   }
 }
 
