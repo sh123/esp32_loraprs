@@ -9,6 +9,7 @@
 * [Digital voice with Codec2](#digital-voice-with-codec2)
 * [KISS command extensions](#kiss-command-extensions)
 * [Test Results](#test-results)
+* [TODO](#todo)
 
 # Introduction
 ![alt text](images/diagram.png)
@@ -195,3 +196,7 @@ Payloads for commands are sent and expected as big endian and defined as:
 - Could not get modems communicate with each other when using spreading factor 6, need to use implicit LoRa header mode
 - It might be useful to add additional pass band filter or broadcast FM radio reject filter, it seem to improve sensitivity when using external base antenna
 
+# TODO
+- Support for more devices and devices with built-in OLED screen (merge from [branch](https://github.com/RadioHome/esp32_loraprs/tree/oled))
+- Investigate support for [M17 Protocol](http://m17project.org) reflector gating in addition to APRS-IS when M17 protocol is used by the client application
+- Improve CSMA logic and if possible add support for CAD
