@@ -39,7 +39,8 @@
 #define CFG_WIFI_KEY          "<key>"
 
 #define CFG_FREQ_CORR         false   // NB! incoming interrupts may stop working on frequent corrections when enabled
-                                      //      test with your module before heavy usage
+#define CFG_FREQ_CORR_DELTA   1000    //      test with your module before heavy usage
+
 #define CFG_PERSISTENT_APRS   true
 #define CFG_DIGIREPEAT        false
 #define CFG_RF_TO_IS          true

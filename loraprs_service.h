@@ -85,8 +85,6 @@ private:
   const int CfgPollDelayMs = 5;             // main loop delay
   const int CfgWiFiConnRetryMaxTimes = 10;  // wifi number of connection retries
   const int CfgMaxAX25PayloadSize = 512;    // maximum ax25 payload size
-  const int CfgFreqCorrMinHz = 1000;        // correct if deviation is larger than this number
-                                            // NB! small value causes frequent corrections, which locks LoRa ISR
   const int CfgMaxAprsInMessageSize = 255;  // maximum aprsis to rf message size
 
   // csma parameters, overriden with KISS commands

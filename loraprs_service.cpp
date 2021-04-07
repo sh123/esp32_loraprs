@@ -287,7 +287,7 @@ void Service::onRigPacket(void *packet, int packetLength)
 {  
   long frequencyError = LoRa.packetFrequencyError();
 
-  if (config_.EnableAutoFreqCorrection && abs(frequencyError) > CfgFreqCorrMinHz) {
+  if (config_.EnableAutoFreqCorrection && abs(frequencyError) > config_.AutoFreqCorrectionDeltaHz) {
     config_.LoraFreq -= frequencyError;
     Serial.print("Correcting frequency: "); Serial.println(frequencyError);
     LoRa.setFrequency(config_.LoraFreq);

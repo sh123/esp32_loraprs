@@ -43,9 +43,12 @@ struct Config
   String AprsRawBeacon; // aprs string for server beacon, e.g. NOCALL-1>APZMDM,WIDE1-1:!0000.00N/00000.00E#LoRA 433.775MHz/BW125/SF12/CR7/0xf3
   int AprsRawBeaconPeriodMinutes; // aprs beacon period
 
+  // frequency correction
+  bool EnableAutoFreqCorrection;        // true - correct own frequency based on received packet frequency deviation
+  int AutoFreqCorrectionDeltaHz;        // correct when difference is larger than this value
+  
   // aprs logic
   bool EnableSignalReport;              // true - append signal report on server side for the client to be sent to APRS-IS
-  bool EnableAutoFreqCorrection;        // true - correct own frequency based on received packet frequency deviation
   bool EnablePersistentAprsConnection;  // true - keep aprs-is connection active all the time
   bool EnableRfToIs;                    // true - enable RF to APRS-IS submission
   bool EnableIsToRf;                    // true - enable APRS-IS to RF submission

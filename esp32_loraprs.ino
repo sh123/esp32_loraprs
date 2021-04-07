@@ -52,8 +52,11 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.WifiSsid = CFG_WIFI_SSID;
   cfg.WifiKey = CFG_WIFI_KEY;
 
-  // configuration flags and features
+  // frequency correction
   cfg.EnableAutoFreqCorrection = CFG_FREQ_CORR;  // automatic tune to any incoming packet frequency
+  cfg.AutoFreqCorrectionDeltaHz = CFG_FREQ_CORR_DELTA;
+
+  // configuration flags and features
   cfg.EnableSignalReport = true;  // signal report will be added to the comment sent to aprsis
   cfg.EnablePersistentAprsConnection = CFG_PERSISTENT_APRS; // keep aprsis connection open, otherwise connect on new data only
   cfg.EnableRfToIs = CFG_RF_TO_IS;  // send data from rf to aprsis
