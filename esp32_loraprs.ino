@@ -34,7 +34,7 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.LoraPinSs = CFG_LORA_PIN_SS;
   cfg.LoraPinRst = CFG_LORA_PIN_RST;
   cfg.LoraPinDio0 = CFG_LORA_PIN_DIO0;
-  cfg.LoraUseIsr = true;  // set to false for polling instead of interrupts
+  cfg.LoraUseIsr = false;  // set to true for incoming packet ISR usage
 
   // aprs configuration
   cfg.AprsHost = "rotate.aprs2.net";
