@@ -28,13 +28,13 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.LoraCodingRate = CFG_LORA_CR;
   cfg.LoraSync = 0x34;
   cfg.LoraPower = CFG_LORA_PWR;
-  cfg.LoraEnableCrc = CFG_LORA_ENABLE_CRC; // set to false for speech data
+  cfg.LoraEnableCrc = CFG_LORA_ENABLE_CRC; // set to false for speech streaming data
 
   // lora pinouts
   cfg.LoraPinSs = CFG_LORA_PIN_SS;
   cfg.LoraPinRst = CFG_LORA_PIN_RST;
   cfg.LoraPinDio0 = CFG_LORA_PIN_DIO0;
-  cfg.LoraUseIsr = false;  // set to true for incoming packet ISR usage
+  cfg.LoraUseIsr = CFG_LORA_USE_ISR;  // set to true for incoming packet ISR usage (stream mode, e.g. speech)
 
   // aprs configuration
   cfg.AprsHost = "rotate.aprs2.net";
