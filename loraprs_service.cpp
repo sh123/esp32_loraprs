@@ -1,5 +1,5 @@
 #include "loraprs_service.h"
-
+void setGPSInfo();
 namespace LoraPrs {
   
 Service::Service()
@@ -204,6 +204,7 @@ void Service::sendPeriodicBeacon()
   long currentMs = millis();
 
   if (previousBeaconMs_ == 0 || currentMs - previousBeaconMs_ >= config_.AprsRawBeaconPeriodMinutes * 60 * 1000) {
+      ::setGPSInfo();
       AX25::Payload payload(config_.AprsRawBeacon);
       if (payload.IsValid()) {
         sendAX25ToLora(payload);
