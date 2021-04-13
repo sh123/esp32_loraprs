@@ -1,3 +1,7 @@
+#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
+#include <u-blox_config_keys.h>
+#include <u-blox_structs.h>
+
 #include <arduino-timer.h>
 #include "WiFi.h"
 #include "loraprs_service.h"
