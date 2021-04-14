@@ -2,7 +2,6 @@
 #include <u-blox_config_keys.h>
 #include <u-blox_structs.h>
 
-#include <SPI.h>
 #include <arduino-timer.h>
 #include "WiFi.h"
 #include "loraprs_service.h"
