@@ -113,21 +113,42 @@ bool toggleWatchdogLed(void *) {
   digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
   return true;
 }
+
+ String create_lat_aprs(double lat) {
+            char str[20];
+            char n_s = 'N';
+            if (lat < 0) {
+              n_s = 'S';
+            }
+            lat = std::abs(lat);
+            sprintf(str, "%02d%05.2f%c", (int)lat, (lat - (double)((int)lat)) * 60.0, n_s);
+            String lat_str(str);
+            return lat_str;
+}
+
+String create_long_aprs(double lng) {
+      char str[20];
+      char e_w = 'E';
+      if (lng < 0) {
+        e_w = 'W';
+      }
+      lng = std::abs(lng);
+      sprintf(str, "%03d%05.2f%c", (int)lng, (lng - (double)((int)lng)) * 60.0, e_w);
+      String lng_str(str);
+      return lng_str;
+}
+
 void setGPSInfo(String arr[]){
       
       myGNSS.checkUblox(); //See if new data is available. Process bytes as they come in.
       //Get GPS Info
-      if (nmea.isValid() == true) {
-        float latitude_mdeg = nmea.getLatitude() / 10000.;
-        float longitude_mdeg = nmea.getLongitude() / 10000.;
-        String latitude1 =  (latitude_mdeg > 0) ? String(latitude_mdeg)+"N" : String(latitude_mdeg)+"S";
-        String longitude1 = (longitude_mdeg > 0) ? String(longitude_mdeg)+"E" : String(fabs(longitude_mdeg))+"W";
-        arr[0]=latitude1;
-        arr[1]=longitude1;
+      if (nmea.isValid() == true) {        
+        arr[0]=create_lat_aprs((double)nmea.getLatitude()/1000000);
+        arr[1]=create_long_aprs((double)nmea.getLongitude()/1000000);
         Serial.print("Latitude (deg): ");
         Serial.println(arr[0]);
         Serial.print("Longitude (deg): ");
-        Serial.println(arr[1]);
+       Serial.println(arr[1]);
     } else {
         Serial.print("No Fix - ");
         Serial.print("Num. satellites: ");
