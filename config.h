@@ -30,20 +30,33 @@
 
 #define CFG_BT_NAME           "loraprs"
 
-#define CFG_APRS_LOGIN        "NOCALL-10"
+#define CFG_APRS_LOGIN        "N7DMR-10"
 #define CFG_APRS_PASS         "12345"
 #define CFG_APRS_FILTER	      "r/35.60/139.80/25"
-#define CFG_APRS_RAW_BKN      "NOCALL-10>APZMDM,WIDE1-1:!0000.00N/00000.00E#LoRA 433.775MHz/BW125/SF12/CR7/0x34"
-
+#define CFG_APRS_RAW_BKN      ""  //set RAW BKN to empty string to utilize GPS
+#define CFG_APRS_SYMBOL_FIRST "L"
+#define CFG_APRS_SYMBOL_SECOND "&"
+#define CFG_APRS_COMMENTS     "LoRA 433.775MHz/BW125/SF12/CR7/0x34"
+#define CFG_APRS_BEACONMINUTES 2
 #define CFG_WIFI_SSID         "<ssid>"
 #define CFG_WIFI_KEY          "<key>"
 
 #define CFG_FREQ_CORR         false   // NB! incoming interrupts may stop working on frequent corrections when enabled
 #define CFG_FREQ_CORR_DELTA   1000    //      test with your module before heavy usage
 
-#define CFG_PERSISTENT_APRS   true
+#define CFG_PERSISTENT_APRS   false
 #define CFG_DIGIREPEAT        false
-#define CFG_RF_TO_IS          true
+#define CFG_RF_TO_IS          false
 #define CFG_IS_TO_RF          false
-#define CFG_BEACON            false
-#define CFG_KISS_EXTENSIONS   false
+#define CFG_BEACON            true
+#define CFG_KISS_EXTENSIONS   true
+
+
+//GPS Configuration
+
+#define T_BEAM_V10 
+#define GPS_RX_PIN 34
+#define GPS_TX_PIN 12
+#define I2C_SDA 21
+#define I2C_SCL 22
+#define GPS_BAND_RATE      9600
