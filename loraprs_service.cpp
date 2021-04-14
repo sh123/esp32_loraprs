@@ -1,5 +1,5 @@
 #include "loraprs_service.h"
-void setGPSInfo();
+void setGPSInfo(String arr[]);
 namespace LoraPrs {
   
 Service::Service()
@@ -202,10 +202,15 @@ ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr(int packetSize)
 void Service::sendPeriodicBeacon()
 {
   long currentMs = millis();
-
+  String arr[2];
   if (previousBeaconMs_ == 0 || currentMs - previousBeaconMs_ >= config_.AprsRawBeaconPeriodMinutes * 60 * 1000) {
-      ::setGPSInfo();
-      AX25::Payload payload(config_.AprsRawBeacon);
+     ::setGPSInfo(arr);
+     
+      String AprsBk = config_.AprsLogin + ">APZMDM,WIDE2-2:=" + arr[0] + config_.AprsSymbolFirst + arr[1] + config_.AprsSymbolSecond + config_.AprsComments; 
+      String AprsBKFinal = (config_.AprsRawBeacon=="") ? AprsBk : config_.AprsRawBeacon;
+      if(arr[0]!="0" || config_.AprsRawBeacon!=""){
+      AX25::Payload payload(AprsBKFinal);
+      Serial.println(AprsBKFinal);
       if (payload.IsValid()) {
         sendAX25ToLora(payload);
         if (config_.EnableRfToIs) {
@@ -216,6 +221,9 @@ void Service::sendPeriodicBeacon()
       else {
         Serial.println("Beacon payload is invalid");
       }
+     }else{
+        Serial.print("No GPS Fix - ");
+     }
       previousBeaconMs_ = currentMs;
   }
 }
