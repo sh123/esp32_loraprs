@@ -30,7 +30,7 @@
 
 #define CFG_BT_NAME           "loraprs"
 
-#define CFG_APRS_LOGIN        "N7DMR-10"
+#define CFG_APRS_LOGIN        "NOCALL-10"
 #define CFG_APRS_PASS         "12345"
 #define CFG_APRS_FILTER	      "r/35.60/139.80/25"
 #define CFG_APRS_RAW_BKN      ""  //set RAW BKN to empty string to utilize GPS
