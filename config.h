@@ -53,10 +53,6 @@
 
 
 //GPS Configuration
-
-#define T_BEAM_V10 
 #define GPS_RX_PIN 34
 #define GPS_TX_PIN 12
-#define I2C_SDA 21
-#define I2C_SCL 22
-#define GPS_BAND_RATE 9600
+#define GPS_BAUD_RATE 9600
