@@ -37,7 +37,7 @@
 #define CFG_APRS_SYMBOL_FIRST "\\"
 #define CFG_APRS_SYMBOL_SECOND "Y"
 #define CFG_APRS_COMMENTS     " LoRA 433.775MHz/BW125/SF12/CR7/0x34"
-#define CFG_APRS_BEACONMINUTES 2
+#define CFG_APRS_BEACONMINUTES 2  // in minutes
 #define CFG_WIFI_SSID         "<ssid>"
 #define CFG_WIFI_KEY          "<key>"
 
