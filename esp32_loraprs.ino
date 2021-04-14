@@ -96,7 +96,7 @@ void setup() {
   loraPrsService.setup(config);
   //init GPS
   Serial.println("initGPS");
-  Serial1.begin(GPS_BAND_RATE, SERIAL_8N1, GPS_RX_PIN, GPS_TX_PIN);
+  Serial1.begin(GPS_BAUD_RATE, SERIAL_8N1, GPS_RX_PIN, GPS_TX_PIN);
   delay(1500);
   if (myGNSS.begin(Serial1) == false) {
      Serial.println(F("Ublox GNSS not detected at default I2C address. Please check wiring."));
@@ -113,8 +113,8 @@ bool toggleWatchdogLed(void *) {
   digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
   return true;
 }
-
- String create_lat_aprs(double lat) {
+//functions to convert decimal to dms borrowed from https://github.com/lora-aprs/LoRa_APRS_Tracker
+String create_lat_aprs(double lat) {
             char str[20];
             char n_s = 'N';
             if (lat < 0) {
@@ -139,7 +139,6 @@ String create_long_aprs(double lng) {
 }
 
 void setGPSInfo(String arr[]){
-      
       myGNSS.checkUblox(); //See if new data is available. Process bytes as they come in.
       //Get GPS Info
       if (nmea.isValid() == true) {        
@@ -157,7 +156,6 @@ void setGPSInfo(String arr[]){
         arr[1]="0";
     }
 }
-
 
 void SFE_UBLOX_GNSS::processNMEA(char incoming)
   {
