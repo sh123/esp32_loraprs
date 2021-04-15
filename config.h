@@ -5,13 +5,13 @@
 // change pinouts if not defined through native board LORA_* definitions
 #ifndef LORA_RST
 #pragma message("LoRa pin definitions are not found, redefining...")
-#define LORA_RST              26
-#define LORA_IRQ              14
+#define LORA_RST              23
+#define LORA_IRQ              26
 #endif
 
 #ifndef BUILTIN_LED
 #pragma message("BUILDIN_LED is not found, defining as 2")
-#define BUILTIN_LED           2
+#define BUILTIN_LED           25
 #endif
 
 #define CFG_IS_CLIENT_MODE    true
@@ -25,7 +25,7 @@
 #define CFG_LORA_BW           125e3
 #define CFG_LORA_SF           12
 #define CFG_LORA_CR           7
-#define CFG_LORA_PWR          20
+#define CFG_LORA_PWR          100
 #define CFG_LORA_ENABLE_CRC   true  // set to false for speech data
 
 #define CFG_BT_NAME           "loraprs"
@@ -33,17 +33,26 @@
 #define CFG_APRS_LOGIN        "NOCALL-10"
 #define CFG_APRS_PASS         "12345"
 #define CFG_APRS_FILTER	      "r/35.60/139.80/25"
-#define CFG_APRS_RAW_BKN      "NOCALL-10>APZMDM,WIDE1-1:!0000.00N/00000.00E#LoRA 433.775MHz/BW125/SF12/CR7/0x34"
-
+#define CFG_APRS_RAW_BKN      ""  //set RAW BKN to empty string to utilize GPS
+#define CFG_APRS_SYMBOL_FIRST "\\"
+#define CFG_APRS_SYMBOL_SECOND "Y"
+#define CFG_APRS_COMMENTS     " LoRA 433.775MHz/BW125/SF12/CR7/0x34"
+#define CFG_APRS_BEACONMINUTES 2  // in minutes
 #define CFG_WIFI_SSID         "<ssid>"
 #define CFG_WIFI_KEY          "<key>"
 
 #define CFG_FREQ_CORR         false   // NB! incoming interrupts may stop working on frequent corrections when enabled
 #define CFG_FREQ_CORR_DELTA   1000    //      test with your module before heavy usage
 
-#define CFG_PERSISTENT_APRS   true
+#define CFG_PERSISTENT_APRS   false
 #define CFG_DIGIREPEAT        false
-#define CFG_RF_TO_IS          true
+#define CFG_RF_TO_IS          false
 #define CFG_IS_TO_RF          false
-#define CFG_BEACON            false
-#define CFG_KISS_EXTENSIONS   false
+#define CFG_BEACON            true
+#define CFG_KISS_EXTENSIONS   true
+
+
+//GPS Configuration
+#define GPS_RX_PIN 34
+#define GPS_TX_PIN 12
+#define GPS_BAUD_RATE 9600

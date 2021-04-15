@@ -1,6 +1,14 @@
+#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
+#include <u-blox_config_keys.h>
+#include <u-blox_structs.h>
+
 #include <arduino-timer.h>
 #include "WiFi.h"
 #include "loraprs_service.h"
+#include <MicroNMEA.h> //https://github.com/stevemarple/MicroNMEA
+char nmeaBuffer[100];
+MicroNMEA nmea(nmeaBuffer, sizeof(nmeaBuffer));
+SFE_UBLOX_GNSS myGNSS;
 
 #if __has_include("/tmp/esp32_loraprs_config.h")
 #pragma message("Using external config")
@@ -43,7 +51,11 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.AprsPass = CFG_APRS_PASS;
   cfg.AprsFilter = CFG_APRS_FILTER; // multiple filters are space separated
   cfg.AprsRawBeacon = CFG_APRS_RAW_BKN;
-  cfg.AprsRawBeaconPeriodMinutes = 20;
+  cfg.AprsRawBeaconPeriodMinutes = CFG_APRS_BEACONMINUTES;
+
+  cfg.AprsSymbolFirst = CFG_APRS_SYMBOL_FIRST;
+  cfg.AprsSymbolSecond = CFG_APRS_SYMBOL_SECOND;
+  cfg.AprsComments = CFG_APRS_COMMENTS;
 
   // bluetooth device name
   cfg.BtName = CFG_BT_NAME;
@@ -81,7 +93,13 @@ void setup() {
 
   initializeConfig(config);
   loraPrsService.setup(config);
-
+  //init GPS
+  Serial.println("initGPS");
+  Serial1.begin(GPS_BAUD_RATE, SERIAL_8N1, GPS_RX_PIN, GPS_TX_PIN);
+  delay(1500);
+  if (myGNSS.begin(Serial1) == false) {
+     Serial.println(F("Ublox GNSS not detected at default I2C address. Please check wiring."));
+  }
   watchdogLedTimer.every(LED_TOGGLE_PERIOD, toggleWatchdogLed);
 }
 
@@ -94,3 +112,53 @@ bool toggleWatchdogLed(void *) {
   digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
   return true;
 }
+//functions to convert decimal to dms borrowed from https://github.com/lora-aprs/LoRa_APRS_Tracker
+String create_lat_aprs(double lat) {
+            char str[20];
+            char n_s = 'N';
+            if (lat < 0) {
+              n_s = 'S';
+            }
+            lat = std::abs(lat);
+            sprintf(str, "%02d%05.2f%c", (int)lat, (lat - (double)((int)lat)) * 60.0, n_s);
+            String lat_str(str);
+            return lat_str;
+}
+
+String create_long_aprs(double lng) {
+      char str[20];
+      char e_w = 'E';
+      if (lng < 0) {
+        e_w = 'W';
+      }
+      lng = std::abs(lng);
+      sprintf(str, "%03d%05.2f%c", (int)lng, (lng - (double)((int)lng)) * 60.0, e_w);
+      String lng_str(str);
+      return lng_str;
+}
+
+void setGPSInfo(String arr[]){
+      myGNSS.checkUblox(); //See if new data is available. Process bytes as they come in.
+      //Get GPS Info
+      if (nmea.isValid() == true) {        
+        arr[0]=create_lat_aprs((double)nmea.getLatitude()/1000000);
+        arr[1]=create_long_aprs((double)nmea.getLongitude()/1000000);
+        Serial.print("Latitude (deg): ");
+        Serial.println(arr[0]);
+        Serial.print("Longitude (deg): ");
+       Serial.println(arr[1]);
+    } else {
+        Serial.print("No Fix - ");
+        Serial.print("Num. satellites: ");
+        Serial.println(nmea.getNumSatellites());
+        arr[0]="0";
+        arr[1]="0";
+    }
+}
+
+void SFE_UBLOX_GNSS::processNMEA(char incoming)
+  {
+      //Take the incoming char from the Ublox I2C port and pass it on to the MicroNMEA lib
+      //for sentence cracking
+      nmea.process(incoming);
+  }

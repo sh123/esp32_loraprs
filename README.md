@@ -68,6 +68,8 @@ Install via libraries:
 - LoRa arduino library: https://github.com/sandeepmistry/arduino-LoRa
 - Arduino Timer library: https://github.com/contrem/arduino-timer
 - CircularBuffer library: https://github.com/rlogiacco/CircularBuffer
+- MicroNMEA: https://github.com/stevemarple/MicroNMEA
+- SparkFun u-blox GNSS Arduino Library
 
 # Software Setup
 - **NB! select next partition scheme for ESP32 in Arduino IDE Tools menu:** "Minimal SPIFFS (1.9 MB APP with OTA/190 KB SPIFFS)"
@@ -104,6 +106,13 @@ Install via libraries:
    - `cfg.EnableRepeater` set to `true` to enable packet repeater
    - `cfg.EnableBeacon` set to `true` to enable periodic beacons specified in `cfg.AprsRawBeacon` with period specified in `cfg.AprsRawBeaconPeriodMinutes` into RF and APRS-IS if `cfg.EnableRfToIs` is enabled
    - `cfg.LoraUseIsr` set to `true` to enable LoRa incoming packet handling using interrupts in continous RX mode suitable for speech data, otherwise set to `false` for single packet polling mode
+
+- GPS APRS BEACON
+   GPS PIN needs to be defined. Following are default T-Beam V1.0 PIN.
+   GPS_RX_PIN 34
+   GPS_TX_PIN 12
+  To use GPS location for APRS beacon, Set CFG_APRS_RAW_BKN to "" empty string. CFG_APRS_SYMBOL_FIRST and CFG_APRS_SYMBOL_SECOND are APRS symbols. Please refer to http://www.aprs.org/symbols/symbols-new.txt for all the symbols. CFG_APRS_COMMENTS will be the APRS Beacon comments. CFG_APRS_BEACONMINUTES will determine how frequently would the beacon be sent. The number is in minutes. 
+  CFG_BEACON need to set to true to send beacons. Beacon will be sent regardless of Client mode or server mode. Beacon will be sent via RF. 
 
 # Protocol Compatibility
 - Make sure LoRa sync word and other LoRa parameters match

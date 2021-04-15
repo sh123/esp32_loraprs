@@ -46,7 +46,7 @@ private:
   }
   inline bool needsWifi() const { return needsAprsis(); }
   inline bool needsBt() const { return config_.IsClientMode; }
-  inline bool needsBeacon() const { return !config_.IsClientMode && config_.EnableBeacon; }
+  inline bool needsBeacon() const { return config_.EnableBeacon; }
 
 protected:
   virtual bool onRigTxBegin();
