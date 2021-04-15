@@ -206,7 +206,7 @@ void Service::sendPeriodicBeacon()
   if (previousBeaconMs_ == 0 || currentMs - previousBeaconMs_ >= config_.AprsRawBeaconPeriodMinutes * 60 * 1000) {
      ::setGPSInfo(arr);
      
-      String AprsBk = config_.AprsLogin + ">APZMDM,WIDE2-2:=" + arr[0] + config_.AprsSymbolFirst + arr[1] + config_.AprsSymbolSecond + config_.AprsComments; 
+      String AprsBk = config_.AprsLogin + ">BEACON,WIDE2-2:!" + arr[0] + config_.AprsSymbolFirst + arr[1] + config_.AprsSymbolSecond + config_.AprsComments; 
       String AprsBKFinal = (config_.AprsRawBeacon=="") ? AprsBk : config_.AprsRawBeacon;
       if(arr[0]!="0" || config_.AprsRawBeacon!=""){
       AX25::Payload payload(AprsBKFinal);
