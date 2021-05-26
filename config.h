@@ -47,3 +47,8 @@
 #define CFG_IS_TO_RF          false
 #define CFG_BEACON            false
 #define CFG_KISS_EXTENSIONS   false
+
+#define CFG_PTT_ENABLE        false
+#define CFG_PTT_PIN           12
+#define CFG_PTT_TX_DELAY_MS   50
+#define CFG_PTT_TX_TAIL_MS    10

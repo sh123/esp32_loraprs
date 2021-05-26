@@ -43,6 +43,11 @@ void Service::setup(const Config &conf)
   if (needsAprsis() && config_.EnablePersistentAprsConnection) {
     reconnectAprsis();
   }
+
+  if (config_.PttEnable) {
+    Serial.println("External PTT is enabled");
+    pinMode(config_.PttPin, OUTPUT);
+  }
 }
 
 void Service::setupWifi(const String &wifiName, const String &wifiKey)
@@ -357,7 +362,12 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
 
 bool Service::onRigTxBegin()
 {
-  delay(CfgPollDelayMs);
+  if (config_.PttEnable) {
+    digitalWrite(config_.PttPin, HIGH);
+    delay(config_.PttTxDelayMs);
+  } else {
+    delay(CfgPollDelayMs);
+  }
   return (LoRa.beginPacket() == 1);
 }
 
@@ -368,7 +378,13 @@ void Service::onRigTx(byte b)
 
 void Service::onRigTxEnd()
 {
-  LoRa.endPacket(true);
+  if (config_.PttEnable) {
+    LoRa.endPacket(false);
+    delay(config_.PttTxTailMs);
+    digitalWrite(config_.PttPin, LOW);
+  } else {
+    LoRa.endPacket(true);
+  }
 }
 
 void Service::onSerialTx(byte b)
@@ -401,6 +417,14 @@ void Service::onControlCommand(Cmd cmd, byte value)
     case Cmd::SlotTime:
       Serial.print("CSMA SlotTime: "); Serial.println(value);
       csmaSlotTime_ = (long)value * 10;
+      break;
+    case Cmd::TxDelay:
+      Serial.print("TX delay: "); Serial.println(value);
+      config_.PttTxDelayMs = (long)value * 10;
+      break;
+    case Cmd::TxTail:
+      Serial.print("TX tail: "); Serial.println(value);
+      config_.PttTxTailMs = (long)value * 10;
       break;
     default:
       break;

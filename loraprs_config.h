@@ -54,6 +54,12 @@ struct Config
   bool EnableIsToRf;                    // true - enable APRS-IS to RF submission
   bool EnableRepeater;                  // true - digirepeat incoming packets based on WIDEn-n paths
   bool EnableBeacon;                    // true - send AprsRawBeacon to RF and APRS-IS if EnableRfToIs is true
+
+  // external ptt tx control
+  bool PttEnable;                       // true - enable external ptt control
+  int PttPin;                           // esp pin to set high on transmit
+  int PttTxDelayMs;                     // ptt tx delay
+  int PttTxTailMs;                      // ptt tx tail
 };
 
 } // LoraPrs

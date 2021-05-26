@@ -64,6 +64,12 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.EnableRepeater = CFG_DIGIREPEAT; // digirepeat incoming packets
   cfg.EnableBeacon = CFG_BEACON;  // enable periodic AprsRawBeacon beacon to rf and aprsis if rf to aprsis is enabled
   cfg.EnableKissExtensions = CFG_KISS_EXTENSIONS; // radio control and signal reports
+
+  // external ptt control
+  cfg.PttEnable = CFG_PTT_ENABLE;
+  cfg.PttPin = CFG_PTT_PIN;
+  cfg.PttTxDelayMs = CFG_PTT_TX_DELAY_MS;
+  cfg.PttTxTailMs = CFG_PTT_TX_TAIL_MS;
 }
 
 LoraPrs::Service loraPrsService;
