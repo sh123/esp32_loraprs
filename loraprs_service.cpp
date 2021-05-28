@@ -23,7 +23,7 @@ void Service::setup(const Config &conf)
 
   aprsLoginCommand_ = String("user ") + config_.AprsLogin + String(" pass ") + 
     config_.AprsPass + String(" vers ") + CfgLoraprsVersion;
-  if (config_.AprsFilter.length() > 0) {
+  if (config_.EnableIsToRf && config_.AprsFilter.length() > 0) {
     aprsLoginCommand_ += String(" filter ") + config_.AprsFilter;
   }
   aprsLoginCommand_ += String("\n");
