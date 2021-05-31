@@ -180,7 +180,7 @@ It is possible to get 30-40% coverage increase in urban environment by using add
 - Set LoRa output power to around 8 dBm `cfg.LoraPwr = 8;`, NB! higher than 10 dBm levels can destroy amplifier
 - Set `cfg.PttEnable` to `true`
 - Set `cfg.PttPin` to your relay control pin
-- Optionally set `PttTxDelayMs` and `PttTxTailMs` depending on your releay switching times
+- Optionally change `cfg.PttTxDelayMs` and `cfg.PttTxTailMs` depending on your releay switching times
 
 # Test Results
 ![alt text](images/setup.png)
