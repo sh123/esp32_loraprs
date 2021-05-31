@@ -8,7 +8,7 @@
 * [CSMA Usage](#csma-usage)
 * [Digital voice with Codec2](#digital-voice-with-codec2)
 * [KISS command extensions](#kiss-command-extensions)
-* [Using External UHF Amplifier](#external-amplifier)
+* [Using External UHF Amplifier](#using-external-uhf-amplifier)
 * [Test Results](#test-results)
 * [TODO](#todo)
 
@@ -172,8 +172,13 @@ Payloads for commands are sent and expected as big endian and defined as:
 ```
 
 # Using External UHF Amplifier
-
 ![alt text](images/amp.png)
+It is possible to get 30-40% coverage increase in urban environment by using additional external 1-2W amplifier (about 6$ on Aliexpress), which will give 10-12 dB signal increase.
+- Implement simple amplifier power switching by using relay
+- Set LoRa output power to around 8 dBm `cfg.LoraPwr = 8;`, NB! higher than 10 dBm levels can destroy amplifier
+- Set `cfg.PttEnable` to `true`
+- Set `cfg.PttPin` to your relay control pin
+- Optionally set `PttTxDelayMs` and `PttTxTailMs` depending on your releay switching times
 
 # Test Results
 ![alt text](images/setup.png)
