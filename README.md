@@ -174,7 +174,7 @@ Payloads for commands are sent and expected as big endian and defined as:
 # Using External UHF Amplifier
 ![alt text](images/amp.png)
 
-It is possible to get 30-40% coverage increase in urban environment by using additional external 1-2W amplifier (about 6$ on Aliexpress), which will give 10-12 dB signal increase
+It is possible to get 30-40% TX only coverage increase in urban environment by using additional external 1-2W amplifier (about 6$ on Aliexpress), which will give 10-12 dB signal increase
 
 - Implement simple amplifier power switching by using relay, do NOT keep this amplifier always ON
 - Set LoRa output power to around 8 dBm `cfg.LoraPwr = 8;`, NB! higher than 10 dBm levels can destroy amplifier
