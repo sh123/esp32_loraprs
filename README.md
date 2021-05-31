@@ -8,6 +8,7 @@
 * [CSMA Usage](#csma-usage)
 * [Digital voice with Codec2](#digital-voice-with-codec2)
 * [KISS command extensions](#kiss-command-extensions)
+* [Using External UHF Amplifier](#external-amplifier)
 * [Test Results](#test-results)
 * [TODO](#todo)
 
@@ -169,6 +170,10 @@ Payloads for commands are sent and expected as big endian and defined as:
     int16_t snr;  // snr * 100
   } __attribute__((packed));
 ```
+
+# Using External UHF Amplifier
+
+![alt text](images/amp.png)
 
 # Test Results
 ![alt text](images/setup.png)
