@@ -26,7 +26,7 @@ struct Config
 
   // bluetooth
   String BtName;        // bluetooth device name for the client, set to empty string to disable bluetooth in server mode
-
+  bool useBLE;          // bluetooth device presents as BLE rather than serial bluetooth e.g. for iOS devices
   // wifi
   String WifiSsid;      // wifi access point name
   String WifiKey;       // wifi access point key
