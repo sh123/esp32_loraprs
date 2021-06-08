@@ -29,7 +29,7 @@
 #define CFG_LORA_ENABLE_CRC   true  // set to false for speech data
 
 #define CFG_BT_NAME           "loraprs"
-#define CFG_USE_BLE           true // set to true to use bluetooth low energy (for ios devices)
+#define CFG_USE_BLE           false // set to true to use bluetooth low energy (for ios devices)
 
 #define CFG_APRS_LOGIN        "NOCALL-10"
 #define CFG_APRS_PASS         "12345"

@@ -33,7 +33,7 @@ class BLESerial: public Stream
         BLESerial(void);
         ~BLESerial(void);
 
-        bool begin(char* localName="loraprs");
+        bool begin(const char* localName);
         int available(void);
         int peek(void);
         bool connected(void);

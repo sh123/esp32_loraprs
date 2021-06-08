@@ -106,6 +106,10 @@ Install via libraries:
    - `cfg.EnableBeacon` set to `true` to enable periodic beacons specified in `cfg.AprsRawBeacon` with period specified in `cfg.AprsRawBeaconPeriodMinutes` into RF and APRS-IS if `cfg.EnableRfToIs` is enabled
    - `cfg.LoraUseIsr` set to `true` to enable LoRa incoming packet handling using interrupts in continous RX mode suitable for speech data, otherwise set to `false` for single packet polling mode
 
+# BLE Usage (iOS)
+- iOS does not support serial over Bluetooth and requires BLE support, this enables APRS applications such as official aprs.fi to work with the modem
+- to enable BLE support set `cfg.BtEnableBle` to `true`
+
 # Protocol Compatibility
 - Make sure LoRa sync word and other LoRa parameters match
 - **Client** should be interoperable with other clients, which transmit raw text APRS messages if bluetooth client sends them in this format to the modem

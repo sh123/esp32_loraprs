@@ -141,9 +141,9 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
 
 void Service::setupBt(const String &btName)
 {
-  if (config_.useBLE) {
+  if (config_.BtEnableBle) {
     Serial.print("BLE init " + btName + "...");
-    if (serialBLE_.begin()) {
+    if (serialBLE_.begin(btName.c_str())) {
       Serial.println("ok");
     }
     else {
@@ -401,7 +401,7 @@ void Service::onRigTxEnd()
 
 void Service::onSerialTx(byte b)
 {
-  if (config_.useBLE) {
+  if (config_.BtEnableBle) {
     serialBLE_.write(b);
   }
   else {
@@ -411,7 +411,7 @@ void Service::onSerialTx(byte b)
 
 bool Service::onSerialRxHasData()
 {
-  if (config_.useBLE) {
+  if (config_.BtEnableBle) {
     return serialBLE_.available();
   }
   else {
@@ -421,7 +421,7 @@ bool Service::onSerialRxHasData()
 
 bool Service::onSerialRx(byte *b)
 {
-  if (config_.useBLE) {
+  if (config_.BtEnableBle) {
     int rxResult = serialBLE_.read();
     if (rxResult == -1) {
       return false;
