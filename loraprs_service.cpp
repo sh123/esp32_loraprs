@@ -421,23 +421,12 @@ bool Service::onSerialRxHasData()
 
 bool Service::onSerialRx(byte *b)
 {
-  if (config_.BtEnableBle) {
-    int rxResult = serialBLE_.read();
-    if (rxResult == -1) {
-      return false;
-    }
-    *b = (byte)rxResult;
-    return true;
+  int rxResult = config_.BtEnableBle ? serialBLE_.read() : serialBt_.read();
+  if (rxResult == -1) {
+    return false;
   }
-
-  else {
-    int rxResult = serialBt_.read();
-    if (rxResult == -1) {
-      return false;
-    }
-    *b = (byte)rxResult;
-    return true;
-  }
+  *b = (byte)rxResult;
+  return true;
 }
 
 void Service::onControlCommand(Cmd cmd, byte value)
