@@ -8,6 +8,7 @@ Service::Service()
   , csmaSlotTime_(CfgCsmaSlotTimeMs)
   , csmaSlotTimePrev_(0)
   , serialBt_()
+  , serialBLE_()
 {
 }
 
@@ -140,14 +141,25 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
 
 void Service::setupBt(const String &btName)
 {
-  Serial.print("BT init " + btName + "...");
-  
-  if (serialBt_.begin(btName)) {
-    Serial.println("ok");
+  if (config_.useBLE) {
+    Serial.print("BLE init " + btName + "...");
+    if (serialBLE_.begin()) {
+      Serial.println("ok");
+    }
+    else {
+      Serial.println("failed");
+    }
   }
-  else
-  {
-    Serial.println("failed");
+
+  else {
+    Serial.print("BT init " + btName + "...");
+  
+    if (serialBt_.begin(btName)) {
+      Serial.println("ok");
+    }
+    else {
+      Serial.println("failed");
+    }
   }
 }
 
@@ -389,22 +401,43 @@ void Service::onRigTxEnd()
 
 void Service::onSerialTx(byte b)
 {
-  serialBt_.write(b);
+  if (config_.useBLE) {
+    serialBLE_.write(b);
+  }
+  else {
+    serialBt_.write(b);
+  }
 }
 
 bool Service::onSerialRxHasData()
 {
-  return serialBt_.available();
+  if (config_.useBLE) {
+    return serialBLE_.available();
+  }
+  else {
+    return serialBt_.available();
+  }
 }
 
 bool Service::onSerialRx(byte *b)
 {
-  int rxResult = serialBt_.read();
-  if (rxResult == -1) {
-    return false;
+  if (config_.useBLE) {
+    int rxResult = serialBLE_.read();
+    if (rxResult == -1) {
+      return false;
+    }
+    *b = (byte)rxResult;
+    return true;
   }
-  *b = (byte)rxResult;
-  return true;
+
+  else {
+    int rxResult = serialBt_.read();
+    if (rxResult == -1) {
+      return false;
+    }
+    *b = (byte)rxResult;
+    return true;
+  }
 }
 
 void Service::onControlCommand(Cmd cmd, byte value)

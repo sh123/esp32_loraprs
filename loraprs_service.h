@@ -8,6 +8,7 @@
 #include <endian.h>
 
 #include "BluetoothSerial.h"
+#include "ble_serial.h"
 #include "ax25_payload.h"
 #include "kiss_processor.h"
 #include "loraprs_config.h"
@@ -107,6 +108,7 @@ private:
     
   // peripherals
   BluetoothSerial serialBt_;
+  BLESerial serialBLE_;
   WiFiClient aprsisConn_;
 };
 
