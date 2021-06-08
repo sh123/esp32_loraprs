@@ -47,7 +47,7 @@ void initializeConfig(LoraPrs::Config &cfg) {
 
   // bluetooth device name
   cfg.BtName = CFG_BT_NAME;
-  cfg.BtEnableBle = CFG_USE_BLE;
+  cfg.BtEnableBle = CFG_BT_USE_BLE;
 
   // server mode wifi paramaters
   cfg.WifiSsid = CFG_WIFI_SSID;
