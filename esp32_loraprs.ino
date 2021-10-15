@@ -17,7 +17,7 @@
 #endif
 
 void initializeConfig(LoraPrs::Config &cfg) {
-  
+
   // client/server mode switch
   cfg.IsClientMode = CFG_IS_CLIENT_MODE;
 

@@ -124,6 +124,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
     delay(CfgConnRetryMs);
   }
   LoRa.setSyncWord(sync);
+  if (sf == 6) LoRa.implicitHeaderMode();
   LoRa.setSpreadingFactor(sf);
   LoRa.setSignalBandwidth(bw);
   LoRa.setCodingRate4(cr);
