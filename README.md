@@ -210,7 +210,6 @@ It is possible to get 30-40% TX only coverage increase in urban environment by u
   - Monitor your planned frequency, such as 433.775 MHz for ISM device activity, if there is strong interference from other users tune up or down it to minimize interference, it might be critical for long range
 - Weather
   - Rain and high humidity levels decrease signal level by about **~3-6 dB** on 433 MHz, could be higher on 868 MHz
-- Could not get modems communicate with each other when using spreading factor 6, need to use implicit LoRa header mode
 - It might be useful to add additional pass band filter or broadcast FM radio reject filter, it seem to improve sensitivity when using external base antenna
 
 # TODO
