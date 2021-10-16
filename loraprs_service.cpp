@@ -1,7 +1,11 @@
 #include "loraprs_service.h"
 
 namespace LoraPrs {
-  
+
+#ifdef USE_RADIOLIB
+std::shared_ptr<SX1278> Service::radio_;
+#endif
+
 Service::Service()
   : Kiss::Processor()
   , csmaP_(CfgCsmaPersistence)
@@ -119,6 +123,28 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
 
   isImplicitHeaderMode_ = sf == 6;
   
+#ifdef USE_RADIOLIB
+  radio_ = std::make_shared<SX1278>(new Module(config_.LoraPinSs, config_.LoraPinDio0, config_.LoraPinRst, config_.LoraPinDio1));
+
+  while (true) {
+    int state = radio_->begin((float)loraFreq / 1e6, (float)bw / 1e3, sf, cr, sync, pwr);
+    if (state == ERR_NONE) break;
+    Serial.println("Radio start error: " + state);
+    delay(CfgConnRetryMs);
+  }
+  radio_->setCRC(enableCrc);
+
+  if (config_.LoraUseIsr) {
+    radio_->setDio0Action(onLoraDataAvailableIsr);
+    while (true) {
+      int state = radio_->startReceive();
+      if (state == ERR_NONE) break;
+      Serial.println("Receive start error: " + state);
+      delay(CfgConnRetryMs);
+    }
+  }
+  
+#else
   LoRa.setPins(config_.LoraPinSs, config_.LoraPinRst, config_.LoraPinDio0);
   
   while (!LoRa.begin(loraFreq)) {
@@ -138,6 +164,8 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
     LoRa.onReceive(onLoraDataAvailableIsr);
     LoRa.receive();
   }
+#endif // USE_RADIOLIB
+
   Serial.println("ok");
 }
 
@@ -180,10 +208,17 @@ void Service::loop()
   if (config_.LoraUseIsr) {
     isRigToSerialProcessed = processRigToSerial();
   } else {
+#ifdef USE_RADIOLIB
+     if (int packetSize = radio_->getPacketLength()) {
+        loraReceive(packetSize);
+        isRigToSerialProcessed = true;
+     }
+#else
      if (int packetSize = LoRa.parsePacket()) {
         loraReceive(packetSize);
         isRigToSerialProcessed = true;
      }
+#endif
   }
 
   // TX path, Serial -> Rig
@@ -198,13 +233,31 @@ void Service::loop()
         sendPeriodicBeacon();
       }
       if (processSerialToRig() && config_.LoraUseIsr) {
+#ifdef USE_RADIOLIB
+        radio_->startReceive();
+#else
         LoRa.receive();
+#endif
       }
       csmaSlotTimePrev_ = currentTime;
     }
   }
   delay(CfgPollDelayMs);
 }
+
+#ifdef USE_RADIOLIB
+
+ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr()
+{
+  // TODO, move to separate ESP32 task  
+  int packetSize = Service::radio_->getPacketLength(false);
+  
+  byte rxBuf[packetSize];
+  Service::radio_->readData(rxBuf, packetSize);
+  queueRigToSerialIsr(Cmd::Data, rxBuf, packetSize);
+}
+
+#else // USE_RADIOLIB
 
 ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr(int packetSize)
 {
@@ -217,6 +270,8 @@ ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr(int packetSize)
   }
   queueRigToSerialIsr(Cmd::Data, rxBuf, rxBufIndex);
 }
+
+#endif // USE_RADIOLIB
 
 void Service::sendPeriodicBeacon()
 {
@@ -304,20 +359,35 @@ bool Service::sendAX25ToLora(const AX25::Payload &payload)
 
 void Service::onRigPacket(void *packet, int packetLength)
 {  
-  long frequencyError = LoRa.packetFrequencyError();
-
-  if (config_.EnableAutoFreqCorrection && abs(frequencyError) > config_.AutoFreqCorrectionDeltaHz) {
-    config_.LoraFreq -= frequencyError;
-    Serial.print("Correcting frequency: "); Serial.println(frequencyError);
+#ifdef USE_RADIOLIB
+  long frequencyErrorHz = radio_->getFrequencyError();
+#else
+  long frequencyErrorHz = LoRa.packetFrequencyError();
+#endif
+  if (config_.EnableAutoFreqCorrection && abs(frequencyErrorHz) > config_.AutoFreqCorrectionDeltaHz) {
+    config_.LoraFreq -= frequencyErrorHz;
+    Serial.print("Correcting frequency: "); Serial.println(frequencyErrorHz);
+#ifdef USE_RADIOLIB
+    // FIXME, setFrequencyRaw is protected in RadioLib
+#else
     LoRa.setFrequency(config_.LoraFreq);
+#endif
     if (config_.LoraUseIsr) {
+#ifdef USE_RADIOLIB
+      radio_->startReceive();
+#else
       LoRa.idle();
       LoRa.receive();
+#endif
     }
   }
 
   if (config_.EnableKissExtensions) {
+#ifdef USE_RADIOLIB
+    sendSignalReportEvent(radio_->getRSSI(), radio_->getSNR());
+#else
     sendSignalReportEvent(LoRa.packetRssi(), LoRa.packetSnr());
+#endif
   }
 
   if (!config_.IsClientMode) {
@@ -330,9 +400,14 @@ void Service::loraReceive(int packetSize)
   int rxBufIndex = 0;
   byte rxBuf[packetSize];
 
+#ifdef USE_RADIOLIB
+  radio_->readData(rxBuf, packetSize);
+  rxBufIndex = packetSize;
+#else
   while (LoRa.available()) {
     rxBuf[rxBufIndex++] = LoRa.read();
   }
+#endif
   sendRigToSerial(Cmd::Data, rxBuf, rxBufIndex);
   onRigPacket(rxBuf, rxBufIndex);
 }
@@ -343,10 +418,15 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
 
   if (payload.IsValid()) {
 
+#ifdef USE_RADIOLIB
+    float snr = radio_->getSNR  ();
+    int rssi = radio_->getRSSI();
+    long frequencyError = radio_->getFrequencyError();
+#else
     float snr = LoRa.packetSnr();
     int rssi = LoRa.packetRssi();
     long frequencyError = LoRa.packetFrequencyError();
-    
+#endif
     String signalReport = String(" ") +
       String("rssi: ") +
       String(snr < 0 ? rssi + snr : rssi) +
@@ -382,22 +462,43 @@ bool Service::onRigTxBegin()
   } else {
     delay(CfgPollDelayMs);
   }
+#ifdef USE_RADIOLIB
+  return true;
+#else
   return (LoRa.beginPacket(isImplicitHeaderMode_) == 1);
+#endif
 }
 
 void Service::onRigTx(byte b)
 {
+#ifdef USE_RADIOLIB
+  txQueue_.push(b);
+#else
   LoRa.write(b);
+#endif
 }
 
 void Service::onRigTxEnd()
 {
+#ifdef USE_RADIOLIB
+  int txPacketSize = txQueue_.size();
+  byte txBuf[txPacketSize];
+  for (int i = 0; i < txPacketSize; i++) {
+    txBuf[i] = txQueue_.shift();
+  }
+  radio_->transmit(txBuf, txPacketSize);
+#endif
+
   if (config_.PttEnable) {
+#ifndef USE_RADIOLIB
     LoRa.endPacket(false);
+#endif
     delay(config_.PttTxTailMs);
     digitalWrite(config_.PttPin, LOW);
   } else {
+#ifndef USE_RADIOLIB
     LoRa.endPacket(true);
+#endif
   }
 }
 
