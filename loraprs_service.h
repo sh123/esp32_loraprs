@@ -1,7 +1,7 @@
 #ifndef LORAPRS_SEVICE_H
 #define LORAPRS_SERVICE_H
 
-#define USE_RADIOLIB
+//#define USE_RADIOLIB
 
 #include <Arduino.h>
 #include <SPI.h>
@@ -38,6 +38,7 @@ private:
   bool reconnectAprsis();
 
 #ifdef USE_RADIOLIB
+  void onLoraDataAvailable();
   static ICACHE_RAM_ATTR void onLoraDataAvailableIsr();
 #else
   static ICACHE_RAM_ATTR void onLoraDataAvailableIsr(int packetSize);
@@ -119,6 +120,8 @@ private:
     
   // peripherals
 #ifdef USE_RADIOLIB
+  static bool hasRxData_;
+  static bool interruptEnabled_;
   CircularBuffer<uint8_t, 256> txQueue_;
   static std::shared_ptr<SX1278> radio_;
 #endif

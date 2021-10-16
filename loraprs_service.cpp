@@ -3,6 +3,8 @@
 namespace LoraPrs {
 
 #ifdef USE_RADIOLIB
+bool Service::hasRxData_ = false;
+bool Service::interruptEnabled_ = true;
 std::shared_ptr<SX1278> Service::radio_;
 #endif
 
@@ -14,6 +16,10 @@ Service::Service()
   , serialBt_()
   , serialBLE_()
 {
+#ifdef USE_RADIOLIB
+  hasRxData_ = false;
+  interruptEnabled_ = true;
+#endif
 }
 
 void Service::setup(const Config &conf)
@@ -122,7 +128,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   Serial.print(enableCrc); Serial.print("...");
 
   isImplicitHeaderMode_ = sf == 6;
-  
+
 #ifdef USE_RADIOLIB
   radio_ = std::make_shared<SX1278>(new Module(config_.LoraPinSs, config_.LoraPinDio0, config_.LoraPinRst, config_.LoraPinDio1));
 
@@ -157,6 +163,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   LoRa.setSignalBandwidth(bw);
   LoRa.setCodingRate4(cr);
   LoRa.setTxPower(pwr);
+
   if (enableCrc) {
     LoRa.enableCrc();
   }
@@ -196,6 +203,13 @@ void Service::setupBt(const String &btName)
 
 void Service::loop()
 {
+#ifdef USE_RADIOLIB
+  if (hasRxData_) {
+    interruptEnabled_ = false;
+    onLoraDataAvailable();
+    interruptEnabled_ = true;
+  }
+#endif
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
@@ -252,15 +266,27 @@ void Service::loop()
 
 #ifdef USE_RADIOLIB
 
-ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr()
+ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr() {
+  if (interruptEnabled) {
+    hasRxData_ = true;
+  }
+}
+
+void Service::onLoraDataAvailable()
 {
-  //Serial.println("onLoraDataAvailableIsr()");
-  // TODO, move to separate ESP32 task  
-  int packetSize = Service::radio_->getPacketLength(false);
+  int packetSize = radio_->getPacketLength();
+  Serial.println(packetSize);
   if (packetSize > 0) {  
     byte rxBuf[packetSize];
-    Service::radio_->readData(rxBuf, packetSize);
-    queueRigToSerialIsr(Cmd::Data, rxBuf, packetSize);
+    int state = radio_->readData(rxBuf, packetSize);
+    if (state == ERR_NONE) {
+      queueRigToSerialIsr(Cmd::Data, rxBuf, packetSize);
+    } else {
+      Serial.print("Read data error: "); Serial.println(state);
+    }
+    hasRxData_ = false;
+    Serial.println("startReceive()");
+    radio_->startReceive();
   }
 }
 
@@ -493,13 +519,15 @@ void Service::onRigTx(byte b)
 void Service::onRigTxEnd()
 {
 #ifdef USE_RADIOLIB
-  //Serial.println("onRigTxEnd()");
+
   int txPacketSize = txQueue_.size();
   byte txBuf[txPacketSize];
   for (int i = 0; i < txPacketSize; i++) {
     txBuf[i] = txQueue_.shift();
   }
+  interruptEnabled_ = false;
   int state = radio_->transmit(txBuf, txPacketSize);
+  interruptEnabled_ = true;
   if (state != ERR_NONE) {
     Serial.print("TX error: "); Serial.println(state);
   }
