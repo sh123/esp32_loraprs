@@ -267,7 +267,7 @@ void Service::loop()
 #ifdef USE_RADIOLIB
 
 ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr() {
-  if (interruptEnabled) {
+  if (interruptEnabled_) {
     hasRxData_ = true;
   }
 }

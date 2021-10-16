@@ -1,7 +1,7 @@
 #ifndef LORAPRS_SEVICE_H
 #define LORAPRS_SERVICE_H
 
-//#define USE_RADIOLIB
+#define USE_RADIOLIB
 
 #include <Arduino.h>
 #include <SPI.h>
