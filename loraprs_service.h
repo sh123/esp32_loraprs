@@ -97,6 +97,7 @@ private:
   Config config_;
   String aprsLoginCommand_;
   AX25::Callsign ownCallsign_;
+  bool isImplicitHeaderMode_;
 
   // csma
   byte csmaP_;

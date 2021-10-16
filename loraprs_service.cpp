@@ -116,6 +116,8 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   Serial.print(pwr); Serial.print(", ");
   Serial.print(sync, 16); Serial.print(", ");
   Serial.print(enableCrc); Serial.print("...");
+
+  isImplicitHeaderMode_ = sf == 6;
   
   LoRa.setPins(config_.LoraPinSs, config_.LoraPinRst, config_.LoraPinDio0);
   
@@ -124,7 +126,6 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
     delay(CfgConnRetryMs);
   }
   LoRa.setSyncWord(sync);
-  if (sf == 6) LoRa.implicitHeaderMode();
   LoRa.setSpreadingFactor(sf);
   LoRa.setSignalBandwidth(bw);
   LoRa.setCodingRate4(cr);
@@ -381,7 +382,7 @@ bool Service::onRigTxBegin()
   } else {
     delay(CfgPollDelayMs);
   }
-  return (LoRa.beginPacket() == 1);
+  return (LoRa.beginPacket(isImplicitHeaderMode_) == 1);
 }
 
 void Service::onRigTx(byte b)
