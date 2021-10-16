@@ -129,17 +129,18 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   while (true) {
     int state = radio_->begin((float)loraFreq / 1e6, (float)bw / 1e3, sf, cr, sync, pwr);
     if (state == ERR_NONE) break;
-    Serial.println("Radio start error: " + state);
+    Serial.print("Radio start error: "); Serial.println(state);
     delay(CfgConnRetryMs);
   }
   radio_->setCRC(enableCrc);
+  //radio_->setRfSwitchPins(4, 5);
 
   if (config_.LoraUseIsr) {
     radio_->setDio0Action(onLoraDataAvailableIsr);
     while (true) {
       int state = radio_->startReceive();
       if (state == ERR_NONE) break;
-      Serial.println("Receive start error: " + state);
+      Serial.print("Receive start error: "); Serial.println(state);
       delay(CfgConnRetryMs);
     }
   }
@@ -234,7 +235,11 @@ void Service::loop()
       }
       if (processSerialToRig() && config_.LoraUseIsr) {
 #ifdef USE_RADIOLIB
-        radio_->startReceive();
+        Serial.println("startReceive()");
+        int state = radio_->startReceive();
+        if (state != ERR_NONE) {
+          Serial.print("Start receive error: "); Serial.println(state);
+        }
 #else
         LoRa.receive();
 #endif
@@ -249,12 +254,14 @@ void Service::loop()
 
 ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr()
 {
+  //Serial.println("onLoraDataAvailableIsr()");
   // TODO, move to separate ESP32 task  
   int packetSize = Service::radio_->getPacketLength(false);
-  
-  byte rxBuf[packetSize];
-  Service::radio_->readData(rxBuf, packetSize);
-  queueRigToSerialIsr(Cmd::Data, rxBuf, packetSize);
+  if (packetSize > 0) {  
+    byte rxBuf[packetSize];
+    Service::radio_->readData(rxBuf, packetSize);
+    queueRigToSerialIsr(Cmd::Data, rxBuf, packetSize);
+  }
 }
 
 #else // USE_RADIOLIB
@@ -374,7 +381,10 @@ void Service::onRigPacket(void *packet, int packetLength)
 #endif
     if (config_.LoraUseIsr) {
 #ifdef USE_RADIOLIB
-      radio_->startReceive();
+      int state = radio_->startReceive();
+      if (state != ERR_NONE) {
+        Serial.print("Start receive error: "); Serial.println(state);
+      }
 #else
       LoRa.idle();
       LoRa.receive();
@@ -401,6 +411,7 @@ void Service::loraReceive(int packetSize)
   byte rxBuf[packetSize];
 
 #ifdef USE_RADIOLIB
+  Serial.println("loraReceive()");
   radio_->readData(rxBuf, packetSize);
   rxBufIndex = packetSize;
 #else
@@ -463,6 +474,7 @@ bool Service::onRigTxBegin()
     delay(CfgPollDelayMs);
   }
 #ifdef USE_RADIOLIB
+  //Serial.println("onRigTxBegin()");
   return true;
 #else
   return (LoRa.beginPacket(isImplicitHeaderMode_) == 1);
@@ -481,12 +493,16 @@ void Service::onRigTx(byte b)
 void Service::onRigTxEnd()
 {
 #ifdef USE_RADIOLIB
+  //Serial.println("onRigTxEnd()");
   int txPacketSize = txQueue_.size();
   byte txBuf[txPacketSize];
   for (int i = 0; i < txPacketSize; i++) {
     txBuf[i] = txQueue_.shift();
   }
-  radio_->transmit(txBuf, txPacketSize);
+  int state = radio_->transmit(txBuf, txPacketSize);
+  if (state != ERR_NONE) {
+    Serial.print("TX error: "); Serial.println(state);
+  }
 #endif
 
   if (config_.PttEnable) {
