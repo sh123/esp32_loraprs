@@ -40,6 +40,9 @@ void Service::setup(const Config &conf)
   aprsLoginCommand_ += String("\n");
 
   // peripherals
+#ifdef USE_RADIOLIB
+  radio_ = std::make_shared<SX1278>(new Module(config_.LoraPinSs, config_.LoraPinDio0, config_.LoraPinRst, RADIOLIB_NC));
+#endif
   setupLora(config_.LoraFreq, config_.LoraBw, config_.LoraSf, 
     config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraEnableCrc);
 
@@ -130,25 +133,23 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   isImplicitHeaderMode_ = sf == 6;
 
 #ifdef USE_RADIOLIB
-  radio_ = std::make_shared<SX1278>(new Module(config_.LoraPinSs, config_.LoraPinDio0, config_.LoraPinRst, config_.LoraPinDio1));
 
-  while (true) {
-    int state = radio_->begin((float)loraFreq / 1e6, (float)bw / 1e3, sf, cr, sync, pwr);
-    if (state == ERR_NONE) break;
+  int state = radio_->begin((float)loraFreq / 1e6, (float)bw / 1e3, sf, cr, sync, pwr);
+  if (state != ERR_NONE) {
     Serial.print("Radio start error: "); Serial.println(state);
-    delay(CfgConnRetryMs);
   }
   radio_->setCRC(enableCrc);
+  //radio_->forceLDRO(false);
   //radio_->setRfSwitchPins(4, 5);
 
   if (config_.LoraUseIsr) {
+    radio_->clearDio0Action();
     radio_->setDio0Action(onLoraDataAvailableIsr);
-    while (true) {
-      int state = radio_->startReceive();
-      if (state == ERR_NONE) break;
-      Serial.print("Receive start error: "); Serial.println(state);
-      delay(CfgConnRetryMs);
-    }
+  }
+  Serial.println("startReceive()");
+  state = radio_->startReceive();
+  if (state != ERR_NONE) {
+    Serial.print("Receive start error: "); Serial.println(state);
   }
   
 #else
@@ -205,11 +206,10 @@ void Service::loop()
 {
 #ifdef USE_RADIOLIB
   if (hasRxData_) {
-    interruptEnabled_ = false;
     onLoraDataAvailable();
-    interruptEnabled_ = true;
   }
 #endif
+
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
@@ -247,7 +247,8 @@ void Service::loop()
       if (needsBeacon()) {
         sendPeriodicBeacon();
       }
-      if (processSerialToRig() && config_.LoraUseIsr) {
+      bool allTxProcessed = processSerialToRig();
+      if (allTxProcessed) {
 #ifdef USE_RADIOLIB
         Serial.println("startReceive()");
         int state = radio_->startReceive();
@@ -255,7 +256,9 @@ void Service::loop()
           Serial.print("Start receive error: "); Serial.println(state);
         }
 #else
-        LoRa.receive();
+        if (config_.LoraUseIsr) {
+          LoRa.receive();
+        }
 #endif
       }
       csmaSlotTimePrev_ = currentTime;
@@ -276,7 +279,7 @@ void Service::onLoraDataAvailable()
 {
   int packetSize = radio_->getPacketLength();
   Serial.println(packetSize);
-  if (packetSize > 0) {  
+  if (packetSize > 0) {
     byte rxBuf[packetSize];
     int state = radio_->readData(rxBuf, packetSize);
     if (state == ERR_NONE) {
@@ -286,7 +289,10 @@ void Service::onLoraDataAvailable()
     }
     hasRxData_ = false;
     Serial.println("startReceive()");
-    radio_->startReceive();
+    state = radio_->startReceive();
+    if (state != ERR_NONE) {
+      Serial.print("Start receive error: "); Serial.println(state);
+    }
   }
 }
 
@@ -407,6 +413,7 @@ void Service::onRigPacket(void *packet, int packetLength)
 #endif
     if (config_.LoraUseIsr) {
 #ifdef USE_RADIOLIB
+      Serial.println("startReceive()");
       int state = radio_->startReceive();
       if (state != ERR_NONE) {
         Serial.print("Start receive error: "); Serial.println(state);
@@ -437,9 +444,16 @@ void Service::loraReceive(int packetSize)
   byte rxBuf[packetSize];
 
 #ifdef USE_RADIOLIB
-  Serial.println("loraReceive()");
+  Serial.print("loraReceive() "); Serial.println(packetSize);
+
   radio_->readData(rxBuf, packetSize);
   rxBufIndex = packetSize;
+
+  Serial.println("startReceive()");
+  int state = radio_->startReceive();
+  if (state != ERR_NONE) {
+    Serial.print("Start receive error: "); Serial.println(state);
+  }
 #else
   while (LoRa.available()) {
     rxBuf[rxBufIndex++] = LoRa.read();
@@ -531,6 +545,7 @@ void Service::onRigTxEnd()
   if (state != ERR_NONE) {
     Serial.print("TX error: "); Serial.println(state);
   }
+  Serial.println("onRigTxEnd()");
 #endif
 
   if (config_.PttEnable) {
