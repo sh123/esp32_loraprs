@@ -42,9 +42,8 @@ private:
   static ICACHE_RAM_ATTR void onLoraDataAvailableIsr();
 #else
   static ICACHE_RAM_ATTR void onLoraDataAvailableIsr(int packetSize);
-#endif
-  
   void loraReceive(int packetSize);
+#endif
   void onAprsisDataAvailable();
 
   void sendSignalReportEvent(int rssi, float snr);
