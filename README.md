@@ -69,8 +69,8 @@ Require LoRa module pinout definitions in `config.h`:
 # Software Dependencies
 Install via libraries:
 - Arduino ESP32 library: https://github.com/espressif/arduino-esp32
-  - or RadioLib library (use github master version): https://github.com/jgromes/RadioLib
 - LoRa arduino library: https://github.com/sandeepmistry/arduino-LoRa
+  - or RadioLib library (use github master version): https://github.com/jgromes/RadioLib
 - Arduino Timer library: https://github.com/contrem/arduino-timer
 - CircularBuffer library: https://github.com/rlogiacco/CircularBuffer
 
