@@ -36,7 +36,9 @@ Modem could also be used for **LoRa Codec2 digital voice DV communication**
 # Compatible Boards
 All work was done on ESP32-WROOM with custom made LoRa shield, Arduino Board is "ESP32 Dev Module".
 
-If your ESP32 board is compatible or has build in LoRa module then it should work without redefining pinouts, for custom shields there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section), currently pinouts are connected from LoRa to ESP32-WROOM as (SS/RST/DIO0 could be redefined in config.h):
+Supported modules - modules, which are supported by [RadioLib](https://github.com/jgromes/RadioLib).
+
+If your ESP32 board is compatible or has built in LoRa module then it should work without redefining pinouts, for custom shields there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section), currently pinouts are connected from LoRa to ESP32-WROOM as (SS/RST/DIO0 could be redefined in config.h):
 
 ![alt text](images/pinouts.png)
 
@@ -68,10 +70,13 @@ Require LoRa module pinout definitions in `config.h`:
 Install via libraries:
 - Arduino ESP32 library: https://github.com/espressif/arduino-esp32
 - LoRa arduino library: https://github.com/sandeepmistry/arduino-LoRa
+  - or RadioLib library (use github master version): https://github.com/jgromes/RadioLib
 - Arduino Timer library: https://github.com/contrem/arduino-timer
 - CircularBuffer library: https://github.com/rlogiacco/CircularBuffer
 
 # Software Setup
+- Decide if you want to use arduino-LoRa or RadioLib library, you have to use RadioLib library if you are NOT using `SX127x` module, uncomment `USE_RADIOLIB` in sketch if you want to use RadioLib
+  - If you are using RadioLib and not using SX1278 module then modify module declarations in `loraprs_service.cpp` and `loraprs_service.h` find and replace `SX1278` with your module name. Read more about supported modules at [RadioLib Wiki](https://github.com/jgromes/RadioLib/wiki).
 - **NB! select next partition scheme for ESP32 in Arduino IDE Tools menu:** "Minimal SPIFFS (1.9 MB APP with OTA/190 KB SPIFFS)"
   - for boards, which do not have this option, need to modify `~/.arduino15/packages/esp32/hardware/esp32/1.0.4/boards.txt` and add required partition option
 - **use 80 MHz ESP32 frequency** in Arduino SDK, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
@@ -174,6 +179,10 @@ Payloads for commands are sent and expected as big endian and defined as:
     int16_t rssi;
     int16_t snr;  // snr * 100
   } __attribute__((packed));
+  
+  // KISS command 8
+  struct RebootModem {
+  } __attribute__((packed));
 ```
 
 # Using External UHF Amplifier
@@ -213,6 +222,5 @@ It is possible to get 30-40% TX only coverage increase in urban environment by u
 - It might be useful to add additional pass band filter or broadcast FM radio reject filter, it seem to improve sensitivity when using external base antenna
 
 # TODO
-- Support for more devices and devices with built-in OLED screen (merge from [branch](https://github.com/RadioHome/esp32_loraprs/tree/oled))
-- Investigate support for [M17 Protocol](http://m17project.org) reflector gating in addition to APRS-IS when M17 protocol is used by the client application
 - Improve CSMA logic and if possible add support for CAD
+- Investigate support for [M17 Protocol](http://m17project.org) reflector gating in addition to APRS-IS when M17 protocol is used by the client application
