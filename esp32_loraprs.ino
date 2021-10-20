@@ -1,7 +1,8 @@
 #include <arduino-timer.h>
 #include "WiFi.h"
 
-#define USE_RADIOLIB
+// when defined RadioLib will be used, otherwise arduino-LoRa
+//#define USE_RADIOLIB
 
 #include "loraprs_service.h"
 

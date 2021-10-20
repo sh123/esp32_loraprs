@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <SPI.h>
+
 #ifdef USE_RADIOLIB
 #include <RadioLib.h>
 #pragma message("Using RadioLib")
@@ -10,6 +11,7 @@
 #include <LoRa.h>
 #pragma message("Using arduino-LoRa")
 #endif
+
 #include <WiFi.h>
 #include <endian.h>
 
