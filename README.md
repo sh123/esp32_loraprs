@@ -36,7 +36,9 @@ Modem could also be used for **LoRa Codec2 digital voice DV communication**
 # Compatible Boards
 All work was done on ESP32-WROOM with custom made LoRa shield, Arduino Board is "ESP32 Dev Module".
 
-If your ESP32 board is compatible or has build in LoRa module then it should work without redefining pinouts, for custom shields there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section), currently pinouts are connected from LoRa to ESP32-WROOM as (SS/RST/DIO0 could be redefined in config.h):
+Supported modules - all supported by [RadioLib](https://github.com/jgromes/RadioLib)
+
+If your ESP32 board is compatible or has built in LoRa module then it should work without redefining pinouts, for custom shields there might be need to redefine pinouts to LoRa module if it differs (see further description in Software Setup section), currently pinouts are connected from LoRa to ESP32-WROOM as (SS/RST/DIO0 could be redefined in config.h):
 
 ![alt text](images/pinouts.png)
 
@@ -67,11 +69,14 @@ Require LoRa module pinout definitions in `config.h`:
 # Software Dependencies
 Install via libraries:
 - Arduino ESP32 library: https://github.com/espressif/arduino-esp32
+  - or RadioLib library (use github master version): https://github.com/jgromes/RadioLib
 - LoRa arduino library: https://github.com/sandeepmistry/arduino-LoRa
 - Arduino Timer library: https://github.com/contrem/arduino-timer
 - CircularBuffer library: https://github.com/rlogiacco/CircularBuffer
 
 # Software Setup
+- Decide if you want to use arduino-LoRa or RadioLib library, uncomment `USE_RADIOLIB` in sketch if you want to use RadioLib
+  - If you are using RadioLib and not using SX1278 module then modify module declarations in `loraprs_service.cpp` and `loraprs_service.h` find and replace `SX1278` with your module name. Consult [RadioLib Wiki](https://github.com/jgromes/RadioLib/wiki).
 - **NB! select next partition scheme for ESP32 in Arduino IDE Tools menu:** "Minimal SPIFFS (1.9 MB APP with OTA/190 KB SPIFFS)"
   - for boards, which do not have this option, need to modify `~/.arduino15/packages/esp32/hardware/esp32/1.0.4/boards.txt` and add required partition option
 - **use 80 MHz ESP32 frequency** in Arduino SDK, it will prolong battery life when operating portable, higher CPU speed is not required, there are no CPU intensive operations
