@@ -1,12 +1,16 @@
 #include <arduino-timer.h>
 #include "WiFi.h"
+
+// when defined RadioLib will be used, otherwise arduino-LoRa
+//#define USE_RADIOLIB
+
 #include "loraprs_service.h"
 
 #if __has_include("/tmp/esp32_loraprs_config.h")
 #pragma message("Using external config")
 #include "/tmp/esp32_loraprs_config.h"
 #else
-#pragma message("Using default config")
+#pragma message("Using default built-in config")
 #include "config.h"
 #endif
 
@@ -34,6 +38,7 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.LoraPinSs = CFG_LORA_PIN_SS;
   cfg.LoraPinRst = CFG_LORA_PIN_RST;
   cfg.LoraPinDio0 = CFG_LORA_PIN_DIO0;
+  cfg.LoraPinDio1 = CFG_LORA_PIN_DIO1;
   cfg.LoraUseIsr = CFG_LORA_USE_ISR;  // set to true for incoming packet ISR usage (stream mode, e.g. speech)
 
   // aprs configuration

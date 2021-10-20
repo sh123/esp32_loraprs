@@ -19,6 +19,7 @@
 #define CFG_LORA_PIN_SS       SS
 #define CFG_LORA_PIN_RST      LORA_RST
 #define CFG_LORA_PIN_DIO0     LORA_IRQ
+#define CFG_LORA_PIN_DIO1     LORA_IRQ
 #define CFG_LORA_USE_ISR      false // set to true for incoming packet ISR usage (stream mode, e.g. speech)
 
 #define CFG_LORA_FREQ         433.775E6

@@ -3,7 +3,15 @@
 
 #include <Arduino.h>
 #include <SPI.h>
+
+#ifdef USE_RADIOLIB
+#include <RadioLib.h>
+#pragma message("Using RadioLib")
+#else
 #include <LoRa.h>
+#pragma message("Using arduino-LoRa")
+#endif
+
 #include <WiFi.h>
 #include <endian.h>
 
@@ -31,9 +39,13 @@ private:
   void reconnectWifi() const;
   bool reconnectAprsis();
 
+#ifdef USE_RADIOLIB
+  void onLoraDataAvailable();
+  static ICACHE_RAM_ATTR void onLoraDataAvailableIsr();
+#else
   static ICACHE_RAM_ATTR void onLoraDataAvailableIsr(int packetSize);
-  
   void loraReceive(int packetSize);
+#endif
   void onAprsisDataAvailable();
 
   void sendSignalReportEvent(int rssi, float snr);
@@ -109,6 +121,12 @@ private:
   long previousBeaconMs_;
     
   // peripherals
+  static byte rxBuf_[256];
+#ifdef USE_RADIOLIB
+  static bool interruptEnabled_;
+  CircularBuffer<uint8_t, 256> txQueue_;
+  static std::shared_ptr<SX1278> radio_;
+#endif
   BluetoothSerial serialBt_;
   BLESerial serialBLE_;
   WiFiClient aprsisConn_;
