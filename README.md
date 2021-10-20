@@ -222,6 +222,5 @@ It is possible to get 30-40% TX only coverage increase in urban environment by u
 - It might be useful to add additional pass band filter or broadcast FM radio reject filter, it seem to improve sensitivity when using external base antenna
 
 # TODO
-- Support for more devices and devices with built-in OLED screen (merge from [branch](https://github.com/RadioHome/esp32_loraprs/tree/oled))
-- Investigate support for [M17 Protocol](http://m17project.org) reflector gating in addition to APRS-IS when M17 protocol is used by the client application
 - Improve CSMA logic and if possible add support for CAD
+- Investigate support for [M17 Protocol](http://m17project.org) reflector gating in addition to APRS-IS when M17 protocol is used by the client application
