@@ -1,12 +1,15 @@
 #include <arduino-timer.h>
 #include "WiFi.h"
+
+#define USE_RADIOLIB
+
 #include "loraprs_service.h"
 
 #if __has_include("/tmp/esp32_loraprs_config.h")
 #pragma message("Using external config")
 #include "/tmp/esp32_loraprs_config.h"
 #else
-#pragma message("Using default config")
+#pragma message("Using default built-in config")
 #include "config.h"
 #endif
 

@@ -1,14 +1,14 @@
 #ifndef LORAPRS_SEVICE_H
 #define LORAPRS_SERVICE_H
 
-#define USE_RADIOLIB
-
 #include <Arduino.h>
 #include <SPI.h>
 #ifdef USE_RADIOLIB
 #include <RadioLib.h>
+#pragma message("Using RadioLib")
 #else
 #include <LoRa.h>
+#pragma message("Using arduino-LoRa")
 #endif
 #include <WiFi.h>
 #include <endian.h>
