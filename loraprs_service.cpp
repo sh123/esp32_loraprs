@@ -600,6 +600,7 @@ void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
 
 void Service::onRebootCommand()
 {
+  Serial.println("Reboot requested");
   ESP.restart();
 }
 
