@@ -26,6 +26,7 @@
 #define CFG_LORA_PIN_DIO1     LORA_IRQ  // not used in arduino-LoRa
 #define CFG_LORA_USE_ISR      false // set to true for ISR usage
 #endif
+#define CFG_LORA_USE_CAD      false // set to true to utilize carrier detection
 
 #define CFG_LORA_FREQ         433.775E6
 #define CFG_LORA_BW           125e3

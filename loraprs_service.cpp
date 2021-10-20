@@ -225,7 +225,7 @@ void Service::loop()
   if (!isRigToSerialProcessed) {
 
     long currentTime = millis();
-    if (currentTime > csmaSlotTimePrev_ + csmaSlotTime_ && random(0, 255) < csmaP_) {
+    if (!isLoraRxBusy() && currentTime > csmaSlotTimePrev_ + csmaSlotTime_ && random(0, 255) < csmaP_) {
       if (aprsisConn_.available() > 0) {
         onAprsisDataAvailable();
       }
@@ -249,6 +249,14 @@ void Service::loop()
     }
   }
   delay(CfgPollDelayMs);
+}
+
+bool Service::isLoraRxBusy() {
+#ifdef USE_RADIOLIB
+  return cfg_.LoraUseCad && (radio_->getModemStatus() & 0x01); // SX1278_STATUS_SIG_DETECT
+#else
+  return false;
+#endif
 }
 
 #ifdef USE_RADIOLIB

@@ -24,6 +24,7 @@ struct Config
   byte LoraPinDio0;     // lora dio0 pin
   byte LoraPinDio1;     // lora dio1 pin
   bool LoraUseIsr;      // true to use interrupts, false for fallback polling, e.g. if Dio0 is not connected
+  bool LoraUseCad;      // use carrier detect before transmitting
 
   // bluetooth
   String BtName;        // bluetooth device name for the client, set to empty string to disable bluetooth in server mode

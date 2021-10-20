@@ -43,6 +43,7 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.LoraPinDio0 = CFG_LORA_PIN_DIO0;
   cfg.LoraPinDio1 = CFG_LORA_PIN_DIO1; // valid for radiolib only
   cfg.LoraUseIsr = CFG_LORA_USE_ISR;  // set to true for incoming packet ISR usage (stream mode, e.g. speech)
+  cfg.LoraUseCad = CFG_LORA_USE_CAD;  // carrier detect
 
   // aprs configuration
   cfg.AprsHost = "rotate.aprs2.net";

@@ -39,6 +39,7 @@ private:
   void reconnectWifi() const;
   bool reconnectAprsis();
 
+  bool isLoraRxBusy();
 #ifdef USE_RADIOLIB
   void onLoraDataAvailable();
   static ICACHE_RAM_ATTR void onLoraDataAvailableIsr();
