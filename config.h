@@ -19,8 +19,13 @@
 #define CFG_LORA_PIN_SS       SS
 #define CFG_LORA_PIN_RST      LORA_RST
 #define CFG_LORA_PIN_DIO0     LORA_IRQ
-#define CFG_LORA_PIN_DIO1     LORA_IRQ
-#define CFG_LORA_USE_ISR      false // set to true for incoming packet ISR usage (stream mode, e.g. speech)
+#ifdef USE_RADIOLIB
+#define CFG_LORA_PIN_DIO1     RADIOLIB_NC // set to your DIO1 pin number if connected
+#define CFG_LORA_USE_ISR      true
+#else
+#define CFG_LORA_PIN_DIO1     LORA_IRQ  // not used in arduino-LoRa
+#define CFG_LORA_USE_ISR      false // set to true for ISR usage
+#endif
 
 #define CFG_LORA_FREQ         433.775E6
 #define CFG_LORA_BW           125e3

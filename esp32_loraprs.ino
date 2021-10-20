@@ -1,11 +1,6 @@
 #include <arduino-timer.h>
 #include "WiFi.h"
 
-// when defined RadioLib will be used, otherwise arduino-LoRa
-//#define USE_RADIOLIB
-
-#include "loraprs_service.h"
-
 #if __has_include("/tmp/esp32_loraprs_config.h")
 #pragma message("Using external config")
 #include "/tmp/esp32_loraprs_config.h"
@@ -19,6 +14,14 @@
 #else
 #pragma message("Configured for server mode")
 #endif
+
+// When USE_RADIOLIB is defined then RadioLib will be used, otherwise arduino-LoRa will be used
+// When using RadioLib, default module is SX1278, if you are using
+// different module then update loraprs_service.h and loraprs_service.cpp
+// search for SX1278 and replace with your module name
+
+//#define USE_RADIOLIB
+#include "loraprs_service.h"
 
 void initializeConfig(LoraPrs::Config &cfg) {
 
@@ -38,7 +41,7 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.LoraPinSs = CFG_LORA_PIN_SS;
   cfg.LoraPinRst = CFG_LORA_PIN_RST;
   cfg.LoraPinDio0 = CFG_LORA_PIN_DIO0;
-  cfg.LoraPinDio1 = CFG_LORA_PIN_DIO1;
+  cfg.LoraPinDio1 = CFG_LORA_PIN_DIO1; // valid for radiolib only
   cfg.LoraUseIsr = CFG_LORA_USE_ISR;  // set to true for incoming packet ISR usage (stream mode, e.g. speech)
 
   // aprs configuration
