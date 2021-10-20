@@ -118,8 +118,8 @@ private:
   long previousBeaconMs_;
     
   // peripherals
+  static byte rxBuf_[256];
 #ifdef USE_RADIOLIB
-  static bool hasRxData_;
   static bool interruptEnabled_;
   CircularBuffer<uint8_t, 256> txQueue_;
   static std::shared_ptr<SX1278> radio_;

@@ -2,8 +2,9 @@
 
 namespace LoraPrs {
 
+byte Service::rxBuf_[256];
+
 #ifdef USE_RADIOLIB
-bool Service::hasRxData_ = false;
 bool Service::interruptEnabled_ = true;
 std::shared_ptr<SX1278> Service::radio_;
 #endif
@@ -17,7 +18,6 @@ Service::Service()
   , serialBLE_()
 {
 #ifdef USE_RADIOLIB
-  hasRxData_ = false;
   interruptEnabled_ = true;
 #endif
 }
@@ -141,8 +141,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
 
   radio_->clearDio0Action();
   radio_->setDio0Action(onLoraDataAvailableIsr);
-  
-  Serial.println("startReceive()");
+
   state = radio_->startReceive();
   if (state != ERR_NONE) {
     Serial.print("Receive start error: "); Serial.println(state);
@@ -194,12 +193,6 @@ void Service::setupBt(const String &btName)
 
 void Service::loop()
 {
-#ifdef USE_RADIOLIB
-  if (hasRxData_) {
-    onLoraDataAvailable();
-  }
-#endif
-
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
@@ -257,29 +250,21 @@ void Service::loop()
 
 ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr() {
   if (interruptEnabled_) {
-    hasRxData_ = true;
-  }
-}
-
-void Service::onLoraDataAvailable()
-{
-  int packetSize = radio_->getPacketLength();
+    int packetSize = radio_->getPacketLength();
   
-  if (packetSize > 0) {
-    
-    byte rxBuf[packetSize];
-    
-    int state = radio_->readData(rxBuf, packetSize);
-    if (state == ERR_NONE) {
-      queueRigToSerialIsr(Cmd::Data, rxBuf, packetSize);
-    } else {
-      Serial.print("Read data error: "); Serial.println(state);
-    }
-    hasRxData_ = false;
-    
-    state = radio_->startReceive();
-    if (state != ERR_NONE) {
-      Serial.print("Start receive error: "); Serial.println(state);
+    if (packetSize > 0) {
+      
+      int state = radio_->readData(rxBuf_, packetSize);
+      if (state == ERR_NONE) {
+        queueRigToSerialIsr(Cmd::Data, rxBuf_, packetSize);
+      } else {
+        Serial.print("Read data error: "); Serial.println(state);
+      }
+      
+      state = radio_->startReceive();
+      if (state != ERR_NONE) {
+        Serial.print("Start receive error: "); Serial.println(state);
+      }
     }
   }
 }
@@ -288,14 +273,12 @@ void Service::onLoraDataAvailable()
 
 ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr(int packetSize)
 {
-  // TODO, move to separate ESP32 task
   int rxBufIndex = 0;
-  byte rxBuf[packetSize];
 
   for (int i = 0; i < packetSize; i++) {
-    rxBuf[rxBufIndex++] = LoRa.read();
+    rxBuf_[rxBufIndex++] = LoRa.read();
   }
-  queueRigToSerialIsr(Cmd::Data, rxBuf, rxBufIndex);
+  queueRigToSerialIsr(Cmd::Data, rxBuf_, rxBufIndex);
 }
 
 #endif // USE_RADIOLIB
@@ -395,7 +378,7 @@ void Service::onRigPacket(void *packet, int packetLength)
     config_.LoraFreq -= frequencyErrorHz;
     Serial.print("Correcting frequency: "); Serial.println(frequencyErrorHz);
 #ifdef USE_RADIOLIB
-    // FIXME, setFrequencyRaw is protected in RadioLib
+    radio_->setFrequency((float)config_.LoraFreq / 1e6);
     int state = radio_->startReceive();
     if (state != ERR_NONE) {
       Serial.print("Start receive error: "); Serial.println(state);
@@ -511,7 +494,7 @@ void Service::onRigTxEnd()
   for (int i = 0; i < txPacketSize; i++) {
     txBuf[i] = txQueue_.shift();
   }
-  
+
   interruptEnabled_ = false;
   int state = radio_->transmit(txBuf, txPacketSize);
   if (state != ERR_NONE) {
