@@ -75,7 +75,7 @@ Install via libraries:
 - CircularBuffer library: https://github.com/rlogiacco/CircularBuffer
 
 # Software Setup
-- Decide if you want to use arduino-LoRa or RadioLib library, uncomment `USE_RADIOLIB` in sketch if you want to use RadioLib
+- Decide if you want to use arduino-LoRa or RadioLib library, you have to use RadioLib library if you are NOT using `SX127x` module, uncomment `USE_RADIOLIB` in sketch if you want to use RadioLib
   - If you are using RadioLib and not using SX1278 module then modify module declarations in `loraprs_service.cpp` and `loraprs_service.h` find and replace `SX1278` with your module name. Read more about supported modules at [RadioLib Wiki](https://github.com/jgromes/RadioLib/wiki).
 - **NB! select next partition scheme for ESP32 in Arduino IDE Tools menu:** "Minimal SPIFFS (1.9 MB APP with OTA/190 KB SPIFFS)"
   - for boards, which do not have this option, need to modify `~/.arduino15/packages/esp32/hardware/esp32/1.0.4/boards.txt` and add required partition option
