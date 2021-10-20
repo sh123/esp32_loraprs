@@ -141,6 +141,11 @@ bool Processor::processCommand(byte rxByte) {
       dataType_ = DataType::Control;
       cmdBuffer_.clear();
       break;
+    case Cmd::RebootRequested:
+      state_ = State::GetData;
+      dataType_ = DataType::Reboot;
+      cmdBuffer_.clear();
+      break;
     case Cmd::P:
       state_ = State::GetP;
       break;
@@ -167,6 +172,8 @@ void Processor::processData(byte rxByte) {
         onRigTxEnd();
       } else if (dataType_ == DataType::Control) {
         onRadioControlCommand(cmdBuffer_);
+      } else if (dataType_ == DataType::Reboot) {
+        onRebootCommand();
       }
       state_ = State::GetStart;
       break;
