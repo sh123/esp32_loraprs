@@ -61,6 +61,7 @@ protected:
 
   virtual void onControlCommand(Cmd cmd, byte value);
   virtual void onRadioControlCommand(const std::vector<byte> &command);
+  virtual void onRebootCommand();
 
 private:
   struct SetHardware {
@@ -84,7 +85,7 @@ private:
   // processor config
   const int CfgConnRetryMs = 500;           // connection retry delay, e.g. wifi
   const int CfgPollDelayMs = 5;             // main loop delay
-  const int CfgWiFiConnRetryMaxTimes = 10;  // wifi number of connection retries
+  const int CfgConnRetryMaxTimes = 10;      // number of connection retries
   const int CfgMaxAX25PayloadSize = 512;    // maximum ax25 payload size
   const int CfgMaxAprsInMessageSize = 255;  // maximum aprsis to rf message size
 

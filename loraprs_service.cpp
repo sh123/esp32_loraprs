@@ -64,7 +64,7 @@ void Service::setupWifi(const String &wifiName, const String &wifiKey)
     while (WiFi.status() != WL_CONNECTED) {
       delay(CfgConnRetryMs);
       Serial.print(".");
-      if (retryCnt++ >= CfgWiFiConnRetryMaxTimes) {
+      if (retryCnt++ >= CfgConnRetryMaxTimes) {
         Serial.println("failed");
         return;
       }
@@ -83,7 +83,7 @@ void Service::reconnectWifi() const
     WiFi.reconnect();
     delay(CfgConnRetryMs);
     Serial.print(".");
-    if (retryCnt++ >= CfgWiFiConnRetryMaxTimes) {
+    if (retryCnt++ >= CfgConnRetryMaxTimes) {
       Serial.println("failed");
       return;
     }
@@ -120,10 +120,15 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   isImplicitHeaderMode_ = sf == 6;
   
   LoRa.setPins(config_.LoraPinSs, config_.LoraPinRst, config_.LoraPinDio0);
-  
+
+  int retryCnt = 0;
   while (!LoRa.begin(loraFreq)) {
     Serial.print(".");
     delay(CfgConnRetryMs);
+    if (retryCnt++ >= CfgConnRetryMaxTimes) {
+      Serial.println("failed");
+      return;
+    }
   }
   LoRa.setSyncWord(sync);
   LoRa.setSpreadingFactor(sf);
@@ -473,6 +478,11 @@ void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
   } else {
     Serial.println("Radio control command of wrong size");
   }
+}
+
+void Service::onRebootCommand()
+{
+  ESP.restart();
 }
 
 } // LoraPrs
