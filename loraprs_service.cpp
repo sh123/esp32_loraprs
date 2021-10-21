@@ -17,6 +17,7 @@ Service::Service()
   , serialBt_()
   , serialBLE_()
   , kissServer_(new WiFiServer(CfgKissPort))
+  , isKissConn_(false)
 {
 #ifdef USE_RADIOLIB
   interruptEnabled_ = true;
@@ -87,6 +88,7 @@ void Service::setupWifi(const String &wifiName, const String &wifiKey)
     Serial.println(WiFi.localIP());
   }
   if (config_.KissEnableTcpIp) {
+    Serial.print("KISS TCP/IP server started on port "); Serial.println(CfgKissPort);
     kissServer_->begin();
   }
 }
@@ -218,6 +220,9 @@ void Service::loop()
   }
   if (needsAprsis() && !aprsisConn_.connected() && config_.EnablePersistentAprsConnection) {
     reconnectAprsis();
+  }
+  if (config_.KissEnableTcpIp) {
+    attachKissNetworkClient();
   }
 
   // RX path, Rig -> Serial
@@ -544,23 +549,30 @@ void Service::onRigTxEnd()
   }
 }
 
-bool Service::getClient(WiFiClient &activeClient) 
+void Service::attachKissNetworkClient() 
 {
-  if (config_.KissEnableTcpIp) {
+  // connected, client dropped off
+  if (isKissConn_) {
+    if (!kissConn_.connected()) {
+      Serial.println("KISS TCP/IP client disconnected");
+      isKissConn_ = false;
+      kissConn_.stop();
+    }
+  // not connected, new client connected
+  } else {
     WiFiClient wifiClient = kissServer_->available();
     if (wifiClient && wifiClient.connected()) {
-      activeClient = wifiClient;
-      return true;
+      Serial.println("New KISS TCP/IP client connected");
+      kissConn_ = wifiClient;
+      isKissConn_ = true;
     }
   }
-  return false;
 }
 
 void Service::onSerialTx(byte b)
 {
-  WiFiClient wifiClient;
-  if (getClient(wifiClient)) {
-    wifiClient.write(b);
+  if (isKissConn_) {
+    kissConn_.write(b);
   }
   else if (config_.BtEnableBle) {
     serialBLE_.write(b);
@@ -572,10 +584,8 @@ void Service::onSerialTx(byte b)
 
 bool Service::onSerialRxHasData()
 {
-  WiFiClient wifiClient;
-  if (getClient(wifiClient)) {
-    Serial.println("!!!");
-    return wifiClient.available();
+  if (isKissConn_) {
+    return kissConn_.available();
   }
   else if (config_.BtEnableBle) {
     return serialBLE_.available();
@@ -589,9 +599,8 @@ bool Service::onSerialRx(byte *b)
 {
   int rxResult;
   
-  WiFiClient wifiClient;
-  if (getClient(wifiClient)) {
-    rxResult = wifiClient.read();
+  if (isKissConn_) {
+    rxResult = kissConn_.read();
   }
   else {
     rxResult = config_.BtEnableBle 

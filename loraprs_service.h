@@ -38,6 +38,7 @@ private:
 
   void reconnectWifi() const;
   bool reconnectAprsis();
+  void attachKissNetworkClient();
 
   bool isLoraRxBusy();
 #ifdef USE_RADIOLIB
@@ -48,8 +49,6 @@ private:
   void loraReceive(int packetSize);
 #endif
   void onAprsisDataAvailable();
-
-  bool getClient(WiFiClient &activeClient);
   
   void sendSignalReportEvent(int rssi, float snr);
   void sendPeriodicBeacon();
@@ -114,7 +113,7 @@ private:
   const long CfgCsmaSlotTimeMs = 500;   // 0 for real time, otherwise set to average tx duration
 
   // kiss static parameters
-  const int CfgKissPort = 8081;             // kiss tcp/ip server port
+  const int CfgKissPort = 8001;             // kiss tcp/ip server port
 private:
   // config
   Config config_;
@@ -140,7 +139,10 @@ private:
   BluetoothSerial serialBt_;
   BLESerial serialBLE_;
   WiFiClient aprsisConn_;
+  
   std::shared_ptr<WiFiServer> kissServer_;
+  WiFiClient kissConn_;
+  bool isKissConn_;
 };
 
 } // LoraPrs
