@@ -63,25 +63,24 @@ void Service::setup(const Config &conf)
 
 void Service::setupWifi(const String &wifiName, const String &wifiKey)
 {
-  if (!config_.IsClientMode) {
-    Serial.print("WIFI connecting to " + wifiName);
+  Serial.print("WIFI connecting to " + wifiName);
 
-    WiFi.setHostname("loraprs");
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(wifiName.c_str(), wifiKey.c_str());
+  WiFi.setHostname("loraprs");
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(wifiName.c_str(), wifiKey.c_str());
 
-    int retryCnt = 0;
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(CfgConnRetryMs);
-      Serial.print(".");
-      if (retryCnt++ >= CfgConnRetryMaxTimes) {
-        Serial.println("failed");
-        return;
-      }
+  int retryCnt = 0;
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(CfgConnRetryMs);
+    Serial.print(".");
+    if (retryCnt++ >= CfgConnRetryMaxTimes) {
+      Serial.println("failed");
+      return;
     }
-    Serial.println("ok");
-    Serial.println(WiFi.localIP());
   }
+  Serial.println("ok");
+  Serial.println(WiFi.localIP());
+}
 }
 
 void Service::reconnectWifi() const
