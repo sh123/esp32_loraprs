@@ -558,14 +558,17 @@ void Service::attachKissNetworkClient()
       isKissConn_ = false;
       kissConn_.stop();
     }
-  // not connected, new client connected
-  } else {
-    WiFiClient wifiClient = kissServer_->available();
-    if (wifiClient && wifiClient.connected()) {
-      Serial.println("New KISS TCP/IP client connected");
-      kissConn_ = wifiClient;
-      isKissConn_ = true;
+  }
+  WiFiClient wifiClient = kissServer_->available();
+  // new client connected
+  if (wifiClient && wifiClient.connected()) {
+    // drop off current one
+    if (isKissConn_) {
+      kissConn_.stop();
     }
+    Serial.println("New KISS TCP/IP client connected");
+    kissConn_ = wifiClient;
+    isKissConn_ = true;
   }
 }
 
@@ -601,6 +604,11 @@ bool Service::onSerialRx(byte *b)
   
   if (isKissConn_) {
     rxResult = kissConn_.read();
+    // client dropped off
+    if (rxResult == -1) {
+      kissConn_.stop();
+      isKissConn_ = false;
+    }
   }
   else {
     rxResult = config_.BtEnableBle 
