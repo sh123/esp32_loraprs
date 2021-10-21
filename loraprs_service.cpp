@@ -561,8 +561,7 @@ WiFiClient Service::getClient()
 
 void Service::onSerialTx(byte b)
 {
-  WiFiClient client = getClient();
-  if (client) {
+  if (WiFiClient client = getClient()) {
     client.write(b);
   }
   else if (config_.BtEnableBle) {
@@ -575,8 +574,7 @@ void Service::onSerialTx(byte b)
 
 bool Service::onSerialRxHasData()
 {
-  WiFiClient client = getClient();
-  if (client) {
+  if (WiFiClient client = getClient()) {
     return client.available();
   }
   else if (config_.BtEnableBle) {
@@ -591,8 +589,7 @@ bool Service::onSerialRx(byte *b)
 {
   int rxResult;
   
-  WiFiClient client = getClient();
-  if (client) {
+  if (WiFiClient client = getClient()) {
     rxResult = client.read();
   }
   else {
