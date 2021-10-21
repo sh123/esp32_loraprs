@@ -49,6 +49,8 @@ private:
 #endif
   void onAprsisDataAvailable();
 
+  WiFiClient getClient();
+  
   void sendSignalReportEvent(int rssi, float snr);
   void sendPeriodicBeacon();
   void sendToAprsis(const String &aprsMessage);
@@ -105,7 +107,9 @@ private:
   // csma parameters, overriden with KISS commands
   const long CfgCsmaPersistence = 100;  // 255 for real time, lower for higher traffic
   const long CfgCsmaSlotTimeMs = 500;   // 0 for real time, otherwise set to average tx duration
-  
+
+  // kiss static parameters
+  const int CfgKissPort = 8081;             // kiss tcp/ip server port
 private:
   // config
   Config config_;
@@ -131,6 +135,7 @@ private:
   BluetoothSerial serialBt_;
   BLESerial serialBLE_;
   WiFiClient aprsisConn_;
+  std::shared_ptr<WiFiServer> kissServer_;
 };
 
 } // LoraPrs

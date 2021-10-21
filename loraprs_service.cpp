@@ -16,6 +16,7 @@ Service::Service()
   , csmaSlotTimePrev_(0)
   , serialBt_()
   , serialBLE_()
+  , kissServer_(new WiFiServer(CfgKissPort))
 {
 #ifdef USE_RADIOLIB
   interruptEnabled_ = true;
@@ -66,20 +67,28 @@ void Service::setupWifi(const String &wifiName, const String &wifiKey)
   Serial.print("WIFI connecting to " + wifiName);
 
   WiFi.setHostname("loraprs");
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(wifiName.c_str(), wifiKey.c_str());
-
-  int retryCnt = 0;
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(CfgConnRetryMs);
-    Serial.print(".");
-    if (retryCnt++ >= CfgConnRetryMaxTimes) {
-      Serial.println("failed");
-      return;
+  if (config_.WifiEnableAp) {
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(wifiName.c_str(), wifiKey.c_str());
+  
+    int retryCnt = 0;
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(CfgConnRetryMs);
+      Serial.print(".");
+      if (retryCnt++ >= CfgConnRetryMaxTimes) {
+        Serial.println("failed");
+        return;
+      }
     }
+    Serial.println("ok");
+    Serial.println(WiFi.localIP());
+  } else {
+    WiFi.softAP(wifiName.c_str(), wifiKey.c_str());    
+    Serial.println(WiFi.softAPIP());
   }
-  Serial.println("ok");
-  Serial.println(WiFi.localIP());
+  if (config_.KissEnableTcpIp) {
+    kissServer_->begin();
+  }
 }
 
 void Service::reconnectWifi() const
@@ -98,6 +107,11 @@ void Service::reconnectWifi() const
   }
 
   Serial.println("ok");
+  Serial.println(WiFi.localIP());
+  
+  if (config_.KissEnableTcpIp) {
+    kissServer_->begin();
+  }
 }
 
 bool Service::reconnectAprsis()
@@ -527,9 +541,28 @@ void Service::onRigTxEnd()
   }
 }
 
+WiFiClient Service::getClient() 
+{
+  if (config_.KissEnableTcpIp) {
+    WiFiClient client = kissServer_->available();
+    if (client) {
+
+      if (client.connected()) {
+        Serial.println("Connected to client");
+      }  
+      return client;
+    }
+  }
+  return 0;
+}
+
 void Service::onSerialTx(byte b)
 {
-  if (config_.BtEnableBle) {
+  WiFiClient client = getClient();
+  if (client) {
+    client.write(b);
+  }
+  else if (config_.BtEnableBle) {
     serialBLE_.write(b);
   }
   else {
@@ -539,7 +572,11 @@ void Service::onSerialTx(byte b)
 
 bool Service::onSerialRxHasData()
 {
-  if (config_.BtEnableBle) {
+  WiFiClient client = getClient();
+  if (client) {
+    return client.available();
+  }
+  else if (config_.BtEnableBle) {
     return serialBLE_.available();
   }
   else {
@@ -549,10 +586,17 @@ bool Service::onSerialRxHasData()
 
 bool Service::onSerialRx(byte *b)
 {
-  int rxResult = config_.BtEnableBle 
-    ? serialBLE_.read() 
-    : serialBt_.read();
-    
+  int rxResult;
+  
+  WiFiClient client = getClient();
+  if (client) {
+    rxResult = client.read();
+  }
+  else {
+    rxResult = config_.BtEnableBle 
+      ? serialBLE_.read() 
+      : serialBt_.read();
+  }
   if (rxResult == -1) {
     return false;
   }
