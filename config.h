@@ -14,7 +14,7 @@
 #define BUILTIN_LED           2
 #endif
 
-#define CFG_IS_CLIENT_MODE    true      // false - server mode (APRS-IS gate mode)
+#define CFG_IS_CLIENT_MODE    true        // false - server mode (APRS-IS gate mode)
 
 // lora pinouts, CAD and ISR usage
 #define CFG_LORA_PIN_SS       SS
@@ -24,10 +24,10 @@
 #define CFG_LORA_PIN_DIO1     RADIOLIB_NC // set to your DIO1 pin number if connected
 #define CFG_LORA_USE_ISR      true        // always ON for RadioLib
 #else
-#define CFG_LORA_PIN_DIO1     LORA_IRQ  // not used in arduino-LoRa
-#define CFG_LORA_USE_ISR      false // set to true for ISR usage in arduino-LoRa
+#define CFG_LORA_PIN_DIO1     LORA_IRQ    // not used in arduino-LoRa
+#define CFG_LORA_USE_ISR      false       // set to true for ISR usage in arduino-LoRa
 #endif
-#define CFG_LORA_USE_CAD      false // set to true to utilize carrier detection
+#define CFG_LORA_USE_CAD      false       // set to true to utilize carrier detection
 
 // lora protocol parameters
 #define CFG_LORA_FREQ         433.775E6
@@ -35,12 +35,12 @@
 #define CFG_LORA_SF           12
 #define CFG_LORA_CR           7
 #define CFG_LORA_PWR          20
-#define CFG_LORA_ENABLE_CRC   true  // set to false for speech data
+#define CFG_LORA_ENABLE_CRC   true        // set to false for speech data
 
 // wifi client and AP options
-#define CFG_WIFI_ENABLE_AP    false     // run as wifi access point, for CFG_KISS_TCP_IP mode
-#define CFG_WIFI_SSID         "<ssid>"  // connect to SSID or run as this SSID in AP mode
-#define CFG_WIFI_KEY          "<key>"   // wifi key
+#define CFG_WIFI_ENABLE_AP    false       // run as wifi access point, for CFG_KISS_TCP_IP mode
+#define CFG_WIFI_SSID         "<ssid>"    // connect to SSID or run as this SSID in AP mode
+#define CFG_WIFI_KEY          "<key>"     // wifi key
 
 // bluetooth
 #define CFG_BT_NAME           "loraprs"
