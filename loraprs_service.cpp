@@ -93,6 +93,9 @@ void Service::setupWifi(const String &wifiName, const String &wifiKey)
 
 void Service::reconnectWifi() const
 {
+  // AP mode does not require re-connection
+  if (config_.WifiEnableAp) return;
+  
   Serial.print("WIFI re-connecting...");
 
   int retryCnt = 0;
