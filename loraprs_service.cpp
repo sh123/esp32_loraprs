@@ -65,13 +65,13 @@ void Service::setup(const Config &conf)
 
 void Service::setupWifi(const String &wifiName, const String &wifiKey)
 {
-  Serial.print("WIFI connecting to " + wifiName);
-
   WiFi.setHostname("loraprs");
   if (config_.WifiEnableAp) {
+    Serial.println("WIFI is running in AP mode " + wifiName);
     WiFi.softAP(wifiName.c_str(), wifiKey.c_str());    
     Serial.println(WiFi.softAPIP());
   } else {
+    Serial.print("WIFI connecting to " + wifiName);
     WiFi.mode(WIFI_STA);
     WiFi.begin(wifiName.c_str(), wifiKey.c_str());
   
