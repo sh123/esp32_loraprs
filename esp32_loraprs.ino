@@ -20,7 +20,7 @@
 // different module then update loraprs_service.h and loraprs_service.cpp
 // search for SX1278 and replace with your module name
 
-//#define USE_RADIOLIB
+#define USE_RADIOLIB
 #include "loraprs_service.h"
 
 void initializeConfig(LoraPrs::Config &cfg) {

@@ -68,6 +68,9 @@ void Service::setupWifi(const String &wifiName, const String &wifiKey)
 
   WiFi.setHostname("loraprs");
   if (config_.WifiEnableAp) {
+    WiFi.softAP(wifiName.c_str(), wifiKey.c_str());    
+    Serial.println(WiFi.softAPIP());
+  } else {
     WiFi.mode(WIFI_STA);
     WiFi.begin(wifiName.c_str(), wifiKey.c_str());
   
@@ -82,9 +85,6 @@ void Service::setupWifi(const String &wifiName, const String &wifiKey)
     }
     Serial.println("ok");
     Serial.println(WiFi.localIP());
-  } else {
-    WiFi.softAP(wifiName.c_str(), wifiKey.c_str());    
-    Serial.println(WiFi.softAPIP());
   }
   if (config_.KissEnableTcpIp) {
     kissServer_->begin();
