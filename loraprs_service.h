@@ -58,7 +58,7 @@ private:
   inline bool needsAprsis() const { 
     return !config_.IsClientMode && (config_.EnableRfToIs || config_.EnableIsToRf); 
   }
-  inline bool needsWifi() const { return needsAprsis(); }
+  inline bool needsWifi() const { return needsAprsis() || config_.KissEnableTcpIp; }
   inline bool needsBt() const { return config_.IsClientMode; }
   inline bool needsBeacon() const { return !config_.IsClientMode && config_.EnableBeacon; }
 

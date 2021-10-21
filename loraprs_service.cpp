@@ -405,7 +405,7 @@ void Service::onRigPacket(void *packet, int packetLength)
 #endif
   }
 
-  if (config_.EnableKissExtensions) {
+  if (config_.KissEnableExtensions) {
 #ifdef USE_RADIOLIB
     sendSignalReportEvent(radio_->getRSSI(), radio_->getSNR());
 #else
@@ -588,7 +588,7 @@ void Service::onControlCommand(Cmd cmd, byte value)
 
 void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
 
-  if (config_.EnableKissExtensions && rawCommand.size() == sizeof(SetHardware)) {
+  if (config_.KissEnableExtensions && rawCommand.size() == sizeof(SetHardware)) {
     const struct SetHardware * setHardware = reinterpret_cast<const struct SetHardware*>(rawCommand.data());
     
     config_.LoraFreq = be32toh(setHardware->freq);
