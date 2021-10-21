@@ -81,7 +81,6 @@ void Service::setupWifi(const String &wifiName, const String &wifiKey)
   Serial.println("ok");
   Serial.println(WiFi.localIP());
 }
-}
 
 void Service::reconnectWifi() const
 {
