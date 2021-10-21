@@ -49,7 +49,7 @@ private:
 #endif
   void onAprsisDataAvailable();
 
-  WiFiClient getClient();
+  bool getClient(WiFiClient &activeClient);
   
   void sendSignalReportEvent(int rssi, float snr);
   void sendPeriodicBeacon();

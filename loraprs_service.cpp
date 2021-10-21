@@ -212,7 +212,7 @@ void Service::setupBt(const String &btName)
 }
 
 void Service::loop()
-{
+{ 
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
@@ -544,25 +544,23 @@ void Service::onRigTxEnd()
   }
 }
 
-WiFiClient Service::getClient() 
+bool Service::getClient(WiFiClient &activeClient) 
 {
   if (config_.KissEnableTcpIp) {
-    WiFiClient client = kissServer_->available();
-    if (client) {
-
-      if (client.connected()) {
-        Serial.println("Connected to client");
-      }  
-      return client;
+    WiFiClient wifiClient = kissServer_->available();
+    if (wifiClient && wifiClient.connected()) {
+      activeClient = wifiClient;
+      return true;
     }
   }
-  return 0;
+  return false;
 }
 
 void Service::onSerialTx(byte b)
 {
-  if (WiFiClient client = getClient()) {
-    client.write(b);
+  WiFiClient wifiClient;
+  if (getClient(wifiClient)) {
+    wifiClient.write(b);
   }
   else if (config_.BtEnableBle) {
     serialBLE_.write(b);
@@ -574,8 +572,10 @@ void Service::onSerialTx(byte b)
 
 bool Service::onSerialRxHasData()
 {
-  if (WiFiClient client = getClient()) {
-    return client.available();
+  WiFiClient wifiClient;
+  if (getClient(wifiClient)) {
+    Serial.println("!!!");
+    return wifiClient.available();
   }
   else if (config_.BtEnableBle) {
     return serialBLE_.available();
@@ -589,8 +589,9 @@ bool Service::onSerialRx(byte *b)
 {
   int rxResult;
   
-  if (WiFiClient client = getClient()) {
-    rxResult = client.read();
+  WiFiClient wifiClient;
+  if (getClient(wifiClient)) {
+    rxResult = wifiClient.read();
   }
   else {
     rxResult = config_.BtEnableBle 
