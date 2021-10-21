@@ -64,8 +64,8 @@
 #define CFG_BEACON            false   // enable perdiodc beacon from CFG_APRS_RAW_BKN
 
 // frequency correction for narrow band bandwidths
-#define CFG_FREQ_CORR         false   // NB! incoming interrupts may stop working on frequent corrections when enabled
-#define CFG_FREQ_CORR_DELTA   1000    //      test with your module before heavy usage
+#define CFG_FREQ_CORR         false   // true - correct own frequency based on received packet
+#define CFG_FREQ_CORR_DELTA   1000    // correct when frequency difference is larger than this value
 
 // PTT control
 #define CFG_PTT_ENABLE        false   // enable external ptt (relay) control (for amplifier)
