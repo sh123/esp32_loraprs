@@ -59,6 +59,7 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.BtEnableBle = CFG_BT_USE_BLE;
 
   // server mode wifi paramaters
+  cfg.WifiEnableAp = CFG_WIFI_ENABLE_AP;
   cfg.WifiSsid = CFG_WIFI_SSID;
   cfg.WifiKey = CFG_WIFI_KEY;
 
@@ -73,7 +74,8 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.EnableIsToRf = CFG_IS_TO_RF; // send data from aprsis to rf
   cfg.EnableRepeater = CFG_DIGIREPEAT; // digirepeat incoming packets
   cfg.EnableBeacon = CFG_BEACON;  // enable periodic AprsRawBeacon beacon to rf and aprsis if rf to aprsis is enabled
-  cfg.EnableKissExtensions = CFG_KISS_EXTENSIONS; // radio control and signal reports
+  cfg.KissEnableExtensions = CFG_KISS_EXTENSIONS; // radio control and signal reports
+  cfg.KissEnableTcpIp = CFG_KISS_TCP_IP;  // enable KISS ovr TCP/IP as a server
 
   // external ptt control
   cfg.PttEnable = CFG_PTT_ENABLE;

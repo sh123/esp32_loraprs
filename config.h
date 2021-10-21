@@ -43,6 +43,7 @@
 #define CFG_APRS_FILTER	      "r/35.60/139.80/25"
 #define CFG_APRS_RAW_BKN      "NOCALL-10>APZMDM,WIDE1-1:!0000.00N/00000.00E#LoRA 433.775MHz/BW125/SF12/CR7/0x34"
 
+#define CFG_WIFI_ENABLE_AP    false
 #define CFG_WIFI_SSID         "<ssid>"
 #define CFG_WIFI_KEY          "<key>"
 
@@ -55,6 +56,7 @@
 #define CFG_IS_TO_RF          false
 #define CFG_BEACON            false
 #define CFG_KISS_EXTENSIONS   false
+#define CFG_KISS_TCP_IP       false
 
 #define CFG_PTT_ENABLE        false
 #define CFG_PTT_PIN           12

@@ -31,11 +31,13 @@ struct Config
   bool BtEnableBle;     // bluetooth device presents as BLE rather than serial bluetooth e.g. for iOS devices
 
   // wifi
+  bool WifiEnableAp;    // true to run as access point
   String WifiSsid;      // wifi access point name
   String WifiKey;       // wifi access point key
 
   // kiss
-  bool EnableKissExtensions; // true - enable kiss extensions for radio control and signal reports
+  bool KissEnableTcpIp; // true to enable KISS over TCP/IP as a server
+  bool KissEnableExtensions; // true - enable kiss extensions for radio control and signal reports
 
   // aprsis connectivity
   int AprsPort;         // aprs server port, 14580
