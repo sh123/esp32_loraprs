@@ -15,12 +15,17 @@
 #pragma message("Configured for server mode")
 #endif
 
+// Uncomennt to disable serial logging
+//#define DEBUGLOG_DISABLE_LOG
+
+#include <DebugLog.h> 
+
 // When USE_RADIOLIB is defined then RadioLib will be used, otherwise arduino-LoRa will be used
 // When using RadioLib, default module is SX1278, if you are using
 // different module then update loraprs_service.h and loraprs_service.cpp
 // search for SX1278 and replace with your module name
 
-//#define USE_RADIOLIB
+#define USE_RADIOLIB
 #include "loraprs_service.h"
 
 void initializeConfig(LoraPrs::Config &cfg) {
@@ -54,6 +59,9 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.AprsRawBeacon = CFG_APRS_RAW_BKN;
   cfg.AprsRawBeaconPeriodMinutes = 20;
 
+  // USB
+  cfg.UsbSerialEnable = CFG_USB_SERIAL_ENABLE;
+  
   // bluetooth device name
   cfg.BtName = CFG_BT_NAME;
   cfg.BtEnableBle = CFG_BT_USE_BLE;

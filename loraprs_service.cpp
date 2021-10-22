@@ -31,7 +31,7 @@ void Service::setup(const Config &conf)
 
   ownCallsign_ = AX25::Callsign(config_.AprsLogin);
   if (!ownCallsign_.IsValid()) {
-    LOG_ERROR("Own callsign ", config_.AprsLogin, " is not valid");
+    LOG_ERROR("Own callsign", config_.AprsLogin, "is not valid");
   }
 
   aprsLoginCommand_ = String("user ") + config_.AprsLogin + String(" pass ") + 
@@ -69,31 +69,31 @@ void Service::setupWifi(const String &wifiName, const String &wifiKey)
 
   // AP mode
   if (config_.WifiEnableAp) {
-    LOG_INFO("WIFI is running in AP mode ", wifiName);
+    LOG_INFO("WIFI is running in AP mode", wifiName);
     WiFi.softAP(wifiName.c_str(), wifiKey.c_str());    
-    LOG_INFO("IP address: ", WiFi.softAPIP());
+    LOG_INFO("IP address:", WiFi.softAPIP());
 
   // Client/STA mode
   } else {
-    LOG_INFO("WIFI connecting to ", wifiName);
+    LOG_INFO("WIFI connecting to", wifiName);
     WiFi.mode(WIFI_STA);
     WiFi.begin(wifiName.c_str(), wifiKey.c_str());
   
     int retryCnt = 0;
     while (WiFi.status() != WL_CONNECTED) {
       delay(CfgConnRetryMs);
-      LOG_WARN("WIFI retrying ", retryCnt);
+      LOG_WARN("WIFI retrying", retryCnt);
       if (retryCnt++ >= CfgConnRetryMaxTimes) {
         LOG_ERROR("WIFI connect failed");
         return;
       }
     }
-    LOG_INFO("WIFI connected to ", wifiName);
-    LOG_INFO("IP address: ", WiFi.localIP());
+    LOG_INFO("WIFI connected to", wifiName);
+    LOG_INFO("IP address:", WiFi.localIP());
   }
   // Run KISS server if enabled
   if (config_.KissEnableTcpIp) {
-    LOG_INFO("KISS TCP/IP server started on port ", CfgKissPort);
+    LOG_INFO("KISS TCP/IP server started on port", CfgKissPort);
     kissServer_->begin();
   }
 }
@@ -109,27 +109,27 @@ void Service::reconnectWifi() const
   while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0,0,0,0)) {
     WiFi.reconnect();
     delay(CfgConnRetryMs);
-    LOG_WARN("WIFI re-connecting...  ", retryCnt);
+    LOG_WARN("WIFI re-connecting...", retryCnt);
     if (retryCnt++ >= CfgConnRetryMaxTimes) {
       LOG_ERROR("WIFI re-connect failed");
       return;
     }
   }
 
-  LOG_INFO("WIFI reconnected, IP address ", WiFi.localIP());
+  LOG_INFO("WIFI reconnected, IP address", WiFi.localIP());
   
   if (config_.KissEnableTcpIp) {
-    LOG_INFO("KISS TCP/IP server started on port ", CfgKissPort);
+    LOG_INFO("KISS TCP/IP server started on port", CfgKissPort);
     kissServer_->begin();
   }
 }
 
 bool Service::reconnectAprsis()
 {
-  LOG_INFO("APRSIS connecting to ", config_.AprsHost);
+  LOG_INFO("APRSIS connecting to", config_.AprsHost);
   
   if (!aprsisConn_.connect(config_.AprsHost.c_str(), config_.AprsPort)) {
-    LOG_ERROR("Failed to connect to ", config_.AprsHost, ":", config_.AprsPort);
+    LOG_ERROR("Failed to connect to", config_.AprsHost, ":", config_.AprsPort);
     return false;
   }
   LOG_INFO("APRSIS connected");
@@ -140,14 +140,14 @@ bool Service::reconnectAprsis()
 
 void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, bool enableCrc)
 {
-  LOG_INFO("LoRa init: ", loraFreq, ", ", bw, ", ", sf, ", ", cr, ", ", pwr, ", ", sync, ", ", enableCrc);
+  LOG_INFO("LoRa init:", loraFreq, ",", bw, ",", sf, ",", cr, ",", pwr, ",", sync, ",", enableCrc);
   isImplicitHeaderMode_ = sf == 6;
 
 #ifdef USE_RADIOLIB
   radio_ = std::make_shared<SX1278>(new Module(config_.LoraPinSs, config_.LoraPinDio0, config_.LoraPinRst, RADIOLIB_NC));
   int state = radio_->begin((float)loraFreq / 1e6, (float)bw / 1e3, sf, cr, sync, pwr);
   if (state != ERR_NONE) {
-    LOG_ERROR("Radio start error: ", state);
+    LOG_ERROR("Radio start error:", state);
   }
   radio_->setCRC(enableCrc);
   //radio_->forceLDRO(false);
@@ -158,7 +158,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
 
   state = radio_->startReceive();
   if (state != ERR_NONE) {
-    LOG_ERROR("Receive start error: ", state);
+    LOG_ERROR("Receive start error:", state);
   }
   
 #else // USE_RADIOLIB
@@ -167,7 +167,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
 
   int retryCnt = 0;
   while (!LoRa.begin(loraFreq)) {
-    LOG_WARN("LoRa init retry ", retryCnt);
+    LOG_WARN("LoRa init retry", retryCnt);
     delay(CfgConnRetryMs);
     if (retryCnt++ >= CfgConnRetryMaxTimes) {
       LOG_ERROR("LoRa init failed");
@@ -196,14 +196,14 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
 void Service::setupBt(const String &btName)
 {
   String btType = config_.BtEnableBle ? "BLE" : "BT";
-  LOG_INFO(btType, " init ", btName, "...");
+  LOG_INFO(btType, "init", btName, "...");
   
   bool btOk = config_.BtEnableBle 
     ? serialBLE_.begin(btName.c_str()) 
     : serialBt_.begin(btName);
   
   if (btOk) {
-    LOG_INFO(btType, " initialized");
+    LOG_INFO(btType, "initialized");
   }
   else {
     LOG_ERROR(btType, " failed");
@@ -572,7 +572,10 @@ void Service::attachKissNetworkClient()
 
 void Service::onSerialTx(byte b)
 {
-  if (isKissConn_) {
+  if (config_.UsbSerialEnable) {
+    Serial.write(b);
+  } 
+  else if (isKissConn_) {
     kissConn_.write(b);
   }
   else if (config_.BtEnableBle) {
@@ -585,7 +588,10 @@ void Service::onSerialTx(byte b)
 
 bool Service::onSerialRxHasData()
 {
-  if (isKissConn_) {
+  if (config_.UsbSerialEnable) {
+    return Serial.available();
+  } 
+  else if (isKissConn_) {
     return kissConn_.available();
   }
   else if (config_.BtEnableBle) {
@@ -599,8 +605,11 @@ bool Service::onSerialRxHasData()
 bool Service::onSerialRx(byte *b)
 {
   int rxResult;
-  
-  if (isKissConn_) {
+
+  if (config_.UsbSerialEnable) {
+    rxResult = Serial.read();
+  } 
+  else if (isKissConn_) {
     rxResult = kissConn_.read();
     // client dropped off
     if (rxResult == -1) {
