@@ -26,6 +26,11 @@ Service::Service()
 
 void Service::setup(const Config &conf)
 {
+#ifdef USE_RADIOLIB
+  Serial.println("Built with RadioLib library");
+#else
+  Serial.println("Built with arudino-LoRa library");
+#endif
   config_ = conf;  
   previousBeaconMs_ = 0;
 
@@ -273,7 +278,7 @@ void Service::loop()
 
 bool Service::isLoraRxBusy() {
 #ifdef USE_RADIOLIB
-  return cfg_.LoraUseCad && (radio_->getModemStatus() & 0x01); // SX1278_STATUS_SIG_DETECT
+  return config_.LoraUseCad && (radio_->getModemStatus() & 0x01); // SX1278_STATUS_SIG_DETECT
 #else
   return false;
 #endif

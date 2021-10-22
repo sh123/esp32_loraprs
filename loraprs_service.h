@@ -4,6 +4,12 @@
 #include <Arduino.h>
 #include <SPI.h>
 
+// When USE_RADIOLIB is defined then RadioLib will be used, otherwise arduino-LoRa will be used
+// When using RadioLib, default module is SX1278, if you are using
+// different module then update loraprs_service.h and loraprs_service.cpp
+// search for SX1278 and replace with your module name
+#define USE_RADIOLIB
+
 #ifdef USE_RADIOLIB
 #include <RadioLib.h>
 #pragma message("Using RadioLib")
