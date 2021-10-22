@@ -26,13 +26,20 @@ Service::Service()
 
 void Service::setup(const Config &conf)
 {
+  config_ = conf;  
+  previousBeaconMs_ = 0;
+
+  LOG_SET_OPTION(false, false, true);  // disable file, line, enable func
+
+  // disable logging when USB is used for data transfer
+  if (config_.UsbSerialEnable) {
+    LOG_SET_LEVEL(DebugLogLevel::LVL_NONE);
+  }
 #ifdef USE_RADIOLIB
   LOG_INFO("Built with RadioLib library");
 #else
   LOG_INFO("Built with arduino-LoRa library");
 #endif
-  config_ = conf;  
-  previousBeaconMs_ = 0;
 
   ownCallsign_ = AX25::Callsign(config_.AprsLogin);
   if (!ownCallsign_.IsValid()) {
@@ -114,7 +121,7 @@ void Service::reconnectWifi() const
   while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0,0,0,0)) {
     WiFi.reconnect();
     delay(CfgConnRetryMs);
-    LOG_WARN("WIFI re-connecting...", retryCnt);
+    LOG_WARN("WIFI re-connecting", retryCnt);
     if (retryCnt++ >= CfgConnRetryMaxTimes) {
       LOG_ERROR("WIFI re-connect failed");
       return;
@@ -145,7 +152,7 @@ bool Service::reconnectAprsis()
 
 void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, bool enableCrc)
 {
-  LOG_INFO("LoRa init:", loraFreq, ",", bw, ",", sf, ",", cr, ",", pwr, ",", sync, ",", enableCrc);
+  LOG_INFO("LoRa init:", loraFreq, bw, sf, cr, pwr, sync, enableCrc);
   isImplicitHeaderMode_ = sf == 6;
 
 #ifdef USE_RADIOLIB
@@ -201,7 +208,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
 void Service::setupBt(const String &btName)
 {
   String btType = config_.BtEnableBle ? "BLE" : "BT";
-  LOG_INFO(btType, "init", btName, "...");
+  LOG_INFO(btType, "init", btName);
   
   bool btOk = config_.BtEnableBle 
     ? serialBLE_.begin(btName.c_str()) 
