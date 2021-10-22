@@ -50,6 +50,7 @@
 #define CFG_USB_SERIAL_ENABLE false       // true - enable communication over USB Serial
 #if CFG_USB_SERIAL_ENABLE == true
 #define DEBUGLOG_DISABLE_LOG              // logging must be disabled when using USB mode
+#undef CFG_BT_NAME
 #define CFG_BT_NAME           ""
 #endif
 

@@ -15,7 +15,7 @@
 #pragma message("Configured for server mode")
 #endif
 
-// Uncomennt to disable serial logging
+// Uncomment to disable serial logging
 //#define DEBUGLOG_DISABLE_LOG
 
 #include <DebugLog.h> 
@@ -61,7 +61,7 @@ void initializeConfig(LoraPrs::Config &cfg) {
 
   // USB
   cfg.UsbSerialEnable = CFG_USB_SERIAL_ENABLE;
-  
+
   // bluetooth device name
   cfg.BtName = CFG_BT_NAME;
   cfg.BtEnableBle = CFG_BT_USE_BLE;
