@@ -5,8 +5,11 @@ namespace LoraPrs {
 byte Service::rxBuf_[256];
 
 #ifdef USE_RADIOLIB
+#pragma message("Using RadioLib")
 bool Service::interruptEnabled_ = true;
 std::shared_ptr<SX1278> Service::radio_;
+#else
+#pragma message("Using arduino-LoRa")
 #endif
 
 Service::Service()
@@ -152,7 +155,15 @@ bool Service::reconnectAprsis()
 
 void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, bool enableCrc)
 {
-  LOG_INFO("LoRa init:", loraFreq, bw, sf, cr, pwr, sync, enableCrc);
+  LOG_INFO("Initializing LoRa");
+  LOG_INFO("Frequency:", loraFreq, "Hz");
+  LOG_INFO("Bandwidth:", bw, "Hz");
+  LOG_INFO("Spreading:", sf);
+  LOG_INFO("Coding rate:", cr);
+  LOG_INFO("Power:", pwr, "dBm");
+  LOG_INFO("Sync:", "0x" + String(sync, 16));
+  LOG_INFO("CRC:", enableCrc ? "enabled" : "disabled");
+  
   isImplicitHeaderMode_ = sf == 6;
 
 #ifdef USE_RADIOLIB
@@ -218,7 +229,7 @@ void Service::setupBt(const String &btName)
     LOG_INFO(btType, "initialized");
   }
   else {
-    LOG_ERROR(btType, " failed");
+    LOG_ERROR(btType, "failed");
   }
 }
 

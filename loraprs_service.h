@@ -13,10 +13,8 @@
 
 #ifdef USE_RADIOLIB
 #include <RadioLib.h>
-#pragma message("Using RadioLib")
 #else
 #include <LoRa.h>
-#pragma message("Using arduino-LoRa")
 #endif
 
 #include <WiFi.h>
