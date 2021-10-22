@@ -430,12 +430,12 @@ void Service::onRigPacket(void *packet, int packetLength)
 #endif
   if (config_.EnableAutoFreqCorrection && abs(frequencyErrorHz) > config_.AutoFreqCorrectionDeltaHz) {
     config_.LoraFreq -= frequencyErrorHz;
-    LOG_INFO("Correcting frequency: ", frequencyErrorHz);
+    LOG_INFO("Correcting frequency:", frequencyErrorHz);
 #ifdef USE_RADIOLIB
     radio_->setFrequency((float)config_.LoraFreq / 1e6);
     int state = radio_->startReceive();
     if (state != ERR_NONE) {
-      LOG_ERROR("Start receive error: ", state);
+      LOG_ERROR("Start receive error:", state);
     }
 #else
     LoRa.setFrequency(config_.LoraFreq);
@@ -656,19 +656,19 @@ void Service::onControlCommand(Cmd cmd, byte value)
 {
   switch (cmd) {
     case Cmd::P:
-      LOG_INFO("CSMA P: ", value);
+      LOG_INFO("CSMA P:", value);
       csmaP_ = value;
       break;
     case Cmd::SlotTime:
-      LOG_INFO("CSMA SlotTime: ", value);
+      LOG_INFO("CSMA SlotTime:", value);
       csmaSlotTime_ = (long)value * 10;
       break;
     case Cmd::TxDelay:
-      LOG_INFO("TX delay: ", value);
+      LOG_INFO("TX delay:", value);
       config_.PttTxDelayMs = (long)value * 10;
       break;
     case Cmd::TxTail:
-      LOG_INFO("TX tail: ", value);
+      LOG_INFO("TX tail:", value);
       config_.PttTxTailMs = (long)value * 10;
       break;
     default:
