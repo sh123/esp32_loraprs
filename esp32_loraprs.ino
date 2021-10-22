@@ -1,5 +1,6 @@
 #include <arduino-timer.h>
 #include "WiFi.h"
+#include "loraprs_service.h"
 
 #if __has_include("/tmp/esp32_loraprs_config.h")
 #pragma message("Using external config")
@@ -14,8 +15,6 @@
 #else
 #pragma message("Configured for server mode")
 #endif
-
-#include "loraprs_service.h"
 
 void initializeConfig(LoraPrs::Config &cfg) {
 

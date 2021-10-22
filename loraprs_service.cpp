@@ -64,7 +64,7 @@ void Service::setup(const Config &conf)
     setupWifi(config_.WifiSsid, config_.WifiKey);
   }
 
-  if (needsBt() || config_.BtName.length() > 0) {
+  if (needsBt()) {
     setupBt(config_.BtName);
   }
 

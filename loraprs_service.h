@@ -54,13 +54,13 @@ private:
   void loraReceive(int packetSize);
 #endif
   void onAprsisDataAvailable();
-  
+
   void sendSignalReportEvent(int rssi, float snr);
   void sendPeriodicBeacon();
   void sendToAprsis(const String &aprsMessage);
   bool sendAX25ToLora(const AX25::Payload &payload);
   void processIncomingRawPacketAsServer(const byte *packet, int packetLength);
-  
+
   inline bool needsAprsis() const { 
     return !config_.IsClientMode  // only in server mode
       && (config_.EnableRfToIs || config_.EnableIsToRf)  // rx/tx igate enabled
@@ -70,8 +70,14 @@ private:
     return needsAprsis()  // aprsis is needed
       || config_.KissEnableTcpIp; // or kiss over tcp ip is enabled
   }
-  inline bool needsBt() const { return config_.IsClientMode; }
-  inline bool needsBeacon() const { return !config_.IsClientMode && config_.EnableBeacon; }
+  inline bool needsBt() const { 
+    return (config_.IsClientMode || config_.BtName.length() > 0)  // client mode or name must be specified
+      && !config_.UsbSerialEnable;  // inactive in usb serial mode
+  }
+  inline bool needsBeacon() const { 
+    return !config_.IsClientMode  // beaconing only in apris gate / server mode
+    && config_.EnableBeacon;  // beacon must be explicitly enabled
+  }
 
 protected:
   virtual bool onRigTxBegin();
