@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <SPI.h>
+#include <DebugLog.h>
 
 #ifdef USE_RADIOLIB
 #include <RadioLib.h>

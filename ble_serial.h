@@ -21,6 +21,7 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
+#include <DebugLog.h>
 
 #define SERVICE_UUID           "00000001-ba2a-46c9-ae49-01b0961f68bb" // KISS service UUID
 #define CHARACTERISTIC_UUID_TX "00000003-ba2a-46c9-ae49-01b0961f68bb"

@@ -16,16 +16,14 @@ Payload::Payload(const String &textPayload)
 
 void Payload::Dump() 
 {
-  Serial.println();
-  Serial.print("valid: "); Serial.println(isValid_);
-  Serial.println("src: " + srcCall_.ToString());
-  Serial.println("dst: " + dstCall_.ToString());
-  Serial.print("rpt: ");
+  LOG_INFO("valid: ", isValid_);
+  LOG_INFO("src: ", srcCall_.ToString());
+  LOG_INFO("dst: ", dstCall_.ToString());
+  LOG_INFO("rpt: ");
   for (int i = 0; i < rptCallsCount_; i++) {
-    Serial.print(rptCalls_[i].ToString() + " ");
+    LOG_INFO(rptCalls_[i].ToString());
   }
-  Serial.println();
-  Serial.println("info: " + info_);
+  LOG_INFO("info: ", info_);
 }
 
 int Payload::ToBinary(byte *txPayload, int bufferLength) const

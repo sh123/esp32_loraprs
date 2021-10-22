@@ -25,7 +25,7 @@ class BLESerialServerCallbacks: public BLEServerCallbacks {
 
     void onDisconnect(BLEServer* pServer) {
         pServer->startAdvertising(); // restart advertising
-        Serial.println("Started advertising");
+        LOG_INFO("Started advertising");
     }
 };
 
@@ -98,12 +98,12 @@ bool BLESerial::begin(const char* localName)
 
     // Start the service
     pService->start();
-    Serial.println("starting service");
+    LOG_INFO("starting service");
 
     // Start advertising
     pServer->getAdvertising()->addServiceUUID(pService->getUUID()); 
     pServer->getAdvertising()->start();
-    Serial.println("Waiting a client connection to notify...");
+    LOG_INFO("Waiting a client connection to notify...");
     return true;
 }
 

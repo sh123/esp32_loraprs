@@ -2,6 +2,7 @@
 #define KISS_PROCESSOR_H
 
 #include <Arduino.h>
+#include <DebugLog.h>
 #include <memory>
 
 #define CIRCULAR_BUFFER_INT_SAFE
