@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <SPI.h>
+#include <DebugLog.h>
 
 // When USE_RADIOLIB is defined then RadioLib will be used, otherwise arduino-LoRa will be used
 // When using RadioLib, default module is SX1278, if you are using
@@ -12,10 +13,8 @@
 
 #ifdef USE_RADIOLIB
 #include <RadioLib.h>
-#pragma message("Using RadioLib")
 #else
 #include <LoRa.h>
-#pragma message("Using arduino-LoRa")
 #endif
 
 #include <WiFi.h>

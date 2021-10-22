@@ -2,6 +2,7 @@
 #define AX25_PAYLOAD_H
 
 #include <Arduino.h>
+#include <DebugLog.h>
 
 #include "ax25_callsign.h"
 

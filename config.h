@@ -46,6 +46,14 @@
 #define CFG_BT_NAME           "loraprs"
 #define CFG_BT_USE_BLE        false // set to true to use bluetooth low energy (for ios devices)
 
+// USB
+#define CFG_USB_SERIAL_ENABLE false       // true - enable communication over USB Serial
+#if CFG_USB_SERIAL_ENABLE == true
+#define DEBUGLOG_DISABLE_LOG              // logging must be disabled when using USB mode
+#undef CFG_BT_NAME
+#define CFG_BT_NAME           ""
+#endif
+
 // KISS protocol options
 #define CFG_KISS_EXTENSIONS   false   // true - enable modem control from application with KISS commands
 #define CFG_KISS_TCP_IP       false   // true - run as KISS TCP/IP server, no bluetooth operations performed

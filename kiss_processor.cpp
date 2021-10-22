@@ -36,12 +36,12 @@ void Processor::sendRigToSerial(Cmd cmd, const byte *packet, int packetLength) {
 
 void ICACHE_RAM_ATTR Processor::queueRigToSerialIsr(Cmd cmd, const byte *packet, int packetLength) {
   if (!rigToSerialQueueIndex_.unshift(packetLength)) {
-    Serial.println("Rig to serial queue is full!");
+    LOG_WARN("Rig to serial queue is full!");
     return;
   }
   for (int i = 0; i < packetLength; i++) {
     if (!rigToSerialQueue_.unshift(packet[i])) {
-      Serial.println("Rig to serial queue is full!");
+      LOG_WARN("Rig to serial queue is full!");
       return;
     }
   }
@@ -71,7 +71,7 @@ void Processor::queueSerialToRig(Cmd cmd, const byte *packet, int packetLength) 
   result &= serialToRigQueue_.unshift(Marker::Fend);
 
   if (!result) {
-    Serial.println("Serial to rig queue overflow!");
+    LOG_WARN("Serial to rig queue overflow!");
   }
 }
 
@@ -109,7 +109,7 @@ bool Processor::processSerialToRig()
     if (onSerialRxHasData()) {
       if (onSerialRx(&rxByte)) {
           if (!serialToRigQueue_.unshift(rxByte)) {
-            Serial.println("Serial to rig buffer is full!");
+            LOG_WARN("Serial to rig buffer is full!");
           }
       }
     }

@@ -26,6 +26,9 @@ struct Config
   bool LoraUseIsr;      // true to use interrupts, false for fallback polling, e.g. if Dio0 is not connected
   bool LoraUseCad;      // use carrier detect before transmitting
 
+  // usb
+  bool UsbSerialEnable; // true - operate in USB Serial mode, debug logging is disabled
+  
   // bluetooth
   String BtName;        // bluetooth device name for the client, set to empty string to disable bluetooth in server mode
   bool BtEnableBle;     // bluetooth device presents as BLE rather than serial bluetooth e.g. for iOS devices

@@ -48,6 +48,9 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.AprsRawBeacon = CFG_APRS_RAW_BKN;
   cfg.AprsRawBeaconPeriodMinutes = 20;
 
+  // USB
+  cfg.UsbSerialEnable = CFG_USB_SERIAL_ENABLE;
+
   // bluetooth device name
   cfg.BtName = CFG_BT_NAME;
   cfg.BtEnableBle = CFG_BT_USE_BLE;
