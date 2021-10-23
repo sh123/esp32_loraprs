@@ -1,5 +1,6 @@
 # Introduction
 ![alt text](images/diagram.png)
+*Modes of operation*
 
 This project is amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem + LoRa APRS-IS RX/TX iGate server over WiFI + digipeater + Codec2 DV modem
 
