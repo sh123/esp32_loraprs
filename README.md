@@ -1,4 +1,6 @@
 # Introduction
+![alt text](images/diagram.png)
+
 This project is amateur radio ESP32 based LoRa APRSDroid KISS Bluetooth modem + LoRa APRS-IS RX/TX iGate server over WiFI + digipeater + Codec2 DV modem
 
 - For project description, please, visit our Wiki at https://github.com/sh123/esp32_loraprs/wiki
@@ -14,5 +16,3 @@ Install via libraries:
 - CircularBuffer library: https://github.com/rlogiacco/CircularBuffer
 - DebugLog library: https://github.com/hideakitai/DebugLog
 
-# Diagram 
-![alt text](images/diagram.png)
