@@ -64,7 +64,7 @@
 #define CFG_DIGIREPEAT        false   // digirepeat incoming packets
 #define CFG_RF_TO_IS          true    // forward packets from radio to internet
 #define CFG_IS_TO_RF          false   // forward packets from internet to radio basedon CFG_APRS_FILTER
-#define CFG_BEACON            false   // enable perdiodc beacon from CFG_APRS_RAW_BKN
+#define CFG_BEACON            false   // enable perdiodc beacon from CFG_APRS_RAW_BKN 
 
 // frequency correction for narrow band bandwidths
 #define CFG_FREQ_CORR         false   // true - correct own frequency based on received packet
