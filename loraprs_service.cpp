@@ -176,13 +176,9 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   //radio_->forceLDRO(false);
   //radio_->setRfSwitchPins(4, 5);
 
-#if MODULE_NAME == SX1268
-  radio_->clearDio1Action();
-  radio_->setDio1Action(onLoraDataAvailableIsr);
-#else
   radio_->clearDio0Action();
   radio_->setDio0Action(onLoraDataAvailableIsr);
-#endif
+
   state = radio_->startReceive();
   if (state != ERR_NONE) {
     LOG_ERROR("Receive start error:", state);
