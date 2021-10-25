@@ -7,7 +7,7 @@ byte Service::rxBuf_[256];
 #ifdef USE_RADIOLIB
 #pragma message("Using RadioLib")
 bool Service::interruptEnabled_ = true;
-std::shared_ptr<SX1278> Service::radio_;
+std::shared_ptr<MODULE_NAME> Service::radio_;
 #else
 #pragma message("Using arduino-LoRa")
 #endif
@@ -167,7 +167,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   isImplicitHeaderMode_ = sf == 6;
 
 #ifdef USE_RADIOLIB
-  radio_ = std::make_shared<SX1278>(new Module(config_.LoraPinSs, config_.LoraPinDio0, config_.LoraPinRst, RADIOLIB_NC));
+  radio_ = std::make_shared<MODULE_NAME>(new Module(config_.LoraPinSs, config_.LoraPinDio0, config_.LoraPinRst, RADIOLIB_NC));
   int state = radio_->begin((float)loraFreq / 1e6, (float)bw / 1e3, sf, cr, sync, pwr);
   if (state != ERR_NONE) {
     LOG_ERROR("Radio start error:", state);
@@ -176,9 +176,13 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   //radio_->forceLDRO(false);
   //radio_->setRfSwitchPins(4, 5);
 
+#if MODULE_NAME == SX1268
+  radio_->clearDio1Action();
+  radio_->setDio1Action(onLoraDataAvailableIsr);
+#else
   radio_->clearDio0Action();
   radio_->setDio0Action(onLoraDataAvailableIsr);
-
+#endif
   state = radio_->startReceive();
   if (state != ERR_NONE) {
     LOG_ERROR("Receive start error:", state);

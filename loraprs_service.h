@@ -13,6 +13,7 @@
 
 #ifdef USE_RADIOLIB
 #include <RadioLib.h>
+#include "module.h"
 #else
 #include <LoRa.h>
 #endif
@@ -145,7 +146,7 @@ private:
 #ifdef USE_RADIOLIB
   static bool interruptEnabled_;
   CircularBuffer<uint8_t, 256> txQueue_;
-  static std::shared_ptr<SX1278> radio_;
+  static std::shared_ptr<MODULE_NAME> radio_;
 #endif
   BluetoothSerial serialBt_;
   BLESerial serialBLE_;
