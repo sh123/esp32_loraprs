@@ -13,7 +13,7 @@
 
 #ifdef USE_RADIOLIB
 #include <RadioLib.h>
-#include "module.h"
+#include "module_name.h"
 #else
 #include <LoRa.h>
 #endif
