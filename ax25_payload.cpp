@@ -14,6 +14,31 @@ Payload::Payload(const String &textPayload)
   isValid_ = fromString(textPayload);
 }
 
+Payload::Payload(const Payload &payload)
+  : isValid_(payload.isValid_)
+  , srcCall_(payload.srcCall_)
+  , dstCall_(payload.dstCall_)
+  , rptCallsCount_(payload.rptCallsCount_)
+  , info_(payload.info_)
+{
+    for (int i = 0; i < rptCallsCount_; i++) {
+      rptCalls_[i] = payload.rptCalls_[i];
+    }
+}
+
+Payload& Payload::operator=(const Payload &payload)
+{
+  isValid_ = payload.isValid_;
+  srcCall_ = payload.srcCall_;
+  dstCall_ = payload.dstCall_;
+  rptCallsCount_ = payload.rptCallsCount_;
+  info_ = payload.info_;
+  for (int i = 0; i < rptCallsCount_; i++) {
+    rptCalls_[i] = payload.rptCalls_[i];
+  }
+  return *this;
+}
+
 void Payload::Dump() 
 {
   LOG_INFO("valid: ", isValid_);
@@ -65,7 +90,7 @@ int Payload::ToBinary(byte *txPayload, int bufferLength) const
   return (int)(txPtr-txPayload);
 }
 
-String Payload::ToString(const String &customComment)
+String Payload::ToString(const String &customComment) const
 {
   String txt = srcCall_.ToString() + String(">") + dstCall_.ToString();
 

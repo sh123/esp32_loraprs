@@ -13,10 +13,12 @@ class Payload
 public:
   Payload(const String &textPayload);
   Payload(const byte *rxPayload, int payloadLength);
+  Payload(const Payload &payload);
+  Payload& operator=(const Payload &payload);
 
   inline bool IsValid() const { return isValid_; }
   
-  String ToString(const String &customComment=String());
+  String ToString(const String &customComment=String()) const;
   int ToBinary(byte *txPayload, int bufferLength) const;
 
   bool Digirepeat(const Callsign &ownCallsign);

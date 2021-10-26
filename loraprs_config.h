@@ -62,6 +62,7 @@ struct Config
   bool EnableIsToRf;                    // true - enable APRS-IS to RF submission
   bool EnableRepeater;                  // true - digirepeat incoming packets based on WIDEn-n paths
   bool EnableBeacon;                    // true - send AprsRawBeacon to RF and APRS-IS if EnableRfToIs is true
+  bool EnableTextPackets;               // true - use text plain messages insead of AX25 binary frames for interoperability with other projects
 
   // external ptt tx control
   bool PttEnable;                       // true - enable external ptt control

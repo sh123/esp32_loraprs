@@ -411,11 +411,22 @@ void Service::sendSignalReportEvent(int rssi, float snr)
 
 bool Service::sendAX25ToLora(const AX25::Payload &payload)
 {
+  int bytesWritten;
   byte buf[CfgMaxAX25PayloadSize];
-  int bytesWritten = payload.ToBinary(buf, sizeof(buf));
-  if (bytesWritten <= 0) {
-    LOG_WARN("Failed to serialize payload");
-    return false;
+  if (config_.EnableTextPackets) {
+    String textPayload = payload.ToString();
+    bytesWritten = textPayload.length();
+    if (bytesWritten > CfgMaxAX25PayloadSize) {
+      bytesWritten = CfgMaxAX25PayloadSize;
+    }
+    textPayload.getBytes(buf, bytesWritten);
+    buf[bytesWritten-1] = '\0';
+  } else {
+    bytesWritten = payload.ToBinary(buf, sizeof(buf));
+    if (bytesWritten <= 0) {
+      LOG_WARN("Failed to serialize payload");
+      return false;
+    }
   }
   queueSerialToRig(Cmd::Data, buf, bytesWritten);
   return true;
@@ -475,7 +486,13 @@ void Service::loraReceive(int packetSize)
 
 void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLength) {
 
+  // create from binary AX25
   AX25::Payload payload(packet, packetLength);
+
+  // try to parse as text for clients, who submit plain text
+  if (!payload.IsValid() && config_.EnableTextPackets && packet[packetLength - 1] == '\0') {
+    payload = AX25::Payload(String((char*)packet));
+  }
 
   if (payload.IsValid()) {
 
