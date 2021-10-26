@@ -39,13 +39,9 @@ void Service::setup(const Config &conf)
   if (config_.UsbSerialEnable) {
     LOG_SET_LEVEL(DebugLogLevel::LVL_NONE);
   }
-#ifdef USE_RADIOLIB
-  LOG_INFO("Built with RadioLib library");
-#else
-  LOG_INFO("Built with arduino-LoRa library");
-#endif
-  LOG_INFO(disableKiss_ ? "Using TNC2 text mode" : "Using TNC KISS and AX.25 mode");
 
+  printConfig();
+  
   // KISS extensions are disabled in TNC2 mode
   if (disableKiss_) {
     LOG_INFO("KISS extensions are disabled in TNC2 mode");
@@ -82,6 +78,7 @@ void Service::setup(const Config &conf)
 
   // APRS-IS
   if (needsAprsis() && config_.EnablePersistentAprsConnection) {
+    LOG_INFO("Using persistent APRS-IS connection");
     reconnectAprsis();
   }
 
@@ -90,6 +87,16 @@ void Service::setup(const Config &conf)
     LOG_INFO("External PTT is enabled");
     pinMode(config_.PttPin, OUTPUT);
   }
+}
+
+void Service::printConfig() {
+  LOG_INFO("Current mode:", config_.IsClientMode ? "NORMAL" : "APRS-IS iGate");
+#ifdef USE_RADIOLIB
+  LOG_INFO("Built with RadioLib library");
+#else
+  LOG_INFO("Built with arduino-LoRa library");
+#endif
+  LOG_INFO(disableKiss_ ? "Using TNC2 text mode" : "Using TNC KISS and AX.25 mode");
 }
 
 void Service::setupWifi(const String &wifiName, const String &wifiKey)
@@ -427,6 +434,8 @@ bool Service::sendAX25ToLora(const AX25::Payload &payload)
 {
   int bytesWritten;
   byte buf[CfgMaxAX25PayloadSize];
+
+  // TNC2 text mode
   if (config_.EnableTextPackets) {
     String textPayload = payload.ToString();
     bytesWritten = textPayload.length();
@@ -435,6 +444,8 @@ bool Service::sendAX25ToLora(const AX25::Payload &payload)
     }
     textPayload.getBytes(buf, bytesWritten);
     buf[bytesWritten-1] = '\0';
+
+  // KISS TNC
   } else {
     bytesWritten = payload.ToBinary(buf, sizeof(buf));
     if (bytesWritten <= 0) {

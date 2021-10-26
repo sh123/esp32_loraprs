@@ -73,6 +73,7 @@ void Processor::queueSerialToRig(Cmd cmd, const byte *packet, int packetLength) 
       byte rxByte = packet[i];
       result &= serialToRigQueue_.unshift(rxByte);
     }
+    result &= serialToRigQueue_.unshift('\n');
   } else {
     result &= serialToRigQueue_.unshift(Marker::Fend);
     result &= serialToRigQueue_.unshift(cmd);
