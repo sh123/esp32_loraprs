@@ -508,8 +508,12 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
   AX25::Payload payload(packet, packetLength);
 
   // try to parse as text for clients, who submit plain text
-  if (!payload.IsValid() && config_.EnableTextPackets && packet[packetLength - 1] == '\0') {
-    payload = AX25::Payload(String((char*)packet));
+  if (!payload.IsValid() && config_.EnableTextPackets) {
+    char buf[CfgMaxAX25PayloadSize];
+    int cpySize = packetLength > CfgMaxAX25PayloadSize ? CfgMaxAX25PayloadSize : packetLength;
+    memcpy(buf, packet, cpySize);
+    buf[cpySize-1] = '\0';
+    payload = AX25::Payload(String((char*)buf));
   }
 
   if (payload.IsValid()) {
