@@ -17,9 +17,17 @@ void Processor::sendRigToSerial(Cmd cmd, const byte *packet, int packetLength) {
   if (disableKiss_) {
     for (int i = 0; i < packetLength; i++) {
       byte rxByte = packet[i];
-      onSerialTx(rxByte);
+      // TNC2 splits on \n
+      if (rxByte == '\0') {
+        onSerialTx('\n');
+      } else {
+        onSerialTx(rxByte);
+      }
+      // append \n for TNC2 compatibility if not there
+      if (rxByte != '\n' && rxByte != '\0' && i == packetLength - 1) {
+        onSerialTx('\n');
+      }
     }
-    // FIXME, need to check if '\0' or '\n' should be added
   } else {
     onSerialTx((byte)Marker::Fend);
     onSerialTx((byte)cmd);
@@ -60,11 +68,11 @@ void ICACHE_RAM_ATTR Processor::queueRigToSerialIsr(Cmd cmd, const byte *packet,
 void Processor::queueSerialToRig(Cmd cmd, const byte *packet, int packetLength) {
   bool result = 1;
   if (disableKiss_) {
+    // TNC2, send as is, receiveByteRaw will deal with it
     for (int i = 0; i < packetLength; i++) {
       byte rxByte = packet[i];
       result &= serialToRigQueue_.unshift(rxByte);
     }
-    // FIXME, need to check if '\0' or '\n' should be added
   } else {
     result &= serialToRigQueue_.unshift(Marker::Fend);
     result &= serialToRigQueue_.unshift(cmd);
@@ -214,15 +222,16 @@ bool Processor::receiveByteRaw(byte rxByte)
     isRawIdle_ = false;
   }
   onRigTx(rxByte);
-  // FIXME, need to check if '\n' is marker too
-  if (rxByte == '\0') {
+  // NOTE, TNC2 uses \n as a packet delimiter
+  if (rxByte == '\n') {
+    onRigTx('\0');
     onRigTxEnd();
     isRawIdle_ = true;
   }
   return true;
 }
 
-bool Processor::receiveByteKiss(byte rxByte) 
+bool Processor::receiveByteKiss(byte rxByte)
 {
   switch (state_) {
     case State::GetStart:

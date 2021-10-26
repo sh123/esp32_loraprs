@@ -140,7 +140,7 @@ private:
 
   // state
   long previousBeaconMs_;
-    
+
   // peripherals
   static byte rxBuf_[256];
 #ifdef USE_RADIOLIB

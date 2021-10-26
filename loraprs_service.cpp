@@ -44,6 +44,7 @@ void Service::setup(const Config &conf)
 #else
   LOG_INFO("Built with arduino-LoRa library");
 #endif
+  LOG_INFO(disableKiss_ ? "Using TNC2 text mode" : "Using TNC KISS and AX.25 mode");
 
   ownCallsign_ = AX25::Callsign(config_.AprsLogin);
   if (!ownCallsign_.IsValid()) {
