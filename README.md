@@ -3,7 +3,7 @@
 
 This project is amateur radio ESP32 based LoRa **KISS Bluetooth/BLE/USB/TCPIP** modem + LoRa **APRS-IS RX/TX iGate** server over WiFI + **digipeater** + **Codec2 DV modem**. 
 
-Project also supports APRSDroid TNC2 mode and interoperable with other LoRa APRS trackers, which do NOT use AX25.
+NB! Project also supports APRSDroid TNC2 text APRS packet mode (configurable) and interoperable with other LoRa APRS trackers, which do NOT use AX25.
 
 - For project description, setup and more information, please, visit our Wiki at https://github.com/sh123/esp32_loraprs/wiki
 - For discussions, visit https://github.com/sh123/esp32_loraprs/discussions
