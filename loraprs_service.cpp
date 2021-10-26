@@ -46,11 +46,19 @@ void Service::setup(const Config &conf)
 #endif
   LOG_INFO(disableKiss_ ? "Using TNC2 text mode" : "Using TNC KISS and AX.25 mode");
 
+  // KISS extensions are disabled in TNC2 mode
+  if (disableKiss_) {
+    LOG_INFO("KISS extensions are disabled in TNC2 mode");
+    config_.KissEnableExtensions = false;
+  }
+
+  // APRS-IS loging callsign validity
   ownCallsign_ = AX25::Callsign(config_.AprsLogin);
   if (!ownCallsign_.IsValid()) {
     LOG_ERROR("Own callsign", config_.AprsLogin, "is not valid");
   }
 
+  // APRS-IS login command
   aprsLoginCommand_ = String("user ") + config_.AprsLogin + String(" pass ") + 
     config_.AprsPass + String(" vers ") + CfgLoraprsVersion;
   if (config_.EnableIsToRf && config_.AprsFilter.length() > 0) {
@@ -58,22 +66,26 @@ void Service::setup(const Config &conf)
   }
   aprsLoginCommand_ += String("\n");
 
-  // peripherals
+  // peripherals, LoRa
   setupLora(config_.LoraFreq, config_.LoraBw, config_.LoraSf, 
     config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraEnableCrc);
 
+  // peripherls, WiFi
   if (needsWifi()) {
     setupWifi(config_.WifiSsid, config_.WifiKey);
   }
-
+  
+  // peripherals, Bluetooth/BLE
   if (needsBt()) {
     setupBt(config_.BtName);
   }
 
+  // APRS-IS
   if (needsAprsis() && config_.EnablePersistentAprsConnection) {
     reconnectAprsis();
   }
 
+  // peripherals, PTT
   if (config_.PttEnable) {
     LOG_INFO("External PTT is enabled");
     pinMode(config_.PttPin, OUTPUT);
