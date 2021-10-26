@@ -78,7 +78,6 @@ void Service::setup(const Config &conf)
 
   // APRS-IS
   if (needsAprsis() && config_.EnablePersistentAprsConnection) {
-    LOG_INFO("Using persistent APRS-IS connection");
     reconnectAprsis();
   }
 
@@ -97,6 +96,15 @@ void Service::printConfig() {
   LOG_INFO("Built with arduino-LoRa library");
 #endif
   LOG_INFO(disableKiss_ ? "Using TNC2 text mode" : "Using TNC KISS and AX.25 mode");
+  LOG_INFO("UsbSerialEnable:", config_.UsbSerialEnable ? "yes" : "no");
+  if (!config_.IsClientMode) {
+    LOG_INFO("EnableSignalReport:", config_.EnableSignalReport ? "yes" : "no");
+    LOG_INFO("EnablePersistentAprsConnection:", config_.EnablePersistentAprsConnection ? "yes" : "no");
+    LOG_INFO("EnableRfToIs:", config_.EnableRfToIs ? "yes" : "no");
+    LOG_INFO("EnableIsToRf:", config_.EnableIsToRf ? "yes" : "no");
+    LOG_INFO("EnableRepeater:", config_.EnableRepeater ? "yes" : "no");
+    LOG_INFO("EnableBeacon:", config_.EnableBeacon ? "yes" : "no");
+  }
 }
 
 void Service::setupWifi(const String &wifiName, const String &wifiKey)
