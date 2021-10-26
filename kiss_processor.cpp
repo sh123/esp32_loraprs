@@ -221,12 +221,12 @@ bool Processor::receiveByteRaw(byte rxByte)
     }
     isRawIdle_ = false;
   }
-  onRigTx(rxByte);
   // NOTE, TNC2 uses \n as a packet delimiter
   if (rxByte == '\n') {
-    onRigTx('\0');
     onRigTxEnd();
     isRawIdle_ = true;
+  } else {
+    onRigTx(rxByte);
   }
   return true;
 }

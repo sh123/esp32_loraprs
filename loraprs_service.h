@@ -61,6 +61,7 @@ private:
   void sendToAprsis(const String &aprsMessage);
   bool sendAX25ToLora(const AX25::Payload &payload);
   void processIncomingRawPacketAsServer(const byte *packet, int packetLength);
+  void performFrequencyCorrection();
 
   inline bool needsAprsis() const { 
     return !config_.IsClientMode  // only in server mode

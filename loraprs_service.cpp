@@ -447,13 +447,29 @@ bool Service::sendAX25ToLora(const AX25::Payload &payload)
 }
 
 void Service::onRigPacket(void *packet, int packetLength)
-{  
+{
+  if (config_.EnableAutoFreqCorrection) {
+    performFrequencyCorrection();
+  }
+  if (config_.KissEnableExtensions) {
+#ifdef USE_RADIOLIB
+    sendSignalReportEvent(radio_->getRSSI(), radio_->getSNR());
+#else
+    sendSignalReportEvent(LoRa.packetRssi(), LoRa.packetSnr());
+#endif
+  }
+  if (!config_.IsClientMode) {
+    processIncomingRawPacketAsServer((const byte*)packet, packetLength);
+  }
+}
+
+void Service::performFrequencyCorrection() {
 #ifdef USE_RADIOLIB
   long frequencyErrorHz = radio_->getFrequencyError();
 #else
   long frequencyErrorHz = LoRa.packetFrequencyError();
 #endif
-  if (config_.EnableAutoFreqCorrection && abs(frequencyErrorHz) > config_.AutoFreqCorrectionDeltaHz) {
+  if (abs(frequencyErrorHz) > config_.AutoFreqCorrectionDeltaHz) {
     config_.LoraFreq -= frequencyErrorHz;
     LOG_INFO("Correcting frequency:", frequencyErrorHz);
 #ifdef USE_RADIOLIB
@@ -469,18 +485,6 @@ void Service::onRigPacket(void *packet, int packetLength)
       LoRa.receive();
     }
 #endif
-  }
-
-  if (config_.KissEnableExtensions) {
-#ifdef USE_RADIOLIB
-    sendSignalReportEvent(radio_->getRSSI(), radio_->getSNR());
-#else
-    sendSignalReportEvent(LoRa.packetRssi(), LoRa.packetSnr());
-#endif
-  }
-
-  if (!config_.IsClientMode) {
-    processIncomingRawPacketAsServer((const byte*)packet, packetLength);
   }
 }
 
