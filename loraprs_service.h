@@ -120,8 +120,7 @@ private:
   const int CfgConnRetryMs = 500;           // connection retry delay, e.g. wifi
   const int CfgPollDelayMs = 5;             // main loop delay
   const int CfgConnRetryMaxTimes = 10;      // number of connection retries
-  const int CfgMaxAX25PayloadSize = 512;    // maximum ax25 payload size
-  const int CfgMaxAprsInMessageSize = 255;  // maximum aprsis to rf message size
+  static const int CfgMaxPacketSize = 256;  // maximum packet size
 
   // csma parameters, overriden with KISS commands
   const long CfgCsmaPersistence = 100;  // 255 for real time, lower for higher traffic
@@ -145,10 +144,10 @@ private:
   long previousBeaconMs_;
 
   // peripherals
-  static byte rxBuf_[256];
+  static byte rxBuf_[CfgMaxPacketSize];
 #ifdef USE_RADIOLIB
   static bool interruptEnabled_;
-  CircularBuffer<uint8_t, 256> txQueue_;
+  CircularBuffer<uint8_t, CfgMaxPacketSize> txQueue_;
   static std::shared_ptr<MODULE_NAME> radio_;
 #endif
   BluetoothSerial serialBt_;

@@ -2,7 +2,7 @@
 
 namespace LoraPrs {
 
-byte Service::rxBuf_[256];
+byte Service::rxBuf_[CfgMaxPacketSize];
 
 #ifdef USE_RADIOLIB
 #pragma message("Using RadioLib")
@@ -409,7 +409,7 @@ void Service::onAprsisDataAvailable()
     if (c == '\r') continue;
     if (c == '\n') break;
     aprsisData += c;
-    if (aprsisData.length() >= CfgMaxAprsInMessageSize) {
+    if (aprsisData.length() >= CfgMaxPacketSize) {
       LOG_WARN("APRS-IS incoming message is too long, skipping tail");
       break;
     }
@@ -441,15 +441,12 @@ void Service::sendSignalReportEvent(int rssi, float snr)
 bool Service::sendAX25ToLora(const AX25::Payload &payload)
 {
   int bytesWritten;
-  byte buf[CfgMaxAX25PayloadSize];
+  byte buf[CfgMaxPacketSize];
 
   // TNC2 text mode
   if (config_.EnableTextPackets) {
     String textPayload = payload.ToString();
-    bytesWritten = textPayload.length();
-    if (bytesWritten > CfgMaxAX25PayloadSize) {
-      bytesWritten = CfgMaxAX25PayloadSize;
-    }
+    bytesWritten = textPayload.length() > CfgMaxPacketSize ? CfgMaxPacketSize : textPayload.length();
     textPayload.getBytes(buf, bytesWritten);
     buf[bytesWritten-1] = '\0';
 
@@ -528,8 +525,8 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
 
   // try to parse as text for clients, who submit plain text
   if (!payload.IsValid() && config_.EnableTextPackets) {
-    char buf[CfgMaxAX25PayloadSize];
-    int cpySize = packetLength > CfgMaxAX25PayloadSize ? CfgMaxAX25PayloadSize : packetLength;
+    char buf[CfgMaxPacketSize];
+    int cpySize = packetLength > CfgMaxPacketSize ? CfgMaxPacketSize : packetLength;
     memcpy(buf, packet, cpySize);
     buf[cpySize-1] = '\0';
     payload = AX25::Payload(String((char*)buf));
