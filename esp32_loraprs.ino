@@ -70,12 +70,11 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.EnableIsToRf = CFG_IS_TO_RF; // send data from aprsis to rf
   cfg.EnableRepeater = CFG_DIGIREPEAT; // digirepeat incoming packets
   cfg.EnableBeacon = CFG_BEACON;  // enable periodic AprsRawBeacon beacon to rf and aprsis if rf to aprsis is enabled
-  cfg.EnableTextPackets = CFG_TEXT_PACKETS; // enables text packets and disables AX25 binary frames for interoperability
-  
+  cfg.EnableTextPackets = CFG_TEXT_PACKETS; // enables text packets and disables KISS+AX25 binary frames for interoperability
+
   // kiss
   cfg.KissEnableExtensions = CFG_KISS_EXTENSIONS; // radio control and signal reports
   cfg.KissEnableTcpIp = CFG_KISS_TCP_IP;  // enable KISS ovr TCP/IP as a server
-  
 
   // external ptt control
   cfg.PttEnable = CFG_PTT_ENABLE;

@@ -78,10 +78,17 @@ protected:
 
 private:
   bool receiveByte(byte rxByte);
+  bool receiveByteRaw(byte rxByte);
+  bool receiveByteKiss(byte rxByte);
+
   void processData(byte rxByte);
   bool processCommand(byte rxByte);
 
+protected:
+  bool disableKiss_;
+
 private:
+  bool isRawIdle_;
   State state_;
   DataType dataType_;
   std::vector<byte> cmdBuffer_;

@@ -7,31 +7,41 @@ CircularBuffer<uint8_t, Processor::CfgRigToSerialQueueSize> Processor::rigToSeri
 CircularBuffer<uint8_t, Processor::CfgRigToSerialQueueSize> Processor::rigToSerialQueueIndex_;
 
 Processor::Processor()
-  : state_(State::GetStart)
+  : disableKiss_(false)
+  , isRawIdle_(true)
+  , state_(State::GetStart)
 {
 }
 
 void Processor::sendRigToSerial(Cmd cmd, const byte *packet, int packetLength) {
-  onSerialTx((byte)Marker::Fend);
-  onSerialTx((byte)cmd);
-
-  for (int i = 0; i < packetLength; i++) {
-    byte rxByte = packet[i];
-
-    if (rxByte == Marker::Fend) {
-      onSerialTx((byte)Marker::Fesc);
-      onSerialTx((byte)Marker::Tfend);
-    }
-    else if (rxByte == Marker::Fesc) {
-      onSerialTx((byte)Marker::Fesc);
-      onSerialTx((byte)Marker::Tfesc);
-    }
-    else {
+  if (disableKiss_) {
+    for (int i = 0; i < packetLength; i++) {
+      byte rxByte = packet[i];
       onSerialTx(rxByte);
     }
-  }
+    // FIXME, need to check if '\0' or '\n' should be added
+  } else {
+    onSerialTx((byte)Marker::Fend);
+    onSerialTx((byte)cmd);
 
-  onSerialTx((byte)Marker::Fend);
+    for (int i = 0; i < packetLength; i++) {
+      byte rxByte = packet[i];
+  
+      if (rxByte == Marker::Fend) {
+        onSerialTx((byte)Marker::Fesc);
+        onSerialTx((byte)Marker::Tfend);
+      }
+      else if (rxByte == Marker::Fesc) {
+        onSerialTx((byte)Marker::Fesc);
+        onSerialTx((byte)Marker::Tfesc);
+      }
+      else {
+        onSerialTx(rxByte);
+      }
+    }
+  
+    onSerialTx((byte)Marker::Fend);
+  }
 }
 
 void ICACHE_RAM_ATTR Processor::queueRigToSerialIsr(Cmd cmd, const byte *packet, int packetLength) {
@@ -49,26 +59,34 @@ void ICACHE_RAM_ATTR Processor::queueRigToSerialIsr(Cmd cmd, const byte *packet,
 
 void Processor::queueSerialToRig(Cmd cmd, const byte *packet, int packetLength) {
   bool result = 1;
-  result &= serialToRigQueue_.unshift(Marker::Fend);
-  result &= serialToRigQueue_.unshift(cmd);
-
-  for (int i = 0; i < packetLength; i++) {
-    byte rxByte = packet[i];
-
-    if (rxByte == Marker::Fend) {
-      result &= serialToRigQueue_.unshift(Marker::Fesc);
-      result &= serialToRigQueue_.unshift(Marker::Tfend);
-    }
-    else if (rxByte == Marker::Fesc) {
-      result &= serialToRigQueue_.unshift(Marker::Fesc);
-      result &= serialToRigQueue_.unshift(Marker::Tfesc);
-    }
-    else {
+  if (disableKiss_) {
+    for (int i = 0; i < packetLength; i++) {
+      byte rxByte = packet[i];
       result &= serialToRigQueue_.unshift(rxByte);
     }
+    // FIXME, need to check if '\0' or '\n' should be added
+  } else {
+    result &= serialToRigQueue_.unshift(Marker::Fend);
+    result &= serialToRigQueue_.unshift(cmd);
+  
+    for (int i = 0; i < packetLength; i++) {
+      byte rxByte = packet[i];
+  
+      if (rxByte == Marker::Fend) {
+        result &= serialToRigQueue_.unshift(Marker::Fesc);
+        result &= serialToRigQueue_.unshift(Marker::Tfend);
+      }
+      else if (rxByte == Marker::Fesc) {
+        result &= serialToRigQueue_.unshift(Marker::Fesc);
+        result &= serialToRigQueue_.unshift(Marker::Tfesc);
+      }
+      else {
+        result &= serialToRigQueue_.unshift(rxByte);
+      }
+    }
+  
+    result &= serialToRigQueue_.unshift(Marker::Fend);
   }
-
-  result &= serialToRigQueue_.unshift(Marker::Fend);
 
   if (!result) {
     LOG_WARN("Serial to rig queue overflow!");
@@ -187,8 +205,25 @@ void Processor::processData(byte rxByte) {
   }
 }
 
-bool Processor::receiveByte(byte rxByte) {
+bool Processor::receiveByteRaw(byte rxByte) 
+{
+  if (isRawIdle_) {
+    if (!onRigTxBegin()) {
+      return false;
+    }
+    isRawIdle_ = false;
+  }
+  onRigTx(rxByte);
+  // FIXME, need to check if '\n' is marker too
+  if (rxByte == '\0') {
+    onRigTxEnd();
+    isRawIdle_ = true;
+  }
+  return true;
+}
 
+bool Processor::receiveByteKiss(byte rxByte) 
+{
   switch (state_) {
     case State::GetStart:
       if (rxByte == Marker::Fend) {
@@ -235,6 +270,14 @@ bool Processor::receiveByte(byte rxByte) {
       break;
   }
   return true;
+}
+
+bool Processor::receiveByte(byte rxByte) {
+  
+  if (disableKiss_) {
+    return receiveByteRaw(rxByte);
+  }
+  return receiveByteKiss(rxByte);
 }
 
 } // kiss
