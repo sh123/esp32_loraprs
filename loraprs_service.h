@@ -10,7 +10,7 @@
 // different module then update loraprs_service.h and loraprs_service.cpp
 // search for SX1278 and replace with your module name
 #define USE_RADIOLIB
-
+#define HW_DJAPRS 2
 #ifdef USE_RADIOLIB
 #include <RadioLib.h>
 #include "module_name.h"
