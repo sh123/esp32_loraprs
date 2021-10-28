@@ -12,7 +12,7 @@ This project is amateur radio ESP32 based LoRa **KISS Bluetooth/BLE/USB/TCPIP** 
 Install via libraries:
 - Arduino ESP32 library: https://github.com/espressif/arduino-esp32
 - LoRa library
-  - RadioLib library (use github master version): https://github.com/jgromes/RadioLib
+  - RadioLib library (&#x26A0;use github master version): https://github.com/jgromes/RadioLib
   - or LoRa Arduino library: https://github.com/sandeepmistry/arduino-LoRa
 - Arduino Timer library: https://github.com/contrem/arduino-timer
 - CircularBuffer library: https://github.com/rlogiacco/CircularBuffer
