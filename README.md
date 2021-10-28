@@ -1,4 +1,4 @@
-# Introduction
+# ESP32 LoRa APRS Modem 
 ![Modes of operation](images/diagram.png)
 
 This project is amateur radio ESP32 based LoRa **KISS Bluetooth/BLE/USB/TCPIP** modem + LoRa **APRS-IS RX/TX iGate** server over WiFI + LoRa **APRS digipeater** + **Codec2 DV modem** (with Codec2 Talkie Android application). 
