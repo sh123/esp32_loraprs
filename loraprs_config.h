@@ -21,8 +21,8 @@ struct Config
   // lora hardware pinouts and isr
   byte LoraPinSs;       // lora ss pin
   byte LoraPinRst;      // lora rst pin
-  byte LoraPinDio0;     // lora dio0 pin
-  byte LoraPinDio1;     // lora dio1 pin
+  byte LoraPinA;        // lora dio0 pin (sx127x), dio1 (sx126x), check module docs
+  byte LoraPinB;        // lora dio1 pin (sx127x), busy (sx126x), check module docs
   bool LoraUseIsr;      // true to use interrupts, false for fallback polling, e.g. if Dio0 is not connected
   bool LoraUseCad;      // use carrier detect before transmitting
 

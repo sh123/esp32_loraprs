@@ -19,15 +19,9 @@
 // lora pinouts, CAD and ISR usage
 #define CFG_LORA_PIN_SS       SS
 #define CFG_LORA_PIN_RST      LORA_RST
-// check board config!!
-// SX127x - DIO0
-// SX126X - DIO1
-#define CFG_LORA_PIN_DIO0     LORA_IRQ
+#define CFG_LORA_PIN_A        LORA_IRQ    // sx127x - dio0, sx126x - dio1
 #ifdef USE_RADIOLIB
-// check board config!!
-// SX127X - DIO1 (if connected)
-// SX126X - BUSY
-#define CFG_LORA_PIN_DIO1     RADIOLIB_NC
+#define CFG_LORA_PIN_B        RADIOLIB_NC // sx127x - dio1, sx126x - busy
 #define CFG_LORA_USE_ISR      true        // always ON for RadioLib
 #else
 #define CFG_LORA_PIN_DIO1     LORA_IRQ    // not used in arduino-LoRa

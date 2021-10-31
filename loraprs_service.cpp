@@ -196,7 +196,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   isImplicitHeaderMode_ = sf == 6;
 
 #ifdef USE_RADIOLIB
-  radio_ = std::make_shared<MODULE_NAME>(new Module(config_.LoraPinSs, config_.LoraPinDio0, config_.LoraPinRst, config_.LoraPinDio1));
+  radio_ = std::make_shared<MODULE_NAME>(new Module(config_.LoraPinSs, config_.LoraPinA, config_.LoraPinRst, config_.LoraPinB));
   int state = radio_->begin((float)loraFreq / 1e6, (float)bw / 1e3, sf, cr, sync, pwr);
   if (state != ERR_NONE) {
     LOG_ERROR("Radio start error:", state);
