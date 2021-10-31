@@ -33,8 +33,9 @@ void initializeConfig(LoraPrs::Config &cfg) {
   // lora pinouts
   cfg.LoraPinSs = CFG_LORA_PIN_SS;
   cfg.LoraPinRst = CFG_LORA_PIN_RST;
-  cfg.LoraPinDio0 = CFG_LORA_PIN_DIO0;
-  cfg.LoraPinDio1 = CFG_LORA_PIN_DIO1; // valid for radiolib only
+  // For RadioLib DIO0 and DIO1 will depend on Module signature, check RadioLib documentation
+  cfg.LoraPinDio0 = CFG_LORA_PIN_DIO0; // depends on module type, might be DIO1 for SX126x!!
+  cfg.LoraPinDio1 = CFG_LORA_PIN_DIO1; // valid for radiolib only, depends on module type, might be BUSY for SX126x!!
   cfg.LoraUseIsr = CFG_LORA_USE_ISR;  // set to true for incoming packet ISR usage (stream mode, e.g. speech)
   cfg.LoraUseCad = CFG_LORA_USE_CAD;  // carrier detect
 
