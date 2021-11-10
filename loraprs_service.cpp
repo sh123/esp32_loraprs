@@ -203,10 +203,14 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   }
   radio_->setCRC(enableCrc);
   //radio_->forceLDRO(false);
-  //radio_->setRfSwitchPins(4, 5);
-
+  #if (MODULE_NAME == SX1268)
+  radio_->setRfSwitchPins(4, 5);
+  radio_->clearDio1Action();
+  radio_->setDio1Action(onLoraDataAvailableIsr);
+  #else
   radio_->clearDio0Action();
   radio_->setDio0Action(onLoraDataAvailableIsr);
+  #endif
 
   state = radio_->startReceive();
   if (state != ERR_NONE) {
@@ -321,7 +325,7 @@ void Service::loop()
 }
 
 bool Service::isLoraRxBusy() {
-#ifdef USE_RADIOLIB
+#if defined(USE_RADIOLIB) && !(MODULE_NAME == SX1268)
   return config_.LoraUseCad && (radio_->getModemStatus() & 0x01); // SX1278_STATUS_SIG_DETECT
 #else
   return false;
@@ -481,7 +485,11 @@ void Service::onRigPacket(void *packet, int packetLength)
 
 void Service::performFrequencyCorrection() {
 #ifdef USE_RADIOLIB
+  #if (MODULE_NAME == SX1268)
+  long frequencyErrorHz = 0;
+  #else
   long frequencyErrorHz = radio_->getFrequencyError();
+  #endif
 #else
   long frequencyErrorHz = LoRa.packetFrequencyError();
 #endif
@@ -537,7 +545,11 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
 #ifdef USE_RADIOLIB
     float snr = radio_->getSNR();
     int rssi = radio_->getRSSI();
+    #if (MODULE_NAME == SX1268)
+    long frequencyError = 0;
+    #else
     long frequencyError = radio_->getFrequencyError();
+    #endif
 #else
     float snr = LoRa.packetSnr();
     int rssi = LoRa.packetRssi();

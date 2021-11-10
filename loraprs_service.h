@@ -9,7 +9,7 @@
 // When using RadioLib, default module is SX1278, if you are using
 // different module then update MODULE_NAME in module_name.h
 #define USE_RADIOLIB
-
+#define HW_DJAPRS 2
 #ifdef USE_RADIOLIB
 #include <RadioLib.h>
 #include "module_name.h"
