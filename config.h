@@ -24,10 +24,9 @@
 #define CFG_LORA_PIN_A        LORA_IRQ    // (sx127x - dio0, sx126x/sx128x - dio1)
 #ifdef USE_RADIOLIB
 #define CFG_LORA_PIN_B        RADIOLIB_NC // (sx127x - dio1, sx126x/sx128x - busy)
-#define CFG_LORA_USE_ISR      true        // always ON for RadioLib
-#else
-#define CFG_LORA_USE_ISR      false       // set to true for ISR usage in arduino-LoRa
 #endif
+
+#define CFG_LORA_USE_ISR      true        // true - read incoming data in ISR, false - do not read in ISR
 #define CFG_LORA_USE_CAD      false       // set to true to utilize carrier detection
 
 // lora protocol parameters

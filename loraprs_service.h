@@ -9,7 +9,6 @@
 // When using RadioLib, default module is SX1278, if you are using
 // different module then update MODULE_NAME in module_name.h
 #define USE_RADIOLIB
-#define HW_DJAPRS 2
 #ifdef USE_RADIOLIB
 #include <RadioLib.h>
 #include "module_name.h"
@@ -50,7 +49,9 @@ private:
   bool isLoraRxBusy();
 #ifdef USE_RADIOLIB
   void onLoraDataAvailable();
+  static void processIncomingDataTask(void *param);
   static ICACHE_RAM_ATTR void onLoraDataAvailableIsr();
+  static ICACHE_RAM_ATTR void onLoraDataAvailableIsrNoRead();
 #else
   static ICACHE_RAM_ATTR void onLoraDataAvailableIsr(int packetSize);
   void loraReceive(int packetSize);
@@ -117,7 +118,7 @@ private:
 
   // processor config
   const int CfgConnRetryMs = 500;           // connection retry delay, e.g. wifi
-  const int CfgPollDelayMs = 5;             // main loop delay
+  static const int CfgPollDelayMs = 5;      // main loop delay
   const int CfgConnRetryMaxTimes = 10;      // number of connection retries
   static const int CfgMaxPacketSize = 256;  // maximum packet size
 
@@ -145,6 +146,7 @@ private:
   // peripherals
   static byte rxBuf_[CfgMaxPacketSize];
 #ifdef USE_RADIOLIB
+  static volatile bool loraDataAvailable_;
   static bool interruptEnabled_;
   CircularBuffer<uint8_t, CfgMaxPacketSize> txQueue_;
   static std::shared_ptr<MODULE_NAME> radio_;

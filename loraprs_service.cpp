@@ -6,6 +6,7 @@ byte Service::rxBuf_[CfgMaxPacketSize];
 
 #ifdef USE_RADIOLIB
 #pragma message("Using RadioLib")
+volatile bool Service::loraDataAvailable_ = false;
 bool Service::interruptEnabled_ = true;
 std::shared_ptr<MODULE_NAME> Service::radio_;
 #else
@@ -24,6 +25,7 @@ Service::Service()
 {
 #ifdef USE_RADIOLIB
   interruptEnabled_ = true;
+  loraDataAvailable_ = false;
 #endif
 }
 
@@ -65,6 +67,13 @@ void Service::setup(const Config &conf)
   // peripherals, LoRa
   setupLora(config_.LoraFreq, config_.LoraBw, config_.LoraSf, 
     config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraEnableCrc);
+
+#ifdef USE_RADIOLIB
+  if (!config_.LoraUseIsr) {
+    LOG_INFO("Reading data on separate task");
+    xTaskCreate(processIncomingDataTask, "processIncomingDataTask", 10000, NULL, 1, NULL);
+  }
+#endif
 
   // peripherls, WiFi
   if (needsWifi()) {
@@ -206,10 +215,18 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   #if (MODULE_NAME == SX1268)
   radio_->setRfSwitchPins(4, 5);
   radio_->clearDio1Action();
-  radio_->setDio1Action(onLoraDataAvailableIsr);
+  if (config_.LoraUseIsr) {
+    radio_->setDio1Action(onLoraDataAvailableIsr);
+  } else {
+    radio_->setDio1Action(onLoraDataAvailableIsrNoRead);
+  }
   #else
   radio_->clearDio0Action();
-  radio_->setDio0Action(onLoraDataAvailableIsr);
+  if (config_.LoraUseIsr) {
+    radio_->setDio0Action(onLoraDataAvailableIsr);
+  } else {
+    radio_->setDio0Action(onLoraDataAvailableIsrNoRead);
+  }
   #endif
 
   state = radio_->startReceive();
@@ -334,6 +351,12 @@ bool Service::isLoraRxBusy() {
 
 #ifdef USE_RADIOLIB
 
+ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsrNoRead() {
+  if (interruptEnabled_) {
+    loraDataAvailable_ = true;
+  }
+}
+
 ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr() {
   if (interruptEnabled_) {
     int packetSize = radio_->getPacketLength();
@@ -352,6 +375,33 @@ ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr() {
         LOG_ERROR("Start receive error: ", state);
       }
     }
+  }
+}
+
+void Service::processIncomingDataTask(void *param) {
+  LOG_INFO("Incoming data process task started");
+
+  while (true) {
+    if (loraDataAvailable_) {
+      int packetSize = radio_->getPacketLength();
+    
+      if (packetSize > 0) {
+    
+        int state = radio_->readData(rxBuf_, packetSize);
+        if (state == ERR_NONE) {
+          queueRigToSerialIsr(Cmd::Data, rxBuf_, packetSize);
+        } else {
+          LOG_ERROR("Read data error: ", state);
+        }
+    
+        state = radio_->startReceive();
+        if (state != ERR_NONE) {
+          LOG_ERROR("Start receive error: ", state);
+        }
+      }
+      loraDataAvailable_ = false;
+    }
+    delay(CfgPollDelayMs);
   }
 }
 
