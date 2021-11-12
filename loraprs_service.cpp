@@ -219,7 +219,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   
 #else // USE_RADIOLIB
 
-  LoRa.setPins(config_.LoraPinSs, config_.LoraPinRst, config_.LoraPinDio0);
+  LoRa.setPins(config_.LoraPinSs, config_.LoraPinRst, config_.LoraPinA);
 
   int retryCnt = 0;
   while (!LoRa.begin(loraFreq)) {
