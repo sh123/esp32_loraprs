@@ -2,11 +2,13 @@
 #define LORAPRS_CONFIG_H
 
 #include <Arduino.h>
+#include <DebugLog.h>
 
 namespace LoraPrs {
   
 struct Config
 {
+  DebugLogLevel LogLevel;    // log level
   bool IsClientMode;    // false - server mode, true - client mode (disables wifi and aprsis)
 
   // lora protocol parameters

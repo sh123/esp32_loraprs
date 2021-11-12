@@ -1,4 +1,5 @@
 #include <arduino-timer.h>
+#include <DebugLog.h>
 #include "WiFi.h"
 #include "loraprs_service.h"
 
@@ -18,6 +19,9 @@
 
 void initializeConfig(LoraPrs::Config &cfg) {
 
+  // log level
+  cfg.LogLevel = CFG_LOG_LEVEL;
+  
   // client/server mode switch
   cfg.IsClientMode = CFG_IS_CLIENT_MODE;
 

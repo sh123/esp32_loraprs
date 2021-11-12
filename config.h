@@ -2,6 +2,8 @@
 
 #define SERIAL_BAUD_RATE      115200
 
+#define CFG_LOG_LEVEL         DebugLogLevel::LVL_INFO
+
 // change pinouts if not defined through native board LORA_* definitions
 #ifndef LORA_RST
 #pragma message("LoRa pin definitions are not found, redefining...")

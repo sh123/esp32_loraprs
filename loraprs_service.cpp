@@ -37,7 +37,7 @@ void Service::setup(const Config &conf)
 
   // disable logging when USB is used for data transfer
   if (config_.UsbSerialEnable) {
-    LOG_SET_LEVEL(DebugLogLevel::LVL_NONE);
+    LOG_SET_LEVEL(config_.LogLevel);
   }
 
   printConfig();
@@ -599,6 +599,7 @@ bool Service::onRigTxBegin()
 
 void Service::onRigTx(byte b)
 {
+  LOG_TRACE((char)b);
 #ifdef USE_RADIOLIB
   txQueue_.push(b);
 #else
@@ -662,6 +663,7 @@ void Service::attachKissNetworkClient()
 
 void Service::onSerialTx(byte b)
 {
+  LOG_TRACE((char)b);
   if (config_.UsbSerialEnable) {
     Serial.write(b);
   } 
@@ -716,6 +718,7 @@ bool Service::onSerialRx(byte *b)
     return false;
   }
   *b = (byte)rxResult;
+  LOG_TRACE((char)rxResult);
   return true;
 }
 
