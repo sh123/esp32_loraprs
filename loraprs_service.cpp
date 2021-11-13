@@ -214,7 +214,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   }
   radio_->setCRC(enableCrc);
   //radio_->forceLDRO(false);
-  #ifdef USE_SX1268
+  #ifdef USE_SX126X
     #pragma message("Using SX1268")
     radio_->setRfSwitchPins(4, 5);
     radio_->clearDio1Action();
@@ -346,7 +346,7 @@ void Service::loop()
 }
 
 bool Service::isLoraRxBusy() {
-#if defined(USE_RADIOLIB) && !defined(USE_SX1268)
+#if defined(USE_RADIOLIB) && !defined(USE_SX126X)
   return config_.LoraUseCad && (radio_->getModemStatus() & 0x01); // SX1278_STATUS_SIG_DETECT
 #else
   return false;
@@ -539,7 +539,7 @@ void Service::onRigPacket(void *packet, int packetLength)
 
 void Service::performFrequencyCorrection() {
 #ifdef USE_RADIOLIB
-  #ifdef USE_SX1268
+  #ifdef USE_SX126X
   long frequencyErrorHz = 0;
   #else
   long frequencyErrorHz = radio_->getFrequencyError();
@@ -653,7 +653,7 @@ bool Service::onRigTxBegin()
 
 void Service::onRigTx(byte b)
 {
-  LOG_TRACE((char)b);
+  LOG_TRACE((char)b, b);
 #ifdef USE_RADIOLIB
   txQueue_.push(b);
 #else
@@ -717,7 +717,7 @@ void Service::attachKissNetworkClient()
 
 void Service::onSerialTx(byte b)
 {
-  LOG_TRACE((char)b);
+  LOG_TRACE((char)b, b);
   if (config_.UsbSerialEnable) {
     Serial.write(b);
   } 
@@ -772,7 +772,7 @@ bool Service::onSerialRx(byte *b)
     return false;
   }
   *b = (byte)rxResult;
-  LOG_TRACE((char)rxResult);
+  LOG_TRACE((char)rxResult, rxResult);
   return true;
 }
 
