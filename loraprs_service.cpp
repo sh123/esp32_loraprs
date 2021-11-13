@@ -215,7 +215,8 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   radio_->setCRC(enableCrc);
   //radio_->forceLDRO(false);
   #ifdef USE_SX126X
-    #pragma message("Using SX1268")
+    #pragma message("Using SX126X")
+    LOG_INFO("Using SX126X module");
     radio_->setRfSwitchPins(4, 5);
     radio_->clearDio1Action();
     if (config_.LoraUseIsr) {
@@ -224,7 +225,8 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
       radio_->setDio1Action(onLoraDataAvailableIsrNoRead);
     }
   #else
-    #pragma message("Using SX1278")
+    #pragma message("Using SX127X")
+    LOG_INFO("Using SX127X module");
     radio_->clearDio0Action();
     if (config_.LoraUseIsr) {
       radio_->setDio0Action(onLoraDataAvailableIsr);
@@ -653,7 +655,7 @@ bool Service::onRigTxBegin()
 
 void Service::onRigTx(byte b)
 {
-  LOG_TRACE((char)b, b);
+  LOG_TRACE((char)b, String(b, HEX));
 #ifdef USE_RADIOLIB
   txQueue_.push(b);
 #else
@@ -717,7 +719,7 @@ void Service::attachKissNetworkClient()
 
 void Service::onSerialTx(byte b)
 {
-  LOG_TRACE((char)b, b);
+  LOG_TRACE((char)b, String(b, HEX));
   if (config_.UsbSerialEnable) {
     Serial.write(b);
   } 
@@ -772,7 +774,7 @@ bool Service::onSerialRx(byte *b)
     return false;
   }
   *b = (byte)rxResult;
-  LOG_TRACE((char)rxResult, rxResult);
+  LOG_TRACE((char)rxResult, String(rxResult, HEX));
   return true;
 }
 
