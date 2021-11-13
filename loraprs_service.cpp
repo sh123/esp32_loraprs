@@ -212,21 +212,23 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   }
   radio_->setCRC(enableCrc);
   //radio_->forceLDRO(false);
-  #if (MODULE_NAME == SX1268)
-  radio_->setRfSwitchPins(4, 5);
-  radio_->clearDio1Action();
-  if (config_.LoraUseIsr) {
-    radio_->setDio1Action(onLoraDataAvailableIsr);
-  } else {
-    radio_->setDio1Action(onLoraDataAvailableIsrNoRead);
-  }
+  #ifdef USE_SX1268
+    #pragma message("Using SX1268")
+    radio_->setRfSwitchPins(4, 5);
+    radio_->clearDio1Action();
+    if (config_.LoraUseIsr) {
+      radio_->setDio1Action(onLoraDataAvailableIsr);
+    } else {
+      radio_->setDio1Action(onLoraDataAvailableIsrNoRead);
+    }
   #else
-  radio_->clearDio0Action();
-  if (config_.LoraUseIsr) {
-    radio_->setDio0Action(onLoraDataAvailableIsr);
-  } else {
-    radio_->setDio0Action(onLoraDataAvailableIsrNoRead);
-  }
+    #pragma message("Using SX1278")
+    radio_->clearDio0Action();
+    if (config_.LoraUseIsr) {
+      radio_->setDio0Action(onLoraDataAvailableIsr);
+    } else {
+      radio_->setDio0Action(onLoraDataAvailableIsrNoRead);
+    }
   #endif
 
   state = radio_->startReceive();
@@ -342,7 +344,7 @@ void Service::loop()
 }
 
 bool Service::isLoraRxBusy() {
-#if defined(USE_RADIOLIB) && !(MODULE_NAME == SX1268)
+#if defined(USE_RADIOLIB) && !defined(USE_SX1268)
   return config_.LoraUseCad && (radio_->getModemStatus() & 0x01); // SX1278_STATUS_SIG_DETECT
 #else
   return false;
@@ -535,7 +537,7 @@ void Service::onRigPacket(void *packet, int packetLength)
 
 void Service::performFrequencyCorrection() {
 #ifdef USE_RADIOLIB
-  #if (MODULE_NAME == SX1268)
+  #ifdef USE_SX1268
   long frequencyErrorHz = 0;
   #else
   long frequencyErrorHz = radio_->getFrequencyError();
