@@ -39,6 +39,8 @@ void Service::setup(const Config &conf)
 
   // disable logging when USB is used for data transfer
   if (config_.UsbSerialEnable) {
+    LOG_SET_LEVEL(DebugLogLevel::LVL_NONE);
+  } else {
     LOG_SET_LEVEL(config_.LogLevel);
   }
 
