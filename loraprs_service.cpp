@@ -217,7 +217,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   #ifdef USE_SX126X
     #pragma message("Using SX126X")
     LOG_INFO("Using SX126X module");
-    radio_->setRfSwitchPins(4, 5);
+    radio_->setRfSwitchPins(config_.LoraPinSwitchRx, config_.LoraPinSwitchTx);
     radio_->clearDio1Action();
     if (config_.LoraUseIsr) {
       radio_->setDio1Action(onLoraDataAvailableIsr);

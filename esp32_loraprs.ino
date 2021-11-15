@@ -1,6 +1,7 @@
 #include <arduino-timer.h>
 #include <DebugLog.h>
 #include "WiFi.h"
+
 #include "loraprs_service.h"
 
 #if __has_include("/tmp/esp32_loraprs_config.h")
@@ -17,6 +18,10 @@
 #pragma message("Configured for server mode")
 #endif
 
+/*
+ * Initialize config from config.h options.
+ * Enables future use of EEPROM or allows user to dynamically modify config at run time.
+ */
 void initializeConfig(LoraPrs::Config &cfg) {
 
   // log level
@@ -39,6 +44,8 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.LoraPinRst = CFG_LORA_PIN_RST;
   cfg.LoraPinA = CFG_LORA_PIN_A; // (sx127x - dio0, sx126x/sx128x - dio1)
   cfg.LoraPinB = CFG_LORA_PIN_B; // (sx127x - dio1, sx126x/sx128x - busy)
+  cfg.LoraPinSwitchRx = CFG_LORA_PIN_RXEN;  // (sx127x - unused, sx126x - RXEN pin number)
+  cfg.LoraPinSwitchTx = CFG_LORA_PIN_TXEN;  // (sx127x - unused, sx126x - TXEN pin number)
   cfg.LoraUseIsr = CFG_LORA_USE_ISR;  // set to true for incoming packet ISR usage (stream mode, e.g. speech)
   cfg.LoraUseCad = CFG_LORA_USE_CAD;  // carrier detect
 

@@ -1,7 +1,19 @@
+// comment out for arduino-Lora usage
+#define USE_RADIOLIB
+
+// Uncomment for SX126X module usage
+//#define USE_SX126X
+
+// Check your module name at https://github.com/jgromes/RadioLib/wiki/Modules
+#ifdef USE_SX126X
+#define MODULE_NAME   SX1268
+#else
+#define MODULE_NAME   SX1278
+#endif
+
+// generic options
 #define LED_TOGGLE_PERIOD     1000
-
 #define SERIAL_BAUD_RATE      115200
-
 #define CFG_LOG_LEVEL         DebugLogLevel::LVL_INFO
 
 // change pinouts if not defined through native board LORA_* definitions
@@ -11,25 +23,32 @@
 #define LORA_IRQ              14
 #endif
 
+// redefine LED if not defined in Arduino to have module heartbeat indication
 #ifndef BUILTIN_LED
 #pragma message("BUILDIN_LED is not found, defining as 2")
 #define BUILTIN_LED           2
 #endif
 
+// select between client mode and APRS-IS gate mode
 #define CFG_IS_CLIENT_MODE    true        // false - server mode (APRS-IS gate mode)
 
-// lora pinouts, CAD and ISR usage
+// lora generic pinouts
 #define CFG_LORA_PIN_SS       SS
 #define CFG_LORA_PIN_RST      LORA_RST
 #define CFG_LORA_PIN_A        LORA_IRQ    // (sx127x - dio0, sx126x/sx128x - dio1)
-#ifdef USE_RADIOLIB
 #define CFG_LORA_PIN_B        RADIOLIB_NC // (sx127x - dio1, sx126x/sx128x - busy)
+
+// lora pinouts, SX126X RXEN/TXEN usage
+#ifdef USE_SX126X
+#define CFG_LORA_PIN_RXEN     4           // (sx127x - unused, sx126x - RXEN pin number)
+#define CFG_LORA_PIN_TXEN     5           // (sx127x - unused, sx126x - TXEN pin number)
 #endif
 
+// CAD and ISR usage selection
 #define CFG_LORA_USE_ISR      true        // true - read incoming data in ISR, false - do not read in ISR
 #define CFG_LORA_USE_CAD      false       // set to true to utilize carrier detection
 
-// lora protocol parameters
+// lora protocol default parameters
 #define CFG_LORA_FREQ         433.775E6
 #define CFG_LORA_BW           125e3
 #define CFG_LORA_SF           12
@@ -38,7 +57,7 @@
 #define CFG_LORA_ENABLE_CRC   true        // set to false for speech data
 
 // wifi client and AP options
-#define CFG_WIFI_ENABLE_AP    false       // run as wifi access point, for CFG_KISS_TCP_IP mode
+#define CFG_WIFI_ENABLE_AP    false       // run as wifi access point (for CFG_KISS_TCP_IP mode)
 #define CFG_WIFI_SSID         "<ssid>"    // connect to SSID or run as this SSID in AP mode
 #define CFG_WIFI_KEY          "<key>"     // wifi key
 
