@@ -45,8 +45,13 @@
 #endif
 
 // CAD and ISR usage selection
-#define CFG_LORA_USE_ISR      true        // true - read incoming data in ISR, false - do not read in ISR
+#ifdef USE_SX126X
+#define CFG_LORA_USE_ISR      false       // true - read incoming data in ISR, false - do not read in ISR
 #define CFG_LORA_USE_CAD      false       // set to true to utilize carrier detection
+#else
+#define CFG_LORA_USE_ISR      true        // true - read incoming data in ISR, false - do not read in ISR
+#define CFG_LORA_USE_CAD      true        // set to true to utilize carrier detection
+#endif
 
 // lora protocol default parameters
 #define CFG_LORA_FREQ         433.775E6
