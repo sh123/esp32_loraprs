@@ -348,10 +348,14 @@ void Service::loop()
 }
 
 bool Service::isLoraRxBusy() {
-#if defined(USE_RADIOLIB) && !defined(USE_SX126X)
+#ifdef USE_RADIOLIB
+  #ifdef USE_SX126X
+  return config_.LoraUseCad && loraDataAvailable_;
+  #else
   return config_.LoraUseCad && (radio_->getModemStatus() & 0x01); // SX1278_STATUS_SIG_DETECT
+  #endif
 #else
-  return loraDataAvailable_;
+  return false;
 #endif
 }
 

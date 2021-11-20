@@ -46,8 +46,8 @@
 
 // CAD and ISR usage selection
 #ifdef USE_SX126X
-#define CFG_LORA_USE_ISR      false       // true - read incoming data in ISR, false - do not read in ISR
-#define CFG_LORA_USE_CAD      false       // set to true to utilize carrier detection
+#define CFG_LORA_USE_ISR      false       // reading in ISR does not work on sx126x
+#define CFG_LORA_USE_CAD      true        // do not transmit if channel is busy
 #else
 #define CFG_LORA_USE_ISR      true        // true - read incoming data in ISR, false - do not read in ISR
 #define CFG_LORA_USE_CAD      true        // set to true to utilize carrier detection
