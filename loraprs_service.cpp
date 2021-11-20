@@ -351,7 +351,7 @@ bool Service::isLoraRxBusy() {
 #if defined(USE_RADIOLIB) && !defined(USE_SX126X)
   return config_.LoraUseCad && (radio_->getModemStatus() & 0x01); // SX1278_STATUS_SIG_DETECT
 #else
-  return false;
+  return loraDataAvailable_;
 #endif
 }
 
