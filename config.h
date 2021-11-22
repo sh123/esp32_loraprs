@@ -56,7 +56,7 @@
 // lora protocol default parameters (they need to match between devices!!!)
 #define CFG_LORA_FREQ         433.775e6   // frequency in MHz
 #define CFG_LORA_BW           125e3       // bandwidth (from 7.8 kHz up to 500 kHz)
-#define CFG_LORA_SF           12          // spreading factor (7 - 12)
+#define CFG_LORA_SF           12          // spreading factor (6 - 12), 6 requires implicit header mode
 #define CFG_LORA_CR           7           // coding rate (5 - 8)
 #define CFG_LORA_CRC          1           // 0 - disabled, 1 - 1 byte, 2 - 2 bytes
 #define CFG_LORA_EXPLICIT     true        // header mode, true - explicit, false - implicit
