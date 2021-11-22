@@ -68,7 +68,7 @@ void Service::setup(const Config &conf)
 
   // peripherals, LoRa
   setupLora(config_.LoraFreq, config_.LoraBw, config_.LoraSf, 
-    config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraEnableCrc);
+    config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraCrc, config_.LoraExplicit);
 
 #ifdef USE_RADIOLIB
   if (!config_.LoraUseIsr) {
@@ -193,18 +193,20 @@ bool Service::reconnectAprsis()
   return true;
 }
 
-void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, bool enableCrc)
+void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit)
 {
+  isImplicitHeaderMode_ = !isExplicit;
+  isImplicitHeaderMode_ = sf == 6;      // must be implicit for SF6
+  
   LOG_INFO("Initializing LoRa");
   LOG_INFO("Frequency:", loraFreq, "Hz");
   LOG_INFO("Bandwidth:", bw, "Hz");
   LOG_INFO("Spreading:", sf);
   LOG_INFO("Coding rate:", cr);
   LOG_INFO("Power:", pwr, "dBm");
-  LOG_INFO("Sync:", "0x" + String(sync, 16));
-  LOG_INFO("CRC:", enableCrc ? "enabled" : "disabled");
-  
-  isImplicitHeaderMode_ = sf == 6;
+  LOG_INFO("Sync:", "0x" + String(sync, HEX));
+  LOG_INFO("CRC:", crcBytes);
+  LOG_INFO("Header:", isImplicitHeaderMode_ ? "implicit" : "explicit");
 
 #ifdef USE_RADIOLIB
   radio_ = std::make_shared<MODULE_NAME>(new Module(config_.LoraPinSs, config_.LoraPinA, config_.LoraPinRst, config_.LoraPinB));
@@ -212,8 +214,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   if (state != ERR_NONE) {
     LOG_ERROR("Radio start error:", state);
   }
-  radio_->setCRC(enableCrc);
-  //radio_->forceLDRO(false);
+  radio_->setCRC(crcBytes);
   #ifdef USE_SX126X
     #pragma message("Using SX126X")
     LOG_INFO("Using SX126X module");
@@ -235,6 +236,12 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
     }
   #endif
 
+  if (isImplicitHeaderMode_) {
+    radio_->implicitHeader(0xff);
+  } else {
+    radio_->explicitHeader();
+  }
+  
   state = radio_->startReceive();
   if (state != ERR_NONE) {
     LOG_ERROR("Receive start error:", state);
@@ -818,10 +825,10 @@ void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
     config_.LoraCodingRate = be16toh(setHardware->cr);
     config_.LoraPower = be16toh(setHardware->pwr);
     config_.LoraSync = be16toh(setHardware->sync);
-    config_.LoraEnableCrc = setHardware->crc;
+    int crcType = setHardware->crc ? config_.LoraCrc : 0;
 
     setupLora(config_.LoraFreq, config_.LoraBw, config_.LoraSf, 
-      config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraEnableCrc);
+      config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, crcType, config_.LoraExplicit);
   } else {
     LOG_ERROR("Radio control command of wrong size");
   }

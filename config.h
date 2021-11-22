@@ -53,13 +53,15 @@
 #define CFG_LORA_USE_CAD      true        // set to true to utilize carrier detection
 #endif
 
-// lora protocol default parameters
-#define CFG_LORA_FREQ         433.775E6
-#define CFG_LORA_BW           125e3
-#define CFG_LORA_SF           12
-#define CFG_LORA_CR           7
-#define CFG_LORA_PWR          20
-#define CFG_LORA_ENABLE_CRC   true        // set to false for speech data
+// lora protocol default parameters (they need to match between devices!!!)
+#define CFG_LORA_FREQ         433.775e6   // frequency in MHz
+#define CFG_LORA_BW           125e3       // bandwidth (from 7.8 kHz up to 500 kHz)
+#define CFG_LORA_SF           12          // spreading factor (7 - 12)
+#define CFG_LORA_CR           7           // coding rate (5 - 8)
+#define CFG_LORA_CRC          1           // 0 - disabled, 1 - 1 byte, 2 - 2 bytes
+#define CFG_LORA_EXPLICIT     true        // header mode, true - explicit, false - implicit
+#define CFG_LORA_SYNC         0x34        // sync word (0x12 - private, 0x34 - public)
+#define CFG_LORA_PWR          20          // output power in dBm
 
 // wifi client and AP options
 #define CFG_WIFI_ENABLE_AP    false       // run as wifi access point (for CFG_KISS_TCP_IP mode)

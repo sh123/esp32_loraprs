@@ -30,14 +30,15 @@ void initializeConfig(LoraPrs::Config &cfg) {
   // client/server mode switch
   cfg.IsClientMode = CFG_IS_CLIENT_MODE;
 
-  // lora parameters
+  // lora parameters, mus match on devices
   cfg.LoraFreq = CFG_LORA_FREQ;
   cfg.LoraBw = CFG_LORA_BW;
   cfg.LoraSf = CFG_LORA_SF;
   cfg.LoraCodingRate = CFG_LORA_CR;
-  cfg.LoraSync = 0x34;
+  cfg.LoraSync = CFG_LORA_SYNC;
+  cfg.LoraCrc = CFG_LORA_CRC; // set to 0 to disable
+  cfg.LoraExplicit = CFG_LORA_EXPLICIT;
   cfg.LoraPower = CFG_LORA_PWR;
-  cfg.LoraEnableCrc = CFG_LORA_ENABLE_CRC; // set to false for speech streaming data
 
   // lora pinouts
   cfg.LoraPinSs = CFG_LORA_PIN_SS;

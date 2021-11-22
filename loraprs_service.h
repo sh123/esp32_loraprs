@@ -41,7 +41,7 @@ private:
   void printConfig();
 
   void setupWifi(const String &wifiName, const String &wifiKey);
-  void setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, bool enableCrc);
+  void setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit);
   void setupBt(const String &btName);
 
   void reconnectWifi() const;

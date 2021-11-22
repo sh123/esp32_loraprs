@@ -17,8 +17,9 @@ struct Config
   int LoraSf;           // lora spreading factor, e.g. 12
   int LoraCodingRate;   // lora coding rate, e.g. 7
   int LoraPower;        // lora power level in dbm, 20
-  int LoraSync;         // lora sync word/packet id, 0x3f
-  bool LoraEnableCrc;   // lora crc check enabled
+  int LoraSync;         // lora sync word/packet id, 0x34
+  int LoraCrc;          // lora crc mode, 0 - disabled, 1 - 1 byte, 2 - 2 bytes
+  bool LoraExplicit;    // lora header mode, true - explicit, false - implicit
 
   // lora hardware pinouts and isr
   byte LoraPinSs;       // lora ss pin
