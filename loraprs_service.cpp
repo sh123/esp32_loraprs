@@ -197,7 +197,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
 {
   isImplicitHeaderMode_ = !isExplicit;
   isImplicitHeaderMode_ = sf == 6;      // must be implicit for SF6
-  
+        
   LOG_INFO("Initializing LoRa");
   LOG_INFO("Frequency:", loraFreq, "Hz");
   LOG_INFO("Bandwidth:", bw, "Hz");
@@ -207,6 +207,29 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   LOG_INFO("Sync:", "0x" + String(sync, HEX));
   LOG_INFO("CRC:", crcBytes);
   LOG_INFO("Header:", isImplicitHeaderMode_ ? "implicit" : "explicit");
+  LOG_INFO("Speed:", (int)(sf * (4.0 / cr) / (pow(2.0, sf) / bw)), "bps");
+  float snrLimit = -7;
+  switch (sf) {
+    case 7:
+        snrLimit = -7.5;
+        break;
+    case 8:
+        snrLimit = -10.0;
+        break;
+    case 9:
+        snrLimit = -12.6;
+        break;
+    case 10:
+        snrLimit = -15.0;
+        break;
+    case 11:
+        snrLimit = -17.5;
+        break;
+    case 12:
+        snrLimit = -20.0;
+        break;
+  }
+  LOG_INFO("Min level:", -174 + 10 * log10(bw) + 6 + snrLimit, "dBm");
 
 #ifdef USE_RADIOLIB
   radio_ = std::make_shared<MODULE_NAME>(new Module(config_.LoraPinSs, config_.LoraPinA, config_.LoraPinRst, config_.LoraPinB));
