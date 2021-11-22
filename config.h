@@ -64,7 +64,7 @@
 #define CFG_LORA_CR           7           // coding rate (5 - 8)
 #define CFG_LORA_CRC          1           // 0 - disabled, 1 - 1 byte, 2 - 2 bytes
 #define CFG_LORA_EXPLICIT     true        // header mode, true - explicit, false - implicit
-#define CFG_LORA_SYNC         0x34        // sync word (0x12 - private, 0x34 - public)
+#define CFG_LORA_SYNC         0x12        // sync word (0x12 - private, 0x34 - public LoRaWAN)
 #define CFG_LORA_PWR          20          // output power in dBm
 
 // wifi client and AP options
