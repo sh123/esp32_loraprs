@@ -36,7 +36,11 @@
 #define CFG_LORA_PIN_SS       SS
 #define CFG_LORA_PIN_RST      LORA_RST
 #define CFG_LORA_PIN_A        LORA_IRQ    // (sx127x - dio0, sx126x/sx128x - dio1)
+#ifdef USE_SX126X
+#define CFG_LORA_PIN_B        14          // (sx127x - dio1, sx126x/sx128x - busy)
+#else
 #define CFG_LORA_PIN_B        RADIOLIB_NC // (sx127x - dio1, sx126x/sx128x - busy)
+#endif
 
 // lora pinouts, SX126X RXEN/TXEN usage
 #ifdef USE_SX126X
