@@ -105,5 +105,5 @@
 // PTT control
 #define CFG_PTT_ENABLE        false   // enable external ptt (relay) control (for amplifier)
 #define CFG_PTT_PIN           12      // PTT pin
-#define CFG_PTT_TX_DELAY_MS   50      // time between relay swited on and transmission
-#define CFG_PTT_TX_TAIL_MS    10      // time between stop transmission and relay off
+#define CFG_PTT_TX_DELAY_MS   50      // delay between relay switching ON and transmission startup
+#define CFG_PTT_TX_TAIL_MS    10      // delay between stopping transmission and relay switching OFF
