@@ -10,7 +10,14 @@ This project is amateur radio ESP32 based LoRa **KISS Bluetooth/BLE/USB/TCPIP** 
 
 &#x26A0; Project also supports **APRSDroid TNC2 text APRS packet mode** (configurable), which makes it interoperable with other LoRa APRS trackers without AX25 support.
 
-Supported modules: **SX126X** (tested with E22-400M30S) and **SX127X** (tested with RA-01) with possibility to use other modules supported by RadioLib.
+Supported module types: **SX126X**, **SX127X**
+
+Models, which are used by users and known to work
+- **SX126X**
+  - E22-400M30S
+  - E220-400M30S (LLCC68) BW125 SF from 7 to 9 (chip limitations)
+- **SX127X** 
+  - RA-01
 
 # Dependencies
 Install via libraries:
