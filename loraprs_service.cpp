@@ -651,10 +651,12 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
       String("dBm, ") +
       String("snr: ") +
       String(snr) +
-      String("dB, ") +
-      String("err: ") +
+      String("dB");
+    if (frequencyError != 0) {
+      signalReport += String(", err: ") +
       String(frequencyError) +
       String("Hz");
+    }
     
     String textPayload = payload.ToString(config_.EnableSignalReport ? signalReport : String());
     LOG_INFO(textPayload);
