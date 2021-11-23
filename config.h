@@ -14,6 +14,10 @@
 // generic options
 #define LED_TOGGLE_PERIOD     1000
 #define SERIAL_BAUD_RATE      115200
+
+// USB serial logging
+// set to DebugLogLevel::LVL_TRACE for packet logging
+// set to DebugLogLevel::LVL_NONE to disable logging
 #define CFG_LOG_LEVEL         DebugLogLevel::LVL_INFO
 
 // change pinouts if not defined through native board LORA_* definitions
