@@ -20,6 +20,9 @@
 // set to DebugLogLevel::LVL_NONE to disable logging
 #define CFG_LOG_LEVEL         DebugLogLevel::LVL_INFO
 
+// select between client mode and APRS-IS gate mode
+#define CFG_IS_CLIENT_MODE    true        // false - server mode (APRS-IS gate mode)
+
 // change pinouts if not defined through native board LORA_* definitions
 #ifndef LORA_RST
 #pragma message("LoRa pin definitions are not found, redefining...")
@@ -27,16 +30,7 @@
 #define LORA_IRQ              14
 #endif
 
-// redefine LED if not defined in Arduino to have module heartbeat indication
-#ifndef BUILTIN_LED
-#pragma message("BUILDIN_LED is not found, defining as 2")
-#define BUILTIN_LED           2
-#endif
-
-// select between client mode and APRS-IS gate mode
-#define CFG_IS_CLIENT_MODE    true        // false - server mode (APRS-IS gate mode)
-
-// lora generic pinouts
+// LoRa pinouts
 #define CFG_LORA_PIN_SS       SS
 #define CFG_LORA_PIN_RST      LORA_RST
 #define CFG_LORA_PIN_A        LORA_IRQ    // (sx127x - dio0, sx126x/sx128x - dio1)
@@ -48,6 +42,12 @@
 #define CFG_LORA_PIN_B        RADIOLIB_NC // (sx127x - dio1, sx126x/sx128x - busy)
 #endif
 
+// Redefine LED if not defined in Arduino to have module heartbeat indication
+#ifndef BUILTIN_LED
+#pragma message("BUILDIN_LED is not found, defining as 2")
+#define BUILTIN_LED           2
+#endif
+
 // CAD and ISR usage selection
 #ifdef USE_SX126X
 #define CFG_LORA_USE_ISR      false       // reading in ISR does not work on sx126x
@@ -57,7 +57,7 @@
 #define CFG_LORA_USE_CAD      true        // set to true to utilize carrier detection
 #endif
 
-// lora protocol default parameters (they need to match between devices!!!)
+// LoRa protocol default parameters (they need to match between devices!!!)
 #define CFG_LORA_FREQ         433.775e6   // frequency in MHz
 #define CFG_LORA_BW           125e3       // bandwidth (from 7.8 kHz up to 500 kHz)
 #define CFG_LORA_SF           12          // spreading factor (6 - 12), 6 requires implicit header mode
@@ -67,17 +67,17 @@
 #define CFG_LORA_SYNC         0x12        // sync word (0x12 - private used by other trackers, 0x34 - public used by LoRaWAN)
 #define CFG_LORA_PWR          20          // output power in dBm
 
-// wifi client and AP options
+// WiFi client and AP options
 #define CFG_WIFI_ENABLE_AP    false       // run as wifi access point (for CFG_KISS_TCP_IP mode)
 #define CFG_WIFI_SSID         "<ssid>"    // connect to SSID or run as this SSID in AP mode
 #define CFG_WIFI_KEY          "<key>"     // wifi key
 
-// bluetooth
+// Bluetooth
 #define CFG_BT_NAME           "loraprs"   // set to empty to disable Bluetooth
 #define CFG_BT_USE_BLE        false       // set to true to use bluetooth low energy (for ios devices)
 
-// USB
-#define CFG_USB_SERIAL_ENABLE false       // true - enable communication over USB Serial (disables USB logging)
+// USB serial
+#define CFG_USB_SERIAL_ENABLE false       // true - enable KISS communication over USB Serial (e.g. with APRSDroid over USB-OTG), disables USB logging
 
 // KISS protocol options
 #define CFG_KISS_EXTENSIONS   false   // true - enable modem control from application with KISS commands and signal reports
@@ -98,7 +98,7 @@
 #define CFG_BEACON            false   // enable perdiodic beacon from CFG_APRS_RAW_BKN
 #define CFG_TEXT_PACKETS      false   // enable aprs text packets instead of binary for interoperability with other projects (disables KISS + AX.25!)
 
-// frequency correction for narrow band bandwidths
+// Frequency correction for narrow band bandwidths
 #define CFG_FREQ_CORR         false   // true - correct own frequency based on received packet
 #define CFG_FREQ_CORR_DELTA   1000    // correct when frequency difference is larger than this value
 
