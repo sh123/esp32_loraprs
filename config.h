@@ -64,7 +64,7 @@
 #define CFG_LORA_CR           7           // coding rate (5 - 8)
 #define CFG_LORA_CRC          1           // 0 - disabled, 1 - 1 byte, 2 - 2 bytes
 #define CFG_LORA_EXPLICIT     true        // header mode, true - explicit, false - implicit
-#define CFG_LORA_SYNC         0x12        // sync word (0x12 - private, 0x34 - public LoRaWAN)
+#define CFG_LORA_SYNC         0x12        // sync word (0x12 - private used by other trackers, 0x34 - public used by LoRaWAN)
 #define CFG_LORA_PWR          20          // output power in dBm
 
 // wifi client and AP options
@@ -87,9 +87,10 @@
 #define CFG_APRS_LOGIN        "NOCALL-10"
 #define CFG_APRS_PASS         "12345"
 #define CFG_APRS_FILTER	      "r/35.60/139.80/25"
-#define CFG_APRS_RAW_BKN      "NOCALL-10>APZMDM,WIDE1-1:!0000.00N/00000.00E#LoRA 433.775MHz/BW125/SF12/CR7/0x34"
+#define CFG_APRS_RAW_BKN      "NOCALL-10>APZMDM,WIDE1-1:!0000.00N/00000.00E#LoRA 433.775MHz/BW125/SF12/CR7/0x12"
 
 // APRS-IS gateway options, valid in when CFG_IS_CLIENT_MODE = false
+#define CFG_SIGNAL_REPORT     true    // include signal report into the comment when sending to APRS-IS
 #define CFG_PERSISTENT_APRS   true    // keep tcp/ip connection open (lot of traffic), otherwise connect on new packet (very rare traffic)
 #define CFG_DIGIREPEAT        false   // digirepeat incoming packets
 #define CFG_RF_TO_IS          true    // forward packets from radio to internet

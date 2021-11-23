@@ -76,7 +76,7 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.AutoFreqCorrectionDeltaHz = CFG_FREQ_CORR_DELTA;
 
   // configuration flags and features
-  cfg.EnableSignalReport = true;  // signal report will be added to the comment sent to aprsis
+  cfg.EnableSignalReport = CFG_SIGNAL_REPORT;  // signal report will be added to the comment sent to aprsis
   cfg.EnablePersistentAprsConnection = CFG_PERSISTENT_APRS; // keep aprsis connection open, otherwise connect on new data only
   cfg.EnableRfToIs = CFG_RF_TO_IS;  // send data from rf to aprsis
   cfg.EnableIsToRf = CFG_IS_TO_RF; // send data from aprsis to rf
