@@ -12,8 +12,8 @@
 #endif
 
 // generic options
-#define LED_TOGGLE_PERIOD     1000
-#define SERIAL_BAUD_RATE      115200
+#define LED_TOGGLE_PERIOD     1000    // heartbeat LED period
+#define SERIAL_BAUD_RATE      115200  // USB serial baud rate
 
 // USB serial logging
 // set to DebugLogLevel::LVL_TRACE for packet logging
@@ -42,14 +42,10 @@
 #define CFG_LORA_PIN_A        LORA_IRQ    // (sx127x - dio0, sx126x/sx128x - dio1)
 #ifdef USE_SX126X
 #define CFG_LORA_PIN_B        14          // (sx127x - dio1, sx126x/sx128x - busy)
-#else
-#define CFG_LORA_PIN_B        RADIOLIB_NC // (sx127x - dio1, sx126x/sx128x - busy)
-#endif
-
-// lora pinouts, SX126X RXEN/TXEN usage
-#ifdef USE_SX126X
 #define CFG_LORA_PIN_RXEN     4           // (sx127x - unused, sx126x - RXEN pin number)
 #define CFG_LORA_PIN_TXEN     5           // (sx127x - unused, sx126x - TXEN pin number)
+#else
+#define CFG_LORA_PIN_B        RADIOLIB_NC // (sx127x - dio1, sx126x/sx128x - busy)
 #endif
 
 // CAD and ISR usage selection
