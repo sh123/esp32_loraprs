@@ -73,30 +73,30 @@
 #define CFG_WIFI_KEY          "<key>"     // wifi key
 
 // bluetooth
-#define CFG_BT_NAME           "loraprs"
-#define CFG_BT_USE_BLE        false // set to true to use bluetooth low energy (for ios devices)
+#define CFG_BT_NAME           "loraprs"   // set to empty to disable Bluetooth
+#define CFG_BT_USE_BLE        false       // set to true to use bluetooth low energy (for ios devices)
 
 // USB
-#define CFG_USB_SERIAL_ENABLE false       // true - enable communication over USB Serial
+#define CFG_USB_SERIAL_ENABLE false       // true - enable communication over USB Serial (disables USB logging)
 
 // KISS protocol options
-#define CFG_KISS_EXTENSIONS   false   // true - enable modem control from application with KISS commands
+#define CFG_KISS_EXTENSIONS   false   // true - enable modem control from application with KISS commands and signal reports
 #define CFG_KISS_TCP_IP       false   // true - run as KISS TCP/IP server, no bluetooth operations performed
 
 // APRS-IS options, valid in when CFG_IS_CLIENT_MODE = false
 #define CFG_APRS_LOGIN        "NOCALL-10"
 #define CFG_APRS_PASS         "12345"
-#define CFG_APRS_FILTER	      "r/35.60/139.80/25"
+#define CFG_APRS_FILTER	      "r/35.60/139.80/25"  // multiple are space separated, see http://www.aprs-is.net/javAPRSFilter.aspx
 #define CFG_APRS_RAW_BKN      "NOCALL-10>APZMDM,WIDE1-1:!0000.00N/00000.00E#LoRA 433.775MHz/BW125/SF12/CR7/0x12"
 
-// APRS-IS gateway options, valid in when CFG_IS_CLIENT_MODE = false
+// APRS-IS gateway options, valid when CFG_IS_CLIENT_MODE = false
 #define CFG_SIGNAL_REPORT     true    // include signal report into the comment when sending to APRS-IS
 #define CFG_PERSISTENT_APRS   true    // keep tcp/ip connection open (lot of traffic), otherwise connect on new packet (very rare traffic)
 #define CFG_DIGIREPEAT        false   // digirepeat incoming packets
 #define CFG_RF_TO_IS          true    // forward packets from radio to internet
 #define CFG_IS_TO_RF          false   // forward packets from internet to radio basedon CFG_APRS_FILTER
-#define CFG_BEACON            false   // enable perdiodc beacon from CFG_APRS_RAW_BKN 
-#define CFG_TEXT_PACKETS      false   // enable aprs text packets instead of binary for interoperability with other projects (disables KISS + AX.25)
+#define CFG_BEACON            false   // enable perdiodic beacon from CFG_APRS_RAW_BKN
+#define CFG_TEXT_PACKETS      false   // enable aprs text packets instead of binary for interoperability with other projects (disables KISS + AX.25!)
 
 // frequency correction for narrow band bandwidths
 #define CFG_FREQ_CORR         false   // true - correct own frequency based on received packet
