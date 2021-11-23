@@ -635,7 +635,7 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
 #ifdef USE_RADIOLIB
     float snr = radio_->getSNR();
     int rssi = radio_->getRSSI();
-    #if (MODULE_NAME == SX1268)
+    #ifdef USE_SX126X
     long frequencyError = 0;
     #else
     long frequencyError = radio_->getFrequencyError();
