@@ -14,10 +14,11 @@ Supported module types: **SX126X**, **SX127X** and other modules supported by Ra
 
 Modules, which are used by users and known to work
 - **SX126X**
-  - E22-400M30S
+  - E22-400M30S (SX1268)
   - E220-400M30S (LLCC68) BW125 SF from 7 to 9 (chip limitations)
 - **SX127X** 
-  - RA-01
+  - RA-01 (SX1278)
+  - RA-02 (SX1276)
 
 # Dependencies
 Install via libraries:
