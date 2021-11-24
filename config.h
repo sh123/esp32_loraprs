@@ -94,7 +94,7 @@
 #define CFG_PERSISTENT_APRS   true    // keep tcp/ip connection open (lot of traffic), otherwise connect on new packet (very rare traffic)
 #define CFG_DIGIREPEAT        false   // digirepeat incoming packets
 #define CFG_RF_TO_IS          true    // forward packets from radio to internet
-#define CFG_IS_TO_RF          false   // forward packets from internet to radio basedon CFG_APRS_FILTER
+#define CFG_IS_TO_RF          false   // forward packets from internet to radio based on CFG_APRS_FILTER
 #define CFG_BEACON            false   // enable perdiodic beacon from CFG_APRS_RAW_BKN
 #define CFG_TEXT_PACKETS      false   // enable aprs text packets instead of binary for interoperability with other projects (disables KISS + AX.25!)
 
