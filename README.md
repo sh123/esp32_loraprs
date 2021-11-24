@@ -19,6 +19,7 @@ Modules, which are used by users and known to work
 - **SX127X** 
   - RA-01 (SX1278)
   - RA-02 (SX1276)
+  - TTGO (SX1276)
 
 # Dependencies
 Install via libraries:
