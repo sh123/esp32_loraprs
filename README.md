@@ -13,7 +13,7 @@ This project is amateur radio ESP32 based LoRa **KISS Bluetooth/BLE/USB/TCPIP** 
 Supported module types: **SX126X**, **SX127X** and other modules supported by RadioLib.
 
 Modules, which are used by users and known to work
-- **SX126X**
+- **SX126X** (suggested, 1W modules will provide decent coverage for APRS, stable frequency suitable for < 125 kHz BW)
   - E22-400M30S (SX1268)
   - E220-400M30S (LLCC68) BW125 SF from 7 to 9 (chip limitations)
 - **SX127X** 
