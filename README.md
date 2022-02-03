@@ -14,7 +14,7 @@ Supported module types: **SX126X**, **SX127X** and other modules supported by Ra
 
 Modules, which are used by users and known to work
 - **SX126X** (**suggested**, 1W modules will provide decent coverage for APRS, stable frequency suitable for < 125 kHz BW at 433 MHz, 5V from USB power bank is enough to power it, have additional LNA)
-  - **E22-400M30S (SX1268)**
+  - &#128077; **E22-400M30S (SX1268)**
   - E220-400M30S (LLCC68) BW125 SF from 7 to 9 (chip limitations)
 - **SX127X** (low power)
   - RA-01 (SX1278)
