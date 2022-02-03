@@ -16,7 +16,7 @@ Modules, which are used by users and known to work
 - **SX126X** (**suggested**, 1W modules will provide decent coverage for APRS, stable frequency suitable for < 125 kHz BW at 433 MHz, 5V from USB power bank is enough to power it, have additional LNA)
   - &#128077; **E22-400M30S (SX1268)**
   - E220-400M30S (LLCC68) BW125 SF from 7 to 9 (chip limitations)
-- **SX127X** (low power)
+- **SX127X** (low power, 50-100mW, temperature frequency drift, problematic for narrow band)
   - RA-01 (SX1278)
   - RA-02 (SX1276)
   - TTGO T-Beam (SX1276)
