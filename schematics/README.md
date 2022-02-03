@@ -5,4 +5,4 @@ This is small universal ESP32 devkit LoRa prototyping board for RA-01 or E22-400
 
 To be used with firmware from https://github.com/sh123/esp32_loraprs or others.
 
-![Board](images/board.png)
+![Board](../images/board.png)
