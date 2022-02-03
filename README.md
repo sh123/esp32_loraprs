@@ -31,3 +31,4 @@ Install via libraries:
 - CircularBuffer library: https://github.com/rlogiacco/CircularBuffer
 - DebugLog library: https://github.com/hideakitai/DebugLog
 
+![Modes of operation](images/device.png)
