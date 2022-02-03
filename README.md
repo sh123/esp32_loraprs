@@ -32,6 +32,6 @@ Install via libraries:
 - DebugLog library: https://github.com/hideakitai/DebugLog
 
 # Development board
-Development board schematics and case model is available at https://github.com/sh123/lora_tracker
+Development board schematics, case and antenna models are available under `cad` and `schematics`.
 
 ![Modes of operation](images/device.png)
