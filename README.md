@@ -31,4 +31,7 @@ Install via libraries:
 - CircularBuffer library: https://github.com/rlogiacco/CircularBuffer
 - DebugLog library: https://github.com/hideakitai/DebugLog
 
+# Development board
+Development board schematics and case model is available at https://github.com/sh123/lora_tracker
+
 ![Modes of operation](images/device.png)
