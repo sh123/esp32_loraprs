@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name gs)(type KiCad)(uri ${KIPRJMOD}/lora_tracker.pretty)(options "")(descr ""))
+)
