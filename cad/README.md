@@ -8,4 +8,4 @@
 
 **Tracker case**:
 - `aprs_tracker_e22_v2` - base for tracker case.
-- `aprs_tracker_e22_cover_v22` - upper cover for tracker case.
+- `aprs_tracker_e22_cover_v2` - upper cover for tracker case.
