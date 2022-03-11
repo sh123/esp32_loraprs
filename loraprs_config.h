@@ -12,7 +12,8 @@ struct Config
   bool IsClientMode;    // false - server mode, true - client mode (disables wifi and aprsis)
 
   // lora protocol parameters
-  long LoraFreq;        // lora frequency, e.g. 433.775e6
+  long LoraFreqRx;      // lora RX frequency, e.g. 433.775e6
+  long LoraFreqTx;      // lora TX frequency, e.g. 433.775e6
   long LoraBw;          // lora bandwidth, e.g. 125e3
   int LoraSf;           // lora spreading factor, e.g. 12
   int LoraCodingRate;   // lora coding rate, e.g. 7

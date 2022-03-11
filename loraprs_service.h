@@ -42,6 +42,7 @@ private:
 
   void setupWifi(const String &wifiName, const String &wifiKey);
   void setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit);
+  void setupFreq(long loraFreq) const;
   void setupBt(const String &btName);
 
   void reconnectWifi() const;
@@ -83,6 +84,9 @@ private:
   inline bool needsBeacon() const { 
     return !config_.IsClientMode  // beaconing only in apris gate / server mode
     && config_.EnableBeacon;  // beacon must be explicitly enabled
+  }
+  inline bool splitEnabled() const {
+    return config_.LoraFreqRx != config_.LoraFreqTx;
   }
 
 protected:

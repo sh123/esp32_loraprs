@@ -67,7 +67,7 @@ void Service::setup(const Config &conf)
   aprsLoginCommand_ += String("\n");
 
   // peripherals, LoRa
-  setupLora(config_.LoraFreq, config_.LoraBw, config_.LoraSf, 
+  setupLora(config_.LoraFreqRx, config_.LoraBw, config_.LoraSf, 
     config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraCrc, config_.LoraExplicit);
 
 #ifdef USE_RADIOLIB
@@ -584,22 +584,26 @@ void Service::performFrequencyCorrection() {
   long frequencyErrorHz = LoRa.packetFrequencyError();
 #endif
   if (abs(frequencyErrorHz) > config_.AutoFreqCorrectionDeltaHz) {
-    config_.LoraFreq -= frequencyErrorHz;
+    config_.LoraFreqRx -= frequencyErrorHz;
     LOG_INFO("Correcting frequency:", frequencyErrorHz);
-#ifdef USE_RADIOLIB
-    radio_->setFrequency((float)config_.LoraFreq / 1e6);
+    setupFreq(config_.LoraFreqRx);
+  }
+}
+
+void Service::setupFreq(long loraFreq) const {
+  #ifdef USE_RADIOLIB
+    radio_->setFrequency((float)config_.LoraFreqRx / 1e6);
     int state = radio_->startReceive();
     if (state != ERR_NONE) {
       LOG_ERROR("Start receive error:", state);
     }
 #else
-    LoRa.setFrequency(config_.LoraFreq);
+    LoRa.setFrequency(config_.LoraFreqRx);
     if (config_.LoraUseIsr) {
       LoRa.idle();
       LoRa.receive();
     }
 #endif
-  }
 }
 
 #ifndef USE_RADIOLIB
@@ -676,6 +680,9 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
 
 bool Service::onRigTxBegin()
 {
+  if (splitEnabled()) {
+    setupFreq(config_.LoraFreqTx);
+  }
   if (config_.PttEnable) {
     digitalWrite(config_.PttPin, HIGH);
     delay(config_.PttTxDelayMs);
@@ -727,6 +734,9 @@ void Service::onRigTxEnd()
 #ifndef USE_RADIOLIB
     LoRa.endPacket(true);
 #endif
+  }
+  if (splitEnabled()) {
+    setupFreq(config_.LoraFreqRx);
   }
 }
 
@@ -844,7 +854,7 @@ void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
     LOG_INFO("Setting new radio parameters");
     const struct SetHardware * setHardware = reinterpret_cast<const struct SetHardware*>(rawCommand.data());
     
-    config_.LoraFreq = be32toh(setHardware->freq);
+    config_.LoraFreqRx = be32toh(setHardware->freq);
     config_.LoraBw = be32toh(setHardware->bw);
     config_.LoraSf = be16toh(setHardware->sf);
     config_.LoraCodingRate = be16toh(setHardware->cr);
@@ -852,7 +862,7 @@ void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
     config_.LoraSync = be16toh(setHardware->sync);
     int crcType = setHardware->crc ? config_.LoraCrc : 0;
 
-    setupLora(config_.LoraFreq, config_.LoraBw, config_.LoraSf, 
+    setupLora(config_.LoraFreqRx, config_.LoraBw, config_.LoraSf, 
       config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, crcType, config_.LoraExplicit);
   } else {
     LOG_ERROR("Radio control command of wrong size");

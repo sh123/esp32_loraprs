@@ -30,8 +30,9 @@ void initializeConfig(LoraPrs::Config &cfg) {
   // client/server mode switch
   cfg.IsClientMode = CFG_IS_CLIENT_MODE;
 
-  // lora parameters, mus match on devices
-  cfg.LoraFreq = CFG_LORA_FREQ;
+  // lora parameters, must match on devices
+  cfg.LoraFreqRx = CFG_LORA_FREQ_RX;
+  cfg.LoraFreqTx = CFG_LORA_FREQ_TX;
   cfg.LoraBw = CFG_LORA_BW;
   cfg.LoraSf = CFG_LORA_SF;
   cfg.LoraCodingRate = CFG_LORA_CR;
