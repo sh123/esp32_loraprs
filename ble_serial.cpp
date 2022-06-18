@@ -102,6 +102,9 @@ bool BLESerial::begin(const char* localName)
 
     // Start advertising
     pServer->getAdvertising()->addServiceUUID(pService->getUUID()); 
+    pServer->getAdvertising()->setScanResponse(true);
+    pServer->getAdvertising()->setMinPreferred(0x06);
+    pServer->getAdvertising()->setMaxPreferred(0x12);
     pServer->getAdvertising()->start();
     LOG_INFO("Waiting a client connection to notify...");
     return true;
