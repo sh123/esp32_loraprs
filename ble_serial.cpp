@@ -20,13 +20,13 @@ class BLESerialServerCallbacks: public BLEServerCallbacks {
     
     void onConnect(BLEServer* pServer) {
         // do anything needed on connection
-        LOG_INFO("Client connected");
+        LOG_INFO("BLE client connected");
         delay(1000); // wait for connection to complete or messages can be lost
     };
 
     void onDisconnect(BLEServer* pServer) {
         pServer->startAdvertising(); // restart advertising
-        LOG_INFO("Client disconnected, started advertising");
+        LOG_INFO("BLE client disconnected, started advertising");
     }
 };
 
@@ -99,7 +99,7 @@ bool BLESerial::begin(const char* localName)
 
     // Start the service
     pService->start();
-    LOG_INFO("starting service");
+    LOG_INFO("BLE starting service");
 
     // Start advertising
     pServer->getAdvertising()->addServiceUUID(pService->getUUID()); 
@@ -107,7 +107,7 @@ bool BLESerial::begin(const char* localName)
     pServer->getAdvertising()->setMinPreferred(0x06);
     pServer->getAdvertising()->setMaxPreferred(0x12);
     pServer->getAdvertising()->start();
-    LOG_INFO("Waiting a client connection to notify...");
+    LOG_INFO("BLE is waiting a client connection to notify...");
     return true;
 }
 
