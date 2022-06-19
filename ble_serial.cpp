@@ -20,12 +20,13 @@ class BLESerialServerCallbacks: public BLEServerCallbacks {
     
     void onConnect(BLEServer* pServer) {
         // do anything needed on connection
+        LOG_INFO("Client connected");
         delay(1000); // wait for connection to complete or messages can be lost
     };
 
     void onDisconnect(BLEServer* pServer) {
         pServer->startAdvertising(); // restart advertising
-        LOG_INFO("Started advertising");
+        LOG_INFO("Client disconnected, started advertising");
     }
 };
 
