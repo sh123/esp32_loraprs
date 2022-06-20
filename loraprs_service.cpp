@@ -137,7 +137,7 @@ void Service::setupWifi(const String &wifiName, const String &wifiKey)
     int retryCnt = 0;
     while (WiFi.status() != WL_CONNECTED) {
       delay(CfgConnRetryMs);
-      LOG_WARN("WIFI retrying", retryCnt);
+      LOG_INFO("WIFI retrying", retryCnt);
       if (retryCnt++ >= CfgConnRetryMaxTimes) {
         LOG_ERROR("WIFI connect failed");
         return;
