@@ -197,6 +197,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
 {
   isImplicitHeaderMode_ = !isExplicit;
   isImplicitHeaderMode_ = sf == 6;      // must be implicit for SF6
+  int loraSpeed = (int)(sf * (4.0 / cr) / (pow(2.0, sf) / bw));
         
   LOG_INFO("Initializing LoRa");
   LOG_INFO("Frequency:", loraFreq, "Hz");
@@ -207,7 +208,8 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   LOG_INFO("Sync:", "0x" + String(sync, HEX));
   LOG_INFO("CRC:", crcBytes);
   LOG_INFO("Header:", isImplicitHeaderMode_ ? "implicit" : "explicit");
-  LOG_INFO("Speed:", (int)(sf * (4.0 / cr) / (pow(2.0, sf) / bw)), "bps");
+  LOG_INFO("Speed:", loraSpeed, "bps");
+  LOG_INFO("Time on air:", (double)loraSpeed / 37.0, "sec");
   float snrLimit = -7;
   switch (sf) {
     case 7:
