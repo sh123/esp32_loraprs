@@ -209,7 +209,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   LOG_INFO("CRC:", crcBytes);
   LOG_INFO("Header:", isImplicitHeaderMode_ ? "implicit" : "explicit");
   LOG_INFO("Speed:", loraSpeed, "bps");
-  LOG_INFO("Time on air:", (double)loraSpeed / 37.0, "sec");
+  LOG_INFO("Time on air:", 37.0 / (double)loraSpeed / 8.0, "sec");
   float snrLimit = -7;
   switch (sf) {
     case 7:
