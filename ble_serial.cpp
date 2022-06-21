@@ -88,7 +88,7 @@ bool BLESerial::begin(const char* localName)
 
     BLECharacteristic * pRxCharacteristic = pService->createCharacteristic(
                                                 CHARACTERISTIC_UUID_RX,
-                                                BLECharacteristic::PROPERTY_WRITE
+                                                BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_WRITE_NR
                                             );
     if (pRxCharacteristic == nullptr)
         return false; 
@@ -99,7 +99,7 @@ bool BLESerial::begin(const char* localName)
 
     // Start the service
     pService->start();
-    LOG_INFO("BLE starting service");
+    LOG_INFO("BLE started service");
 
     // Start advertising
     pServer->getAdvertising()->addServiceUUID(pService->getUUID()); 
@@ -107,7 +107,7 @@ bool BLESerial::begin(const char* localName)
     pServer->getAdvertising()->setMinPreferred(0x06);
     pServer->getAdvertising()->setMaxPreferred(0x12);
     pServer->getAdvertising()->start();
-    LOG_INFO("BLE is waiting a client connection to notify...");
+    LOG_INFO("BLE started advertising and waiting for client connection...");
     return true;
 }
 
