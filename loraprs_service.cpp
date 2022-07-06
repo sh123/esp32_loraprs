@@ -652,8 +652,7 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
     int rssi = LoRa.packetRssi();
     long frequencyError = LoRa.packetFrequencyError();
 #endif
-    String signalReport = String(" ") +
-      String("rssi: ") +
+    String signalReport = String("rssi: ") +
       String(snr < 0 ? rssi + snr : rssi) +
       String("dBm, ") +
       String("snr: ") +

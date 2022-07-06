@@ -102,7 +102,10 @@ String Payload::ToString(const String &customComment) const
 
   txt += String(":") + info_;
 
-  if (info_.startsWith("=") || info_.startsWith("!")) {
+  if (info_.startsWith("=") || 
+      info_.startsWith("!") || 
+      info_.startsWith("`")) {
+        
     txt += customComment;
   }
 
