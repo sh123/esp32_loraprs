@@ -664,7 +664,7 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
       String(frequencyError) +
       String("Hz");
     }
-    
+
     String textPayload = payload.ToString(config_.EnableSignalReport ? signalReport : String());
     LOG_INFO(textPayload);
 
