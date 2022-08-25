@@ -119,7 +119,8 @@ bool Processor::processRigToSerial()
     int rxPacketSize = rigToSerialQueueIndex_.pop();
     byte buf[rxPacketSize];
 
-    for (int i = 0, j = 0; i < rxPacketSize; i++) {
+    int readCnt = rxPacketSize;
+    for (int i = 0, j = 0; i < readCnt; i++) {
       byte rxByte = rigToSerialQueue_.pop();
       if (disableKiss_) {
         // filter out properietary identifier
