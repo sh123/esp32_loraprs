@@ -17,10 +17,6 @@ void Processor::sendRigToSerial(Cmd cmd, const byte *packet, int packetLength) {
   if (disableKiss_) {
     for (int i = 0; i < packetLength; i++) {
       byte rxByte = packet[i];
-      // filter out properietary identifier
-      if (i == 0 && rxByte == '<') continue;
-      if (i == 1 && rxByte == 0xff) continue;
-      if (i == 2 && rxByte == 0x01) continue;
       // TNC2 splits on \n
       if (rxByte == '\0') {
         onSerialTx('\n');
@@ -123,8 +119,19 @@ bool Processor::processRigToSerial()
     int rxPacketSize = rigToSerialQueueIndex_.pop();
     byte buf[rxPacketSize];
 
-    for (int i = 0; i < rxPacketSize; i++) {
-      buf[i] = rigToSerialQueue_.pop();
+    for (int i = 0, j = 0; i < rxPacketSize; i++) {
+      byte rxByte = rigToSerialQueue_.pop();
+      if (disableKiss_) {
+        // filter out properietary identifier
+        if ((i == 0 && rxByte == '<') ||
+            (i == 1 && rxByte == 0xff) ||
+            (i == 2 && rxByte == 0x01)) 
+           {
+            rxPacketSize--;
+            continue;
+           }
+      }
+      buf[j++] = rxByte;
     }
     sendRigToSerial(Cmd::Data, buf, rxPacketSize);
     onRigPacket(&buf, rxPacketSize);
