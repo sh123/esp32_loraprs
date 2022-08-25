@@ -17,6 +17,10 @@ void Processor::sendRigToSerial(Cmd cmd, const byte *packet, int packetLength) {
   if (disableKiss_) {
     for (int i = 0; i < packetLength; i++) {
       byte rxByte = packet[i];
+      // filter out properietary identifier
+      if (i == 0 && rxByte == '<') continue;
+      if (i == 1 && rxByte == 0xff) continue;
+      if (i == 2 && rxByte == 0x01) continue;
       // TNC2 splits on \n
       if (rxByte == '\0') {
         onSerialTx('\n');
@@ -68,6 +72,10 @@ void ICACHE_RAM_ATTR Processor::queueRigToSerialIsr(Cmd cmd, const byte *packet,
 void Processor::queueSerialToRig(Cmd cmd, const byte *packet, int packetLength) {
   bool result = 1;
   if (disableKiss_) {
+    // inject proprietary identifier
+    result &= serialToRigQueue_.unshift('<');
+    result &= serialToRigQueue_.unshift(0xff);
+    result &= serialToRigQueue_.unshift(0x01);
     // TNC2, send as is, receiveByteRaw will deal with it
     for (int i = 0; i < packetLength; i++) {
       byte rxByte = packet[i];
