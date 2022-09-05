@@ -237,7 +237,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
 #ifdef USE_RADIOLIB
   radio_ = std::make_shared<MODULE_NAME>(new Module(config_.LoraPinSs, config_.LoraPinA, config_.LoraPinRst, config_.LoraPinB));
   int state = radio_->begin((float)loraFreq / 1e6, (float)bw / 1e3, sf, cr, sync, pwr);
-  if (state != ERR_NONE) {
+  if (state != RADIOLIB_ERR_NONE) {
     LOG_ERROR("Radio start error:", state);
   }
   radio_->setCRC(crcBytes);
@@ -269,7 +269,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   }
   
   state = radio_->startReceive();
-  if (state != ERR_NONE) {
+  if (state != RADIOLIB_ERR_NONE) {
     LOG_ERROR("Receive start error:", state);
   }
   
@@ -365,7 +365,7 @@ void Service::loop()
       if (allTxProcessed) {
 #ifdef USE_RADIOLIB
         int state = radio_->startReceive();
-        if (state != ERR_NONE) {
+        if (state != RADIOLIB_ERR_NONE) {
           LOG_ERROR("Start receive error: ", state);
         }
 #else
@@ -407,14 +407,14 @@ ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr() {
     if (packetSize > 0) {
       
       int state = radio_->readData(rxBuf_, packetSize);
-      if (state == ERR_NONE) {
+      if (state == RADIOLIB_ERR_NONE) {
         queueRigToSerialIsr(Cmd::Data, rxBuf_, packetSize);
       } else {
         LOG_ERROR("Read data error: ", state);
       }
       
       state = radio_->startReceive();
-      if (state != ERR_NONE) {
+      if (state != RADIOLIB_ERR_NONE) {
         LOG_ERROR("Start receive error: ", state);
       }
     }
@@ -431,14 +431,14 @@ void Service::processIncomingDataTask(void *param) {
       if (packetSize > 0) {
     
         int state = radio_->readData(rxBuf_, packetSize);
-        if (state == ERR_NONE) {
+        if (state == RADIOLIB_ERR_NONE) {
           queueRigToSerialIsr(Cmd::Data, rxBuf_, packetSize);
         } else {
           LOG_ERROR("Read data error: ", state);
         }
     
         state = radio_->startReceive();
-        if (state != ERR_NONE) {
+        if (state != RADIOLIB_ERR_NONE) {
           LOG_ERROR("Start receive error: ", state);
         }
       }
@@ -597,7 +597,7 @@ void Service::setupFreq(long loraFreq) const {
   #ifdef USE_RADIOLIB
     radio_->setFrequency((float)config_.LoraFreqRx / 1e6);
     int state = radio_->startReceive();
-    if (state != ERR_NONE) {
+    if (state != RADIOLIB_ERR_NONE) {
       LOG_ERROR("Start receive error:", state);
     }
 #else
@@ -720,7 +720,7 @@ void Service::onRigTxEnd()
 
   interruptEnabled_ = false;
   int state = radio_->transmit(txBuf, txPacketSize);
-  if (state != ERR_NONE) {
+  if (state != RADIOLIB_ERR_NONE) {
     LOG_ERROR("TX error: ", state);
   }
   interruptEnabled_ = true;
