@@ -292,7 +292,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   LoRa.setCodingRate4(cr);
   LoRa.setTxPower(pwr);
 
-  if (enableCrc) {
+  if (config_.crcBytes > 0) {
     LoRa.enableCrc();
   }
 
