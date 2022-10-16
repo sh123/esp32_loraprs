@@ -124,7 +124,7 @@ private:
 
   // processor config
   const int CfgConnRetryMs = 500;           // connection retry delay, e.g. wifi
-  static const int CfgPollDelayMs = 5;      // main loop delay
+  static const int CfgPollDelayMs = 20;      // main loop delay
   const int CfgConnRetryMaxTimes = 10;      // number of connection retries
   static const int CfgMaxPacketSize = 256;  // maximum packet size
 
@@ -152,6 +152,7 @@ private:
   // peripherals
   static byte rxBuf_[CfgMaxPacketSize];
 #ifdef USE_RADIOLIB
+  static TaskHandle_t rxTaskHandle_;
   static volatile bool loraDataAvailable_;
   static bool interruptEnabled_;
   CircularBuffer<uint8_t, CfgMaxPacketSize> txQueue_;

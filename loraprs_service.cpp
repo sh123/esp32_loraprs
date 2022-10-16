@@ -6,6 +6,7 @@ byte Service::rxBuf_[CfgMaxPacketSize];
 
 #ifdef USE_RADIOLIB
 #pragma message("Using RadioLib")
+TaskHandle_t Service::rxTaskHandle_;
 volatile bool Service::loraDataAvailable_ = false;
 bool Service::interruptEnabled_ = true;
 std::shared_ptr<MODULE_NAME> Service::radio_;
@@ -73,7 +74,7 @@ void Service::setup(const Config &conf)
 #ifdef USE_RADIOLIB
   if (!config_.LoraUseIsr) {
     LOG_INFO("Reading data on separate task");
-    xTaskCreate(processIncomingDataTask, "processIncomingDataTask", 10000, NULL, 1, NULL);
+    xTaskCreate(processIncomingDataTask, "processIncomingDataTask", 10000, NULL, 1, &rxTaskHandle_);
   }
 #endif
 
@@ -395,8 +396,13 @@ bool Service::isLoraRxBusy() {
 #ifdef USE_RADIOLIB
 
 ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsrNoRead() {
+  BaseType_t xHigherPriorityTaskWoken;
+  uint32_t interruptStatusBits = 0;
+
   if (interruptEnabled_) {
     loraDataAvailable_ = true;
+    interruptStatusBits |= 1;
+    xTaskNotifyFromISR(rxTaskHandle_, interruptStatusBits, eSetBits, &xHigherPriorityTaskWoken);
   }
 }
 
@@ -423,9 +429,12 @@ ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr() {
 
 void Service::processIncomingDataTask(void *param) {
   LOG_INFO("Incoming data process task started");
+  uint32_t interruptStatusBits;
 
   while (true) {
-    if (loraDataAvailable_) {
+    xTaskNotifyWait(0, 0x00, &interruptStatusBits, portMAX_DELAY);
+
+    if (interruptStatusBits & 0x01) {
       int packetSize = radio_->getPacketLength();
     
       if (packetSize > 0) {
@@ -444,7 +453,6 @@ void Service::processIncomingDataTask(void *param) {
       }
       loraDataAvailable_ = false;
     }
-    delay(CfgPollDelayMs);
   }
 }
 
