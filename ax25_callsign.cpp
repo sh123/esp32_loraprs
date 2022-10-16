@@ -65,7 +65,9 @@ bool Callsign::ToBinary(byte *txPayload, int bufferLength) const
 String Callsign::ToString() const
 {
   String result = call_;
-  if (ssid_ != 0) {
+  if (ssid_ == 0) {
+    result += "*";
+  } else {
     result += "-" + String(ssid_);
   }
   return result;
@@ -75,9 +77,7 @@ bool Callsign::Digirepeat()
 {
   if (IsPath()) {
     if (ssid_ > 0) {
-      if (--ssid_ == 0) {
-        call_ += "*";
-      }
+      ssid_--;
       return true;
     }
   }
