@@ -20,7 +20,7 @@ public:
   inline bool IsWide() const { return call_.startsWith("WIDE"); }
   inline bool IsPath() const { return IsWide(); }
   
-  String ToString() const;
+  String ToString(bool isDigirepeater=false) const;
   bool ToBinary(byte *txPayload, int bufferLength) const;
 
   bool Digirepeat();

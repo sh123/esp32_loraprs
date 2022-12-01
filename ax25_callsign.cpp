@@ -62,11 +62,11 @@ bool Callsign::ToBinary(byte *txPayload, int bufferLength) const
   return true;
 }
 
-String Callsign::ToString() const
+String Callsign::ToString(bool isDigirepeater) const
 {
   String result = call_;
   if (ssid_ == 0) {
-    result += "*";
+    result += isDigirepeater ? "*" : "";
   } else {
     result += "-" + String(ssid_);
   }

@@ -96,7 +96,7 @@ String Payload::ToString(const String &customComment) const
 
   for (int i = 0; i < rptCallsCount_; i++) {
     if (rptCalls_[i].IsValid()) {
-      txt += String(",") + rptCalls_[i].ToString();
+      txt += String(",") + rptCalls_[i].ToString(true);
     }
   }
 
