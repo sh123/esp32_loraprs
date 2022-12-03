@@ -329,6 +329,7 @@ void Service::rigTask(void *self) {
 
 void Service::onRigTaskRxPacket() {
   int packetSize = rig_->getPacketLength();
+  LOG_TRACE("onRigTaskRxPacket", packetSize);
   if (packetSize > 0) {
     byte rxBuf[packetSize];
     int state = rig_->readData(rxBuf, packetSize);
@@ -349,6 +350,7 @@ void Service::onRigTaskRxPacket() {
 void Service::onRigTaskTxPacket() {
   while (rigTxQueueIndex_.size() > 0) {
     int txPacketSize = rigTxQueueIndex_.shift();
+    LOG_TRACE("onRigTaskTxPacket", txPacketSize);
     byte txBuf[txPacketSize];
 
     for (int i = 0; i < txPacketSize; i++) {
@@ -559,6 +561,7 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
 
 bool Service::onRigTxBegin()
 {
+  LOG_TRACE("onRigTxBegin");
   rigCurrentTxPacketSize_ = 0;
   if (splitEnabled()) {
     setFreq(config_.LoraFreqTx);
@@ -579,6 +582,7 @@ void Service::onRigTx(byte b)
 
 void Service::onRigTxEnd()
 {
+  LOG_TRACE("onRigTxEnd", rigCurrentTxPacketSize_);
   rigTxQueueIndex_.push(rigCurrentTxPacketSize_);
   uint32_t radioTransmitBit = RadioTaskBits::Transmit;
   xTaskNotify(rigTaskHandle_, radioTransmitBit, eSetBits);

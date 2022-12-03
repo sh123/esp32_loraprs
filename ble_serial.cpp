@@ -35,7 +35,6 @@ class BLESerialCharacteristicCallbacks: public BLECharacteristicCallbacks {
     BLESerial* bleSerial;
     
     void onWrite(BLECharacteristic *pCharacteristic) {
- 
       bleSerial->receiveBuffer = bleSerial->receiveBuffer + pCharacteristic->getValue();
     }
 
