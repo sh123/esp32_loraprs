@@ -12,11 +12,7 @@
 #include "config.h"
 #endif
 
-#ifdef USE_RADIOLIB
 #include <RadioLib.h>
-#else
-#include <LoRa.h>
-#endif
 
 #include <WiFi.h>
 #include <endian.h>
@@ -54,6 +50,7 @@ private:
   void onRadioTransmit();
   static void radioTask(void *param);
   static ICACHE_RAM_ATTR void onRadioDataAvailableIsr();
+  
   void onAprsisDataAvailable();
 
   void sendSignalReportEvent(int rssi, float snr);
