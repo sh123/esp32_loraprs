@@ -15,7 +15,7 @@ Service::Service()
   , serialBt_()
   , serialBLE_()
   , kissServer_(new WiFiServer(CfgKissPort))
-  , isKissClientConnected(false)
+  , isKissClientConnected_(false)
 {
   rigIsRxIsrEnabled_ = true;
   rigIsRxActive_ = false;
@@ -587,10 +587,10 @@ void Service::onRigTxEnd()
 void Service::attachKissNetworkClient() 
 {
   // connected, client dropped off
-  if (isKissClientConnected) {
+  if (isKissClientConnected_) {
     if (!kissConnnection_.connected()) {
       LOG_INFO("KISS TCP/IP client disconnected");
-      isKissClientConnected = false;
+      isKissClientConnected_ = false;
       kissConnnection_.stop();
     }
   }
@@ -598,12 +598,12 @@ void Service::attachKissNetworkClient()
   // new client connected
   if (wifiClient && wifiClient.connected()) {
     // drop off current one
-    if (isKissClientConnected) {
+    if (isKissClientConnected_) {
       kissConnnection_.stop();
     }
     LOG_INFO("New KISS TCP/IP client connected");
     kissConnnection_ = wifiClient;
-    isKissClientConnected = true;
+    isKissClientConnected_ = true;
   }
 }
 
@@ -613,7 +613,7 @@ void Service::onSerialTx(byte b)
   if (config_.UsbSerialEnable) {
     Serial.write(b);
   } 
-  else if (isKissClientConnected) {
+  else if (isKissClientConnected_) {
     kissConnnection_.write(b);
   }
   else if (config_.BtEnableBle) {
@@ -629,7 +629,7 @@ bool Service::onSerialRxHasData()
   if (config_.UsbSerialEnable) {
     return Serial.available();
   } 
-  else if (isKissClientConnected) {
+  else if (isKissClientConnected_) {
     return kissConnnection_.available();
   }
   else if (config_.BtEnableBle) {
@@ -647,12 +647,12 @@ bool Service::onSerialRx(byte *b)
   if (config_.UsbSerialEnable) {
     rxResult = Serial.read();
   } 
-  else if (isKissClientConnected) {
+  else if (isKissClientConnected_) {
     rxResult = kissConnnection_.read();
     // client dropped off
     if (rxResult == -1) {
       kissConnnection_.stop();
-      isKissClientConnected = false;
+      isKissClientConnected_ = false;
     }
   }
   else {
