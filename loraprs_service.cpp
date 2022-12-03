@@ -361,6 +361,7 @@ void Service::onRadioTransmit() {
     if (state != RADIOLIB_ERR_NONE) {
       LOG_ERROR("TX error: ", state);
     }
+    vTaskDelay(1);
   }
   int state = radio_->startReceive();
   if (state != RADIOLIB_ERR_NONE) {

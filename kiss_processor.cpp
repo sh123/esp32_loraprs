@@ -2,10 +2,6 @@
 
 namespace Kiss {
 
-CircularBuffer<uint8_t, Processor::CfgSerialToRigQueueSize> Processor::serialToRigQueue_;
-CircularBuffer<uint8_t, Processor::CfgRigToSerialQueueSize> Processor::rigToSerialQueue_;
-CircularBuffer<uint8_t, Processor::CfgRigToSerialQueueSize> Processor::rigToSerialQueueIndex_;
-
 Processor::Processor()
   : disableKiss_(false)
   , isRawIdle_(true)

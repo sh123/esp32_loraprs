@@ -92,9 +92,9 @@ private:
   DataType dataType_;
   std::vector<byte> cmdBuffer_;
 
-  static CircularBuffer<uint8_t, CfgSerialToRigQueueSize> serialToRigQueue_;
-  static CircularBuffer<uint8_t, CfgRigToSerialQueueSize> rigToSerialQueue_;
-  static CircularBuffer<uint8_t, CfgRigToSerialQueueSize> rigToSerialQueueIndex_;
+  CircularBuffer<uint8_t, CfgSerialToRigQueueSize> serialToRigQueue_;
+  CircularBuffer<uint8_t, CfgRigToSerialQueueSize> rigToSerialQueue_;
+  CircularBuffer<uint8_t, CfgRigToSerialQueueSize> rigToSerialQueueIndex_;
 };
   
 } // Kiss
