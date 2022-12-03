@@ -2,10 +2,6 @@
 
 namespace Kiss {
 
-CircularBuffer<uint8_t, Processor::CfgSerialToRigQueueSize> Processor::serialToRigQueue_;
-CircularBuffer<uint8_t, Processor::CfgRigToSerialQueueSize> Processor::rigToSerialQueue_;
-CircularBuffer<uint8_t, Processor::CfgRigToSerialQueueSize> Processor::rigToSerialQueueIndex_;
-
 Processor::Processor()
   : disableKiss_(false)
   , isRawIdle_(true)
@@ -52,7 +48,7 @@ void Processor::sendRigToSerial(Cmd cmd, const byte *packet, int packetLength) {
   }
 }
 
-void ICACHE_RAM_ATTR Processor::queueRigToSerialIsr(Cmd cmd, const byte *packet, int packetLength) {
+void Processor::queueRigToSerial(Cmd cmd, const byte *packet, int packetLength) {
   if (!rigToSerialQueueIndex_.unshift(packetLength)) {
     LOG_WARN("Rig to serial queue is full!");
     return;
@@ -299,7 +295,6 @@ bool Processor::receiveByteKiss(byte rxByte)
 }
 
 bool Processor::receiveByte(byte rxByte) {
-  
   if (disableKiss_) {
     return receiveByteRaw(rxByte);
   }

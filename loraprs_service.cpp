@@ -2,38 +2,29 @@
 
 namespace LoraPrs {
 
-byte Service::rxBuf_[CfgMaxPacketSize];
-
-#ifdef USE_RADIOLIB
-#pragma message("Using RadioLib")
-TaskHandle_t Service::rxTaskHandle_;
-volatile bool Service::loraDataAvailable_ = false;
-bool Service::interruptEnabled_ = true;
-std::shared_ptr<MODULE_NAME> Service::radio_;
-#else
-#pragma message("Using arduino-LoRa")
-#endif
+TaskHandle_t Service::rigTaskHandle_;
+volatile bool Service::rigIsRxActive_ = false;
+bool Service::rigIsRxIsrEnabled_ = true;
 
 Service::Service()
   : Kiss::Processor()
   , csmaP_(CfgCsmaPersistence)
   , csmaSlotTime_(CfgCsmaSlotTimeMs)
   , csmaSlotTimePrev_(0)
+  , rigCurrentTxPacketSize_(0)
   , serialBt_()
   , serialBLE_()
   , kissServer_(new WiFiServer(CfgKissPort))
-  , isKissConn_(false)
+  , isKissClientConnected(false)
 {
-#ifdef USE_RADIOLIB
-  interruptEnabled_ = true;
-  loraDataAvailable_ = false;
-#endif
+  rigIsRxIsrEnabled_ = true;
+  rigIsRxActive_ = false;
 }
 
 void Service::setup(const Config &conf)
 {
   config_ = conf;  
-  previousBeaconMs_ = 0;
+  beaconLastTimestampMs_ = 0;
   disableKiss_ = conf.EnableTextPackets;
 
   LOG_SET_OPTION(false, false, true);  // disable file, line, enable func
@@ -54,8 +45,8 @@ void Service::setup(const Config &conf)
   }
 
   // APRS-IS loging callsign validity
-  ownCallsign_ = AX25::Callsign(config_.AprsLogin);
-  if (!ownCallsign_.IsValid()) {
+  aprsMyCallsign_ = AX25::Callsign(config_.AprsLogin);
+  if (!aprsMyCallsign_.IsValid()) {
     LOG_ERROR("Own callsign", config_.AprsLogin, "is not valid");
   }
 
@@ -68,15 +59,11 @@ void Service::setup(const Config &conf)
   aprsLoginCommand_ += String("\n");
 
   // peripherals, LoRa
-  setupLora(config_.LoraFreqRx, config_.LoraBw, config_.LoraSf, 
+  setupRig(config_.LoraFreqRx, config_.LoraBw, config_.LoraSf, 
     config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraCrc, config_.LoraExplicit);
 
-#ifdef USE_RADIOLIB
-  if (!config_.LoraUseIsr) {
-    LOG_INFO("Reading data on separate task");
-    xTaskCreate(processIncomingDataTask, "processIncomingDataTask", 10000, NULL, 1, &rxTaskHandle_);
-  }
-#endif
+  // start radio task
+  xTaskCreate(rigTask, "rigTask", 4096, this, 5, &rigTaskHandle_);
 
   // peripherls, WiFi
   if (needsWifi()) {
@@ -102,11 +89,6 @@ void Service::setup(const Config &conf)
 
 void Service::printConfig() {
   LOG_INFO("Current mode:", config_.IsClientMode ? "NORMAL" : "APRS-IS iGate");
-#ifdef USE_RADIOLIB
-  LOG_INFO("Built with RadioLib library");
-#else
-  LOG_INFO("Built with arduino-LoRa library");
-#endif
   LOG_INFO(disableKiss_ ? "Using TNC2 text mode" : "Using TNC KISS and AX.25 mode");
   LOG_INFO("UsbSerialEnable:", config_.UsbSerialEnable ? "yes" : "no");
   if (!config_.IsClientMode) {
@@ -184,20 +166,20 @@ bool Service::reconnectAprsis()
 {
   LOG_INFO("APRSIS connecting to", config_.AprsHost);
   
-  if (!aprsisConn_.connect(config_.AprsHost.c_str(), config_.AprsPort)) {
+  if (!aprsisConnection_.connect(config_.AprsHost.c_str(), config_.AprsPort)) {
     LOG_ERROR("Failed to connect to", config_.AprsHost, ":", config_.AprsPort);
     return false;
   }
   LOG_INFO("APRSIS connected");
-  aprsisConn_.print(aprsLoginCommand_);
+  aprsisConnection_.print(aprsLoginCommand_);
   LOG_INFO("APRSIS logged in");
   return true;
 }
 
-void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit)
+void Service::setupRig(long loraFreq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit)
 {
-  isImplicitHeaderMode_ = !isExplicit;
-  isImplicitHeaderMode_ = sf == 6;      // must be implicit for SF6
+  rigIsImplicitMode_ = !isExplicit;
+  rigIsImplicitMode_ = sf == 6;      // must be implicit for SF6
   int loraSpeed = (int)(sf * (4.0 / cr) / (pow(2.0, sf) / bw));
         
   LOG_INFO("Initializing LoRa");
@@ -208,7 +190,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   LOG_INFO("Power:", pwr, "dBm");
   LOG_INFO("Sync:", "0x" + String(sync, HEX));
   LOG_INFO("CRC:", crcBytes);
-  LOG_INFO("Header:", isImplicitHeaderMode_ ? "implicit" : "explicit");
+  LOG_INFO("Header:", rigIsImplicitMode_ ? "implicit" : "explicit");
   LOG_INFO("Speed:", loraSpeed, "bps");
   LOG_INFO("TOA (compressed):", 37.0 / ((double)loraSpeed / 8.0), "sec");
   LOG_INFO("TOA (uncompressed):", 64.0 / ((double)loraSpeed / 8.0), "sec");
@@ -234,74 +216,35 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
         break;
   }
   LOG_INFO("Min level:", -174 + 10 * log10(bw) + 6 + snrLimit, "dBm");
-
-#ifdef USE_RADIOLIB
-  radio_ = std::make_shared<MODULE_NAME>(new Module(config_.LoraPinSs, config_.LoraPinA, config_.LoraPinRst, config_.LoraPinB));
-  int state = radio_->begin((float)loraFreq / 1e6, (float)bw / 1e3, sf, cr, sync, pwr);
+  rig_ = std::make_shared<MODULE_NAME>(new Module(config_.LoraPinSs, config_.LoraPinA, config_.LoraPinRst, config_.LoraPinB));
+  int state = rig_->begin((float)loraFreq / 1e6, (float)bw / 1e3, sf, cr, sync, pwr);
   if (state != RADIOLIB_ERR_NONE) {
     LOG_ERROR("Radio start error:", state);
   }
-  radio_->setCRC(crcBytes);
-  #ifdef USE_SX126X
+  rig_->setCRC(crcBytes);
+#ifdef USE_SX126X
     #pragma message("Using SX126X")
     LOG_INFO("Using SX126X module");
-    radio_->setRfSwitchPins(config_.LoraPinSwitchRx, config_.LoraPinSwitchTx);
-    radio_->clearDio1Action();
-    if (config_.LoraUseIsr) {
-      radio_->setDio1Action(onLoraDataAvailableIsr);
-    } else {
-      radio_->setDio1Action(onLoraDataAvailableIsrNoRead);
-    }
-  #else
+    rig_->setRfSwitchPins(config_.LoraPinSwitchRx, config_.LoraPinSwitchTx);
+    rig_->clearDio1Action();
+    rig_->setDio1Action(onRigIsrRxPacket);
+#else
     #pragma message("Using SX127X")
     LOG_INFO("Using SX127X module");
     radio_->clearDio0Action();
-    if (config_.LoraUseIsr) {
-      radio_->setDio0Action(onLoraDataAvailableIsr);
-    } else {
-      radio_->setDio0Action(onLoraDataAvailableIsrNoRead);
-    }
-  #endif
+    radio_->setDio0Action(onRigIsrRxPacket);
+#endif
 
-  if (isImplicitHeaderMode_) {
-    radio_->implicitHeader(0xff);
+  if (rigIsImplicitMode_) {
+    rig_->implicitHeader(0xff);
   } else {
-    radio_->explicitHeader();
+    rig_->explicitHeader();
   }
   
-  state = radio_->startReceive();
+  state = rig_->startReceive();
   if (state != RADIOLIB_ERR_NONE) {
     LOG_ERROR("Receive start error:", state);
   }
-  
-#else // USE_RADIOLIB
-
-  LoRa.setPins(config_.LoraPinSs, config_.LoraPinRst, config_.LoraPinA);
-
-  int retryCnt = 0;
-  while (!LoRa.begin(loraFreq)) {
-    LOG_WARN("LoRa init retry", retryCnt);
-    delay(CfgConnRetryMs);
-    if (retryCnt++ >= CfgConnRetryMaxTimes) {
-      LOG_ERROR("LoRa init failed");
-      return;
-    }
-  }
-  LoRa.setSyncWord(sync);
-  LoRa.setSpreadingFactor(sf);
-  LoRa.setSignalBandwidth(bw);
-  LoRa.setCodingRate4(cr);
-  LoRa.setTxPower(pwr);
-
-  if (config_.crcBytes > 0) {
-    LoRa.enableCrc();
-  }
-
-  if (config_.LoraUseIsr) {
-    LoRa.onReceive(onLoraDataAvailableIsr);
-    LoRa.receive();
-  }
-#endif // USE_RADIOLIB
 
   LOG_INFO("LoRa initialized");
 }
@@ -328,7 +271,7 @@ void Service::loop()
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
-  if (needsAprsis() && !aprsisConn_.connected() && config_.EnablePersistentAprsConnection) {
+  if (needsAprsis() && !aprsisConnection_.connected() && config_.EnablePersistentAprsConnection) {
     reconnectAprsis();
   }
   if (config_.KissEnableTcpIp) {
@@ -337,147 +280,110 @@ void Service::loop()
 
   // RX path, Rig -> Serial
   bool isRigToSerialProcessed = false;
-
-#ifdef USE_RADIOLIB
   isRigToSerialProcessed = processRigToSerial();
-#else
-  if (config_.LoraUseIsr) {
-    isRigToSerialProcessed = processRigToSerial();
-  } else {
-     if (int packetSize = LoRa.parsePacket()) {
-        loraReceive(packetSize);
-        isRigToSerialProcessed = true;
-     }
-  }
-#endif
 
   // TX path, Serial -> Rig
   if (!isRigToSerialProcessed) {
 
     long currentTime = millis();
-    if (!isLoraRxBusy() && currentTime > csmaSlotTimePrev_ + csmaSlotTime_ && random(0, 255) < csmaP_) {
-      if (aprsisConn_.available() > 0) {
+    if (!isRigRxBusy() && currentTime > csmaSlotTimePrev_ + csmaSlotTime_ && random(0, 255) < csmaP_) {
+      if (aprsisConnection_.available() > 0) {
         onAprsisDataAvailable();
       }
       if (needsBeacon()) {
         sendPeriodicBeacon();
       }
-      bool allTxProcessed = processSerialToRig();
-      if (allTxProcessed) {
-#ifdef USE_RADIOLIB
-        int state = radio_->startReceive();
-        if (state != RADIOLIB_ERR_NONE) {
-          LOG_ERROR("Start receive error: ", state);
-        }
-#else
-        if (config_.LoraUseIsr) {
-          LoRa.receive();
-        }
-#endif
-      }
+      processSerialToRig();
       csmaSlotTimePrev_ = currentTime;
     }
   }
   delay(CfgPollDelayMs);
 }
 
-bool Service::isLoraRxBusy() {
-#ifdef USE_RADIOLIB
-  #ifdef USE_SX126X
-  return config_.LoraUseCad && loraDataAvailable_;
-  #else
-  return config_.LoraUseCad && (radio_->getModemStatus() & 0x01); // SX1278_STATUS_SIG_DETECT
-  #endif
-#else
-  return false;
-#endif
+bool Service::isRigRxBusy() {
+  return config_.LoraUseCad && rigIsRxActive_;
 }
 
-#ifdef USE_RADIOLIB
-
-ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsrNoRead() {
+ICACHE_RAM_ATTR void Service::onRigIsrRxPacket() {
   BaseType_t xHigherPriorityTaskWoken;
-  uint32_t interruptStatusBits = 0;
-
-  if (interruptEnabled_) {
-    loraDataAvailable_ = true;
-    interruptStatusBits |= 1;
-    xTaskNotifyFromISR(rxTaskHandle_, interruptStatusBits, eSetBits, &xHigherPriorityTaskWoken);
+  if (rigIsRxIsrEnabled_) {
+    rigIsRxActive_ = true;
+    uint32_t radioReceiveBit = RadioTaskBits::Receive;
+    xTaskNotifyFromISR(rigTaskHandle_, radioReceiveBit, eSetBits, &xHigherPriorityTaskWoken);
   }
 }
 
-ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr() {
-  if (interruptEnabled_) {
-    int packetSize = radio_->getPacketLength();
-  
-    if (packetSize > 0) {
-      
-      int state = radio_->readData(rxBuf_, packetSize);
-      if (state == RADIOLIB_ERR_NONE) {
-        queueRigToSerialIsr(Cmd::Data, rxBuf_, packetSize);
-      } else {
-        LOG_ERROR("Read data error: ", state);
-      }
-      
-      state = radio_->startReceive();
-      if (state != RADIOLIB_ERR_NONE) {
-        LOG_ERROR("Start receive error: ", state);
-      }
-    }
-  }
-}
-
-void Service::processIncomingDataTask(void *param) {
-  LOG_INFO("Incoming data process task started");
-  uint32_t interruptStatusBits;
-
+void Service::rigTask(void *self) {
+  LOG_INFO("Radio task started");
   while (true) {
-    xTaskNotifyWait(0, 0x00, &interruptStatusBits, portMAX_DELAY);
-
-    if (interruptStatusBits & 0x01) {
-      int packetSize = radio_->getPacketLength();
-    
-      if (packetSize > 0) {
-    
-        int state = radio_->readData(rxBuf_, packetSize);
-        if (state == RADIOLIB_ERR_NONE) {
-          queueRigToSerialIsr(Cmd::Data, rxBuf_, packetSize);
-        } else {
-          LOG_ERROR("Read data error: ", state);
-        }
-    
-        state = radio_->startReceive();
-        if (state != RADIOLIB_ERR_NONE) {
-          LOG_ERROR("Start receive error: ", state);
-        }
-      }
-      loraDataAvailable_ = false;
+    uint32_t commandBits = 0;
+    xTaskNotifyWaitIndexed(0, 0x00, ULONG_MAX, &commandBits, portMAX_DELAY);
+    if (commandBits & RadioTaskBits::Receive) {
+      ((Service*)self)->onRigTaskRxPacket();
+    }
+    else if (commandBits & RadioTaskBits::Transmit) {
+      ((Service*)self)->onRigTaskTxPacket();
     }
   }
 }
 
-#else // USE_RADIOLIB
+void Service::onRigTaskRxPacket() {
+  int packetSize = rig_->getPacketLength();
+  if (packetSize > 0) {
+    byte rxBuf[packetSize];
+    int state = rig_->readData(rxBuf, packetSize);
+    if (state == RADIOLIB_ERR_NONE) {
+      queueRigToSerial(Cmd::Data, rxBuf, packetSize);
+    } else {
+      LOG_ERROR("Read data error: ", state);
+    }
 
-ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr(int packetSize)
-{
-  int rxBufIndex = 0;
-
-  for (int i = 0; i < packetSize; i++) {
-    rxBuf_[rxBufIndex++] = LoRa.read();
+    state = rig_->startReceive();
+    if (state != RADIOLIB_ERR_NONE) {
+      LOG_ERROR("Start receive error: ", state);
+    }
   }
-  queueRigToSerialIsr(Cmd::Data, rxBuf_, rxBufIndex);
+  rigIsRxActive_ = false;
 }
 
-#endif // USE_RADIOLIB
+void Service::onRigTaskTxPacket() {
+  while (rigTxQueueIndex_.size() > 0) {
+    int txPacketSize = rigTxQueueIndex_.shift();
+    byte txBuf[txPacketSize];
+
+    for (int i = 0; i < txPacketSize; i++) {
+      txBuf[i] = rigTxQueue_.shift();
+    }
+
+    rigIsRxIsrEnabled_ = false;
+    int state = rig_->transmit(txBuf, txPacketSize);
+    if (state != RADIOLIB_ERR_NONE) {
+      LOG_ERROR("TX error: ", state);
+    }
+    vTaskDelay(1);
+  }
+  int state = rig_->startReceive();
+  if (state != RADIOLIB_ERR_NONE) {
+    LOG_ERROR("Start receive error: ", state);
+  }
+  rigIsRxIsrEnabled_ = true;
+  if (config_.PttEnable) {
+    delay(config_.PttTxTailMs);
+    digitalWrite(config_.PttPin, LOW);
+  }
+  if (splitEnabled()) {
+    setFreq(config_.LoraFreqRx);
+  }
+}
 
 void Service::sendPeriodicBeacon()
 {
   long currentMs = millis();
 
-  if (previousBeaconMs_ == 0 || currentMs - previousBeaconMs_ >= config_.AprsRawBeaconPeriodMinutes * 60 * 1000) {
+  if (beaconLastTimestampMs_ == 0 || currentMs - beaconLastTimestampMs_ >= config_.AprsRawBeaconPeriodMinutes * 60 * 1000) {
       AX25::Payload payload(config_.AprsRawBeacon);
       if (payload.IsValid()) {
-        sendAX25ToLora(payload);
+        sendAx25PayloadToRig(payload);
         if (config_.EnableRfToIs) {
           sendToAprsis(payload.ToString());
         }
@@ -486,7 +392,7 @@ void Service::sendPeriodicBeacon()
       else {
         LOG_ERROR("Beacon payload is invalid");
       }
-      previousBeaconMs_ = currentMs;
+      beaconLastTimestampMs_ = currentMs;
   }
 }
 
@@ -495,13 +401,13 @@ void Service::sendToAprsis(const String &aprsMessage)
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
-  if (needsAprsis() && !aprsisConn_.connected()) {
+  if (needsAprsis() && !aprsisConnection_.connected()) {
     reconnectAprsis();
   }
-  aprsisConn_.println(aprsMessage);
+  aprsisConnection_.println(aprsMessage);
 
   if (!config_.EnablePersistentAprsConnection) {
-    aprsisConn_.stop();
+    aprsisConnection_.stop();
   }
 }
 
@@ -509,8 +415,8 @@ void Service::onAprsisDataAvailable()
 {
   String aprsisData;
 
-  while (aprsisConn_.available() > 0) {
-    char c = aprsisConn_.read();
+  while (aprsisConnection_.available() > 0) {
+    char c = aprsisConnection_.read();
     if (c == '\r') continue;
     if (c == '\n') break;
     aprsisData += c;
@@ -525,7 +431,7 @@ void Service::onAprsisDataAvailable()
   if (config_.EnableIsToRf && aprsisData.length() > 0) {
     AX25::Payload payload(aprsisData);
     if (payload.IsValid()) {
-      sendAX25ToLora(payload);
+      sendAx25PayloadToRig(payload);
     }
     else {
       LOG_WARN("Unknown payload from APRSIS, ignoring");
@@ -543,7 +449,7 @@ void Service::sendSignalReportEvent(int rssi, float snr)
   sendRigToSerial(Cmd::SignalReport, (const byte *)&signalReport, sizeof(SignalReport));
 }
 
-bool Service::sendAX25ToLora(const AX25::Payload &payload)
+bool Service::sendAx25PayloadToRig(const AX25::Payload &payload)
 {
   int bytesWritten;
   byte buf[CfgMaxPacketSize];
@@ -573,11 +479,7 @@ void Service::onRigPacket(void *packet, int packetLength)
     performFrequencyCorrection();
   }
   if (config_.KissEnableExtensions) {
-#ifdef USE_RADIOLIB
-    sendSignalReportEvent(radio_->getRSSI(), radio_->getSNR());
-#else
-    sendSignalReportEvent(LoRa.packetRssi(), LoRa.packetSnr());
-#endif
+    sendSignalReportEvent(rig_->getRSSI(), rig_->getSNR());
   }
   if (!config_.IsClientMode) {
     processIncomingRawPacketAsServer((const byte*)packet, packetLength);
@@ -585,51 +487,25 @@ void Service::onRigPacket(void *packet, int packetLength)
 }
 
 void Service::performFrequencyCorrection() {
-#ifdef USE_RADIOLIB
-  #ifdef USE_SX126X
+#ifdef USE_SX126X
   long frequencyErrorHz = 0;
-  #else
-  long frequencyErrorHz = radio_->getFrequencyError();
-  #endif
 #else
-  long frequencyErrorHz = LoRa.packetFrequencyError();
+  long frequencyErrorHz = radio_->getFrequencyError();
 #endif
   if (abs(frequencyErrorHz) > config_.AutoFreqCorrectionDeltaHz) {
     config_.LoraFreqRx -= frequencyErrorHz;
     LOG_INFO("Correcting frequency:", frequencyErrorHz);
-    setupFreq(config_.LoraFreqRx);
+    setFreq(config_.LoraFreqRx);
   }
 }
 
-void Service::setupFreq(long loraFreq) const {
-  #ifdef USE_RADIOLIB
-    radio_->setFrequency((float)config_.LoraFreqRx / 1e6);
-    int state = radio_->startReceive();
-    if (state != RADIOLIB_ERR_NONE) {
-      LOG_ERROR("Start receive error:", state);
-    }
-#else
-    LoRa.setFrequency(config_.LoraFreqRx);
-    if (config_.LoraUseIsr) {
-      LoRa.idle();
-      LoRa.receive();
-    }
-#endif
-}
-
-#ifndef USE_RADIOLIB
-void Service::loraReceive(int packetSize)
-{
-  int rxBufIndex = 0;
-  byte rxBuf[packetSize];
-  
-  while (LoRa.available()) {
-    rxBuf[rxBufIndex++] = LoRa.read();
+void Service::setFreq(long loraFreq) const {
+  rig_->setFrequency((float)config_.LoraFreqRx / 1e6);
+  int state = rig_->startReceive();
+  if (state != RADIOLIB_ERR_NONE) {
+    LOG_ERROR("Start receive error:", state);
   }
-  sendRigToSerial(Cmd::Data, rxBuf, rxBufIndex);
-  onRigPacket(rxBuf, rxBufIndex);
 }
-#endif
 
 void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLength) {
 
@@ -646,19 +522,12 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
   }
 
   if (payload.IsValid()) {
-
-#ifdef USE_RADIOLIB
-    float snr = radio_->getSNR();
-    int rssi = radio_->getRSSI();
-    #ifdef USE_SX126X
+    float snr = rig_->getSNR();
+    int rssi = rig_->getRSSI();
+#ifdef USE_SX126X
     long frequencyError = 0;
-    #else
-    long frequencyError = radio_->getFrequencyError();
-    #endif
 #else
-    float snr = LoRa.packetSnr();
-    int rssi = LoRa.packetRssi();
-    long frequencyError = LoRa.packetFrequencyError();
+    long frequencyError = radio_->getFrequencyError();
 #endif
     String signalReport = String("rssi: ") +
       String(snr < 0 ? rssi + snr : rssi) +
@@ -679,8 +548,8 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
       sendToAprsis(textPayload);
       LOG_INFO("Packet sent to APRS-IS");
     }
-    if (config_.EnableRepeater && payload.Digirepeat(ownCallsign_)) {
-      sendAX25ToLora(payload);
+    if (config_.EnableRepeater && payload.Digirepeat(aprsMyCallsign_)) {
+      sendAx25PayloadToRig(payload);
       LOG_INFO("Packet digirepeated");
     }
   } else {
@@ -690,86 +559,51 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
 
 bool Service::onRigTxBegin()
 {
+  rigCurrentTxPacketSize_ = 0;
   if (splitEnabled()) {
-    setupFreq(config_.LoraFreqTx);
+    setFreq(config_.LoraFreqTx);
   }
   if (config_.PttEnable) {
     digitalWrite(config_.PttPin, HIGH);
     delay(config_.PttTxDelayMs);
-  } else {
-    delay(CfgPollDelayMs);
   }
-#ifdef USE_RADIOLIB
   return true;
-#else
-  return (LoRa.beginPacket(isImplicitHeaderMode_) == 1);
-#endif
 }
 
 void Service::onRigTx(byte b)
 {
   LOG_TRACE((char)b, String(b, HEX));
-#ifdef USE_RADIOLIB
-  txQueue_.push(b);
-#else
-  LoRa.write(b);
-#endif
+  rigTxQueue_.push(b);
+  rigCurrentTxPacketSize_++;
 }
 
 void Service::onRigTxEnd()
 {
-#ifdef USE_RADIOLIB
-  int txPacketSize = txQueue_.size();
-  byte txBuf[txPacketSize];
-  
-  for (int i = 0; i < txPacketSize; i++) {
-    txBuf[i] = txQueue_.shift();
-  }
-
-  interruptEnabled_ = false;
-  int state = radio_->transmit(txBuf, txPacketSize);
-  if (state != RADIOLIB_ERR_NONE) {
-    LOG_ERROR("TX error: ", state);
-  }
-  interruptEnabled_ = true;
-#endif
-
-  if (config_.PttEnable) {
-#ifndef USE_RADIOLIB
-    LoRa.endPacket(false);
-#endif
-    delay(config_.PttTxTailMs);
-    digitalWrite(config_.PttPin, LOW);
-  } else {
-#ifndef USE_RADIOLIB
-    LoRa.endPacket(true);
-#endif
-  }
-  if (splitEnabled()) {
-    setupFreq(config_.LoraFreqRx);
-  }
+  rigTxQueueIndex_.push(rigCurrentTxPacketSize_);
+  uint32_t radioTransmitBit = RadioTaskBits::Transmit;
+  xTaskNotify(rigTaskHandle_, radioTransmitBit, eSetBits);
 }
 
 void Service::attachKissNetworkClient() 
 {
   // connected, client dropped off
-  if (isKissConn_) {
-    if (!kissConn_.connected()) {
+  if (isKissClientConnected) {
+    if (!kissConnnection_.connected()) {
       LOG_INFO("KISS TCP/IP client disconnected");
-      isKissConn_ = false;
-      kissConn_.stop();
+      isKissClientConnected = false;
+      kissConnnection_.stop();
     }
   }
   WiFiClient wifiClient = kissServer_->available();
   // new client connected
   if (wifiClient && wifiClient.connected()) {
     // drop off current one
-    if (isKissConn_) {
-      kissConn_.stop();
+    if (isKissClientConnected) {
+      kissConnnection_.stop();
     }
     LOG_INFO("New KISS TCP/IP client connected");
-    kissConn_ = wifiClient;
-    isKissConn_ = true;
+    kissConnnection_ = wifiClient;
+    isKissClientConnected = true;
   }
 }
 
@@ -779,8 +613,8 @@ void Service::onSerialTx(byte b)
   if (config_.UsbSerialEnable) {
     Serial.write(b);
   } 
-  else if (isKissConn_) {
-    kissConn_.write(b);
+  else if (isKissClientConnected) {
+    kissConnnection_.write(b);
   }
   else if (config_.BtEnableBle) {
     serialBLE_.write(b);
@@ -795,8 +629,8 @@ bool Service::onSerialRxHasData()
   if (config_.UsbSerialEnable) {
     return Serial.available();
   } 
-  else if (isKissConn_) {
-    return kissConn_.available();
+  else if (isKissClientConnected) {
+    return kissConnnection_.available();
   }
   else if (config_.BtEnableBle) {
     return serialBLE_.available();
@@ -813,12 +647,12 @@ bool Service::onSerialRx(byte *b)
   if (config_.UsbSerialEnable) {
     rxResult = Serial.read();
   } 
-  else if (isKissConn_) {
-    rxResult = kissConn_.read();
+  else if (isKissClientConnected) {
+    rxResult = kissConnnection_.read();
     // client dropped off
     if (rxResult == -1) {
-      kissConn_.stop();
-      isKissConn_ = false;
+      kissConnnection_.stop();
+      isKissClientConnected = false;
     }
   }
   else {
@@ -872,7 +706,7 @@ void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
     config_.LoraSync = be16toh(setHardware->sync);
     int crcType = setHardware->crc ? config_.LoraCrc : 0;
 
-    setupLora(config_.LoraFreqRx, config_.LoraBw, config_.LoraSf, 
+    setupRig(config_.LoraFreqRx, config_.LoraBw, config_.LoraSf, 
       config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, crcType, config_.LoraExplicit);
   } else {
     LOG_ERROR("Radio control command of wrong size");

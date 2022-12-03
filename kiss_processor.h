@@ -55,8 +55,7 @@ public:
   Processor();
   
   void sendRigToSerial(Cmd cmd, const byte *packet, int packetLength);
-  static void ICACHE_RAM_ATTR queueRigToSerialIsr(Cmd cmd, const byte *packet, int packetLength);
-
+  void queueRigToSerial(Cmd cmd, const byte *packet, int packetLength);
   void queueSerialToRig(Cmd cmd, const byte *packet, int packetLength);
 
   bool processRigToSerial();
@@ -93,9 +92,9 @@ private:
   DataType dataType_;
   std::vector<byte> cmdBuffer_;
 
-  static CircularBuffer<uint8_t, CfgSerialToRigQueueSize> serialToRigQueue_;
-  static CircularBuffer<uint8_t, CfgRigToSerialQueueSize> rigToSerialQueue_;
-  static CircularBuffer<uint8_t, CfgRigToSerialQueueSize> rigToSerialQueueIndex_;
+  CircularBuffer<uint8_t, CfgSerialToRigQueueSize> serialToRigQueue_;
+  CircularBuffer<uint8_t, CfgRigToSerialQueueSize> rigToSerialQueue_;
+  CircularBuffer<uint8_t, CfgRigToSerialQueueSize> rigToSerialQueueIndex_;
 };
   
 } // Kiss

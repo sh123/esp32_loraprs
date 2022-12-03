@@ -12,11 +12,7 @@
 #include "config.h"
 #endif
 
-#ifdef USE_RADIOLIB
 #include <RadioLib.h>
-#else
-#include <LoRa.h>
-#endif
 
 #include <WiFi.h>
 #include <endian.h>
@@ -41,30 +37,26 @@ private:
   void printConfig();
 
   void setupWifi(const String &wifiName, const String &wifiKey);
-  void setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit);
-  void setupFreq(long loraFreq) const;
+  void setupRig(long freq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit);
+  void setFreq(long freq) const;
   void setupBt(const String &btName);
 
   void reconnectWifi() const;
   bool reconnectAprsis();
   void attachKissNetworkClient();
 
-  bool isLoraRxBusy();
-#ifdef USE_RADIOLIB
-  void onLoraDataAvailable();
-  static void processIncomingDataTask(void *param);
-  static ICACHE_RAM_ATTR void onLoraDataAvailableIsr();
-  static ICACHE_RAM_ATTR void onLoraDataAvailableIsrNoRead();
-#else
-  static ICACHE_RAM_ATTR void onLoraDataAvailableIsr(int packetSize);
-  void loraReceive(int packetSize);
-#endif
+  bool isRigRxBusy();
+  void onRigTaskRxPacket();
+  void onRigTaskTxPacket();
+  static void rigTask(void *self);
+  static ICACHE_RAM_ATTR void onRigIsrRxPacket();
+
   void onAprsisDataAvailable();
 
   void sendSignalReportEvent(int rssi, float snr);
   void sendPeriodicBeacon();
   void sendToAprsis(const String &aprsMessage);
-  bool sendAX25ToLora(const AX25::Payload &payload);
+  bool sendAx25PayloadToRig(const AX25::Payload &payload);
   void processIncomingRawPacketAsServer(const byte *packet, int packetLength);
   void performFrequencyCorrection();
 
@@ -120,13 +112,14 @@ private:
   } __attribute__((packed));
   
 private:
-  const String CfgLoraprsVersion = "LoRAPRS 0.1";
+  const String CfgLoraprsVersion = "LoRAPRS 1.0.2";
 
   // processor config
-  const int CfgConnRetryMs = 500;           // connection retry delay, e.g. wifi
-  static const int CfgPollDelayMs = 20;      // main loop delay
-  const int CfgConnRetryMaxTimes = 10;      // number of connection retries
-  static const int CfgMaxPacketSize = 256;  // maximum packet size
+  const int CfgConnRetryMs = 500;             // connection retry delay, e.g. wifi
+  const int CfgPollDelayMs = 20;              // main loop delay
+  const int CfgConnRetryMaxTimes = 10;        // number of connection retries
+  static const int CfgMaxPacketSize = 256;    // maximum packet size
+  static const int CfgRadioQueueSize = 1024;  // radio queue size
 
   // csma parameters, overriden with KISS commands
   const long CfgCsmaPersistence = 100;  // 255 for real time, lower for higher traffic
@@ -134,37 +127,46 @@ private:
 
   // kiss static parameters
   const int CfgKissPort = 8001;             // kiss tcp/ip server port
+
+  // radio task commands
+  enum RadioTaskBits {
+    Receive = 0x01,
+    Transmit = 0x02
+  };
+
 private:
   // config
   Config config_;
   String aprsLoginCommand_;
-  AX25::Callsign ownCallsign_;
-  bool isImplicitHeaderMode_;
+  AX25::Callsign aprsMyCallsign_;
 
   // csma
   byte csmaP_;
   long csmaSlotTime_;
   long csmaSlotTimePrev_;
 
-  // state
-  long previousBeaconMs_;
+  // beacon state
+  long beaconLastTimestampMs_;
 
-  // peripherals
-  static byte rxBuf_[CfgMaxPacketSize];
-#ifdef USE_RADIOLIB
-  static TaskHandle_t rxTaskHandle_;
-  static volatile bool loraDataAvailable_;
-  static bool interruptEnabled_;
-  CircularBuffer<uint8_t, CfgMaxPacketSize> txQueue_;
-  static std::shared_ptr<MODULE_NAME> radio_;
-#endif
+  // peripherals, radio
+  static TaskHandle_t rigTaskHandle_;
+  static volatile bool rigIsRxActive_;
+  static bool rigIsRxIsrEnabled_;
+  bool rigIsImplicitMode_;
+  int rigCurrentTxPacketSize_;
+  CircularBuffer<uint8_t, CfgRadioQueueSize> rigTxQueue_;
+  CircularBuffer<uint8_t, CfgRadioQueueSize> rigTxQueueIndex_;
+  std::shared_ptr<MODULE_NAME> rig_;
+
+  // bluetooth, wifi
   BluetoothSerial serialBt_;
   BLESerial serialBLE_;
-  WiFiClient aprsisConn_;
+  WiFiClient aprsisConnection_;
   
+  // kiss server
   std::shared_ptr<WiFiServer> kissServer_;
-  WiFiClient kissConn_;
-  bool isKissConn_;
+  WiFiClient kissConnnection_;
+  bool isKissClientConnected_;
 };
 
 } // LoraPrs

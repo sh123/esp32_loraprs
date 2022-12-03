@@ -24,9 +24,7 @@ Modules, which are used by users and known to work
 # Dependencies
 Install via libraries:
 - Arduino ESP32 library: https://github.com/espressif/arduino-esp32
-- LoRa library
-  - RadioLib library (&#x26A0;use github master version): https://github.com/jgromes/RadioLib
-  - or LoRa Arduino library: https://github.com/sandeepmistry/arduino-LoRa
+- RadioLib library: https://github.com/jgromes/RadioLib
 - Arduino Timer library: https://github.com/contrem/arduino-timer
 - CircularBuffer library: https://github.com/rlogiacco/CircularBuffer
 - DebugLog library: https://github.com/hideakitai/DebugLog

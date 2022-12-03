@@ -29,7 +29,6 @@ struct Config
   byte LoraPinB;        // (sx127x - dio1, sx126x/sx128x - busy)
   byte LoraPinSwitchRx; // (sx127x - unused, sx126x - RXEN pin number)
   byte LoraPinSwitchTx; // (sx127x - unused, sx126x - TXEN pin number)
-  bool LoraUseIsr;      // true to use interrupts, false for fallback polling, e.g. if Dio0 is not connected
   bool LoraUseCad;      // use carrier detect before transmitting
 
   // usb
