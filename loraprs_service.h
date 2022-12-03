@@ -37,7 +37,7 @@ private:
   void printConfig();
 
   void setupWifi(const String &wifiName, const String &wifiKey);
-  void setupRadio(long freq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit);
+  void setupRig(long freq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit);
   void setFreq(long freq) const;
   void setupBt(const String &btName);
 
@@ -45,18 +45,18 @@ private:
   bool reconnectAprsis();
   void attachKissNetworkClient();
 
-  bool isRadioRxBusy();
-  void onRadioReceive();
-  void onRadioTransmit();
-  static void radioTask(void *param);
-  static ICACHE_RAM_ATTR void onRadioDataAvailableIsr();
-  
+  bool isRigRxBusy();
+  void onRigTaskRxPacket();
+  void onRigTaskTxPacket();
+  static void rigTask(void *self);
+  static ICACHE_RAM_ATTR void onRigIsrRxPacket();
+
   void onAprsisDataAvailable();
 
   void sendSignalReportEvent(int rssi, float snr);
   void sendPeriodicBeacon();
   void sendToAprsis(const String &aprsMessage);
-  bool sendAX25ToRadio(const AX25::Payload &payload);
+  bool sendAx25PayloadToRig(const AX25::Payload &payload);
   void processIncomingRawPacketAsServer(const byte *packet, int packetLength);
   void performFrequencyCorrection();
 
@@ -112,7 +112,7 @@ private:
   } __attribute__((packed));
   
 private:
-  const String CfgLoraprsVersion = "LoRAPRS 0.1";
+  const String CfgLoraprsVersion = "LoRAPRS 1.0.2";
 
   // processor config
   const int CfgConnRetryMs = 500;             // connection retry delay, e.g. wifi
@@ -138,8 +138,7 @@ private:
   // config
   Config config_;
   String aprsLoginCommand_;
-  AX25::Callsign ownCallsign_;
-  bool isImplicitHeaderMode_;
+  AX25::Callsign aprsMyCallsign_;
 
   // csma
   byte csmaP_;
@@ -147,27 +146,27 @@ private:
   long csmaSlotTimePrev_;
 
   // beacon state
-  long previousBeaconMs_;
+  long beaconLastTimestampMs_;
 
   // peripherals, radio
-  static TaskHandle_t radioTaskHandle_;
-  static volatile bool isRadioRxActive_;
-  static bool interruptEnabled_;
-  int currentTxPacketSize_;
-  byte radioRxPacketBuffer_[CfgMaxPacketSize];
-  CircularBuffer<uint8_t, CfgRadioQueueSize> radioTxQueue_;
-  CircularBuffer<uint8_t, CfgRadioQueueSize> radioTxQueueIndex_;
-  std::shared_ptr<MODULE_NAME> radio_;
+  static TaskHandle_t rigTaskHandle_;
+  static volatile bool rigIsRxActive_;
+  static bool rigIsRxIsrEnabled_;
+  bool rigIsImplicitMode_;
+  int rigCurrentTxPacketSize_;
+  CircularBuffer<uint8_t, CfgRadioQueueSize> rigTxQueue_;
+  CircularBuffer<uint8_t, CfgRadioQueueSize> rigTxQueueIndex_;
+  std::shared_ptr<MODULE_NAME> rig_;
 
   // bluetooth, wifi
   BluetoothSerial serialBt_;
   BLESerial serialBLE_;
-  WiFiClient aprsisConn_;
+  WiFiClient aprsisConnection_;
   
   // kiss server
   std::shared_ptr<WiFiServer> kissServer_;
-  WiFiClient kissConn_;
-  bool isKissConn_;
+  WiFiClient kissConnnection_;
+  bool isKissClientConnected_;
 };
 
 } // LoraPrs
