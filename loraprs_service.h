@@ -41,24 +41,25 @@ private:
   void printConfig();
 
   void setupWifi(const String &wifiName, const String &wifiKey);
-  void setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit);
-  void setFreq(long loraFreq) const;
+  void setupRadio(long freq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit);
+  void setFreq(long freq) const;
   void setupBt(const String &btName);
 
   void reconnectWifi() const;
   bool reconnectAprsis();
   void attachKissNetworkClient();
 
-  bool isLoraRxBusy();
-  void onLoraReceive();
+  bool isRadioRxBusy();
+  void onRadioReceive();
+  void onRadioTransmit();
   static void radioTask(void *param);
-  static ICACHE_RAM_ATTR void onLoraDataAvailableIsr();
+  static ICACHE_RAM_ATTR void onRadioDataAvailableIsr();
   void onAprsisDataAvailable();
 
   void sendSignalReportEvent(int rssi, float snr);
   void sendPeriodicBeacon();
   void sendToAprsis(const String &aprsMessage);
-  bool sendAX25ToLora(const AX25::Payload &payload);
+  bool sendAX25ToRadio(const AX25::Payload &payload);
   void processIncomingRawPacketAsServer(const byte *packet, int packetLength);
   void performFrequencyCorrection();
 
@@ -117,10 +118,11 @@ private:
   const String CfgLoraprsVersion = "LoRAPRS 0.1";
 
   // processor config
-  const int CfgConnRetryMs = 500;           // connection retry delay, e.g. wifi
-  static const int CfgPollDelayMs = 20;     // main loop delay
-  const int CfgConnRetryMaxTimes = 10;      // number of connection retries
-  static const int CfgMaxPacketSize = 256;  // maximum packet size
+  const int CfgConnRetryMs = 500;             // connection retry delay, e.g. wifi
+  const int CfgPollDelayMs = 20;              // main loop delay
+  const int CfgConnRetryMaxTimes = 10;        // number of connection retries
+  static const int CfgMaxPacketSize = 256;    // maximum packet size
+  static const int CfgRadioQueueSize = 1024;  // radio queue size
 
   // csma parameters, overriden with KISS commands
   const long CfgCsmaPersistence = 100;  // 255 for real time, lower for higher traffic
@@ -154,8 +156,10 @@ private:
   static TaskHandle_t radioTaskHandle_;
   static volatile bool isRadioRxActive_;
   static bool interruptEnabled_;
-  byte rxBuf_[CfgMaxPacketSize];
-  CircularBuffer<uint8_t, CfgMaxPacketSize> txQueue_;
+  int currentTxPacketSize_;
+  byte radioRxPacketBuffer_[CfgMaxPacketSize];
+  CircularBuffer<uint8_t, CfgRadioQueueSize> radioTxQueue_;
+  CircularBuffer<uint8_t, CfgRadioQueueSize> radioTxQueueIndex_;
   std::shared_ptr<MODULE_NAME> radio_;
 
   // bluetooth, wifi
