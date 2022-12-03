@@ -42,7 +42,7 @@ private:
 
   void setupWifi(const String &wifiName, const String &wifiKey);
   void setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit);
-  void setupFreq(long loraFreq) const;
+  void setFreq(long loraFreq) const;
   void setupBt(const String &btName);
 
   void reconnectWifi() const;
@@ -50,15 +50,9 @@ private:
   void attachKissNetworkClient();
 
   bool isLoraRxBusy();
-#ifdef USE_RADIOLIB
-  void onLoraDataAvailable();
-  static void processIncomingDataTask(void *param);
+  void onLoraReceive();
+  static void radioTask(void *param);
   static ICACHE_RAM_ATTR void onLoraDataAvailableIsr();
-  static ICACHE_RAM_ATTR void onLoraDataAvailableIsrNoRead();
-#else
-  static ICACHE_RAM_ATTR void onLoraDataAvailableIsr(int packetSize);
-  void loraReceive(int packetSize);
-#endif
   void onAprsisDataAvailable();
 
   void sendSignalReportEvent(int rssi, float snr);
@@ -124,7 +118,7 @@ private:
 
   // processor config
   const int CfgConnRetryMs = 500;           // connection retry delay, e.g. wifi
-  static const int CfgPollDelayMs = 20;      // main loop delay
+  static const int CfgPollDelayMs = 20;     // main loop delay
   const int CfgConnRetryMaxTimes = 10;      // number of connection retries
   static const int CfgMaxPacketSize = 256;  // maximum packet size
 
@@ -134,6 +128,13 @@ private:
 
   // kiss static parameters
   const int CfgKissPort = 8001;             // kiss tcp/ip server port
+
+  // radio task commands
+  enum RadioTaskBits {
+    Receive = 0x01,
+    Transmit = 0x02
+  };
+
 private:
   // config
   Config config_;
@@ -146,22 +147,23 @@ private:
   long csmaSlotTime_;
   long csmaSlotTimePrev_;
 
-  // state
+  // beacon state
   long previousBeaconMs_;
 
-  // peripherals
-  static byte rxBuf_[CfgMaxPacketSize];
-#ifdef USE_RADIOLIB
-  static TaskHandle_t rxTaskHandle_;
-  static volatile bool loraDataAvailable_;
+  // peripherals, radio
+  static TaskHandle_t radioTaskHandle_;
+  static volatile bool isRadioRxActive_;
   static bool interruptEnabled_;
+  byte rxBuf_[CfgMaxPacketSize];
   CircularBuffer<uint8_t, CfgMaxPacketSize> txQueue_;
-  static std::shared_ptr<MODULE_NAME> radio_;
-#endif
+  std::shared_ptr<MODULE_NAME> radio_;
+
+  // bluetooth, wifi
   BluetoothSerial serialBt_;
   BLESerial serialBLE_;
   WiFiClient aprsisConn_;
   
+  // kiss server
   std::shared_ptr<WiFiServer> kissServer_;
   WiFiClient kissConn_;
   bool isKissConn_;

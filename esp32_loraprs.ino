@@ -48,7 +48,6 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.LoraPinB = CFG_LORA_PIN_B; // (sx127x - dio1, sx126x/sx128x - busy)
   cfg.LoraPinSwitchRx = CFG_LORA_PIN_RXEN;  // (sx127x - unused, sx126x - RXEN pin number)
   cfg.LoraPinSwitchTx = CFG_LORA_PIN_TXEN;  // (sx127x - unused, sx126x - TXEN pin number)
-  cfg.LoraUseIsr = CFG_LORA_USE_ISR;  // set to true for incoming packet ISR usage (stream mode, e.g. speech)
   cfg.LoraUseCad = CFG_LORA_USE_CAD;  // carrier detect
 
   // aprs configuration

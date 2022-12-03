@@ -55,8 +55,7 @@ public:
   Processor();
   
   void sendRigToSerial(Cmd cmd, const byte *packet, int packetLength);
-  static void ICACHE_RAM_ATTR queueRigToSerialIsr(Cmd cmd, const byte *packet, int packetLength);
-
+  void queueRigToSerial(Cmd cmd, const byte *packet, int packetLength);
   void queueSerialToRig(Cmd cmd, const byte *packet, int packetLength);
 
   bool processRigToSerial();
