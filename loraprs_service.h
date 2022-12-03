@@ -112,7 +112,7 @@ private:
   } __attribute__((packed));
   
 private:
-  const String CfgLoraprsVersion = "LoRAPRS 1.0.2";
+  const String CfgLoraprsVersion = "LoRAPRS 1.0.3";
 
   // processor config
   const int CfgConnRetryMs = 500;             // connection retry delay, e.g. wifi
