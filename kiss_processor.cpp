@@ -160,7 +160,7 @@ bool Processor::processSerialToRig()
         serialToRigQueue_.push(rxByte);
       }
     }
-    yield();
+    vTaskDelay(1);
   }
   return allProcessed;
 }

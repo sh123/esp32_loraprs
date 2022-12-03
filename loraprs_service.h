@@ -151,7 +151,7 @@ private:
   // peripherals, radio
   static TaskHandle_t rigTaskHandle_;
   static volatile bool rigIsRxActive_;
-  static bool rigIsRxIsrEnabled_;
+  static volatile bool rigIsRxIsrEnabled_;
   bool rigIsImplicitMode_;
   int rigCurrentTxPacketSize_;
   CircularBuffer<uint8_t, CfgRadioQueueSize> rigTxQueue_;

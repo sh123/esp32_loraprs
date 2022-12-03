@@ -4,7 +4,7 @@ namespace LoraPrs {
 
 TaskHandle_t Service::rigTaskHandle_;
 volatile bool Service::rigIsRxActive_ = false;
-bool Service::rigIsRxIsrEnabled_ = true;
+volatile bool Service::rigIsRxIsrEnabled_ = true;
 
 Service::Service()
   : Kiss::Processor()
