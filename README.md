@@ -25,6 +25,7 @@ Modules, which are used by users and known to work
 Install via board manager:
 - Arduino ESP32 (search for esp32): https://github.com/espressif/arduino-esp32
   - Use latest 2.0.5+ version, if board manager does not list it then update "Additional boards manager URL" to https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json 
+
 Install via libraries:
 - RadioLib library: https://github.com/jgromes/RadioLib
 - Arduino Timer library: https://github.com/contrem/arduino-timer
