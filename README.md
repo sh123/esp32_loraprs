@@ -24,6 +24,7 @@ Modules, which are used by users and known to work
 # Dependencies
 Install via libraries:
 - Arduino ESP32 library: https://github.com/espressif/arduino-esp32
+  - Use latest 2.0.5+ version, if board manager does not list it then update "Additional boards manager URL" to https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json 
 - RadioLib library: https://github.com/jgromes/RadioLib
 - Arduino Timer library: https://github.com/contrem/arduino-timer
 - CircularBuffer library: https://github.com/rlogiacco/CircularBuffer
