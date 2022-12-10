@@ -154,6 +154,7 @@ private:
   static volatile bool rigIsRxIsrEnabled_;
   bool rigIsImplicitMode_;
   int rigCurrentTxPacketSize_;
+  bool isIsrInstalled_;
   CircularBuffer<uint8_t, CfgRadioQueueSize> rigTxQueue_;
   CircularBuffer<uint8_t, CfgRadioQueueSize> rigTxQueueIndex_;
   std::shared_ptr<MODULE_NAME> rig_;

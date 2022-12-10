@@ -12,6 +12,7 @@ Service::Service()
   , csmaSlotTime_(CfgCsmaSlotTimeMs)
   , csmaSlotTimePrev_(0)
   , rigCurrentTxPacketSize_(0)
+  , isIsrInstalled_(false)
   , serialBt_()
   , serialBLE_()
   , kissServer_(new WiFiServer(CfgKissPort))
@@ -226,13 +227,15 @@ void Service::setupRig(long loraFreq, long bw, int sf, int cr, int pwr, int sync
     #pragma message("Using SX126X")
     LOG_INFO("Using SX126X module");
     rig_->setRfSwitchPins(config_.LoraPinSwitchRx, config_.LoraPinSwitchTx);
-    rig_->clearDio1Action();
+    if (isIsrInstalled_) rig_->clearDio1Action();
     rig_->setDio1Action(onRigIsrRxPacket);
+    isIsrInstalled_ = true;
 #else
     #pragma message("Using SX127X")
     LOG_INFO("Using SX127X module");
-    radio_->clearDio0Action();
+    if (isIsrInstalled_) radio_->clearDio0Action();
     radio_->setDio0Action(onRigIsrRxPacket);
+    isIsrInstalled_ = true;
 #endif
 
   if (rigIsImplicitMode_) {
