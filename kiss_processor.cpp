@@ -4,7 +4,8 @@ namespace Kiss {
 
 Processor::Processor()
   : disableKiss_(false)
-  , usePrefix_(false)
+  , usePrefix3_(false)
+  , usePrefix4_(false)
   , isRawIdle_(true)
   , state_(State::GetStart)
 {
@@ -66,10 +67,16 @@ void Processor::queueSerialToRig(Cmd cmd, const byte *packet, int packetLength) 
   bool result = 1;
   if (disableKiss_) {
     // inject proprietary identifier
-    if (usePrefix_) {
+    if (usePrefix3_) {
       result &= serialToRigQueue_.unshift('<');
       result &= serialToRigQueue_.unshift(0xff);
       result &= serialToRigQueue_.unshift(0x01);
+    }
+    if (usePrefix4_) {
+      result &= serialToRigQueue_.unshift(' ');
+      result &= serialToRigQueue_.unshift(' ');
+      result &= serialToRigQueue_.unshift(' ');
+      result &= serialToRigQueue_.unshift(' ');
     }
     // TNC2, send as is, receiveByteRaw will deal with it
     for (int i = 0; i < packetLength; i++) {
@@ -121,15 +128,23 @@ bool Processor::processRigToSerial()
     int readCnt = rxPacketSize;
     for (int i = 0, j = 0; i < readCnt; i++) {
       byte rxByte = rigToSerialQueue_.pop();
-      if (disableKiss_ && usePrefix_) {
+      if (disableKiss_) {   
         // filter out properietary identifier
-        if ((i == 0 && rxByte == '<') ||
-            (i == 1 && rxByte == 0xff) ||
-            (i == 2 && rxByte == 0x01)) 
-           {
+        if (usePrefix3_) {
+          if ((i == 0 && rxByte == '<') ||
+              (i == 1 && rxByte == 0xff) ||
+              (i == 2 && rxByte == 0x01)) 
+          {
             rxPacketSize--;
             continue;
-           }
+          }
+        // filter out first 4 bytes
+        } else if (usePrefix4_) {
+          if (i >= 0 && i <= 3) {
+            rxPacketSize--;
+            continue;
+          }
+        }
       }
       buf[j++] = rxByte;
     }
