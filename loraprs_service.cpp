@@ -27,6 +27,7 @@ void Service::setup(const Config &conf)
   config_ = conf;  
   beaconLastTimestampMs_ = 0;
   disableKiss_ = conf.EnableTextPackets;
+  usePrefix_ = conf.EnableTextPacketsPrefix;
 
   LOG_SET_OPTION(false, false, true);  // disable file, line, enable func
 
