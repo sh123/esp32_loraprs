@@ -49,15 +49,15 @@ void Processor::sendRigToSerial(Cmd cmd, const byte *packet, int packetLength) {
 }
 
 void Processor::queueRigToSerial(Cmd cmd, const byte *packet, int packetLength) {
-  if (!rigToSerialQueueIndex_.unshift(packetLength)) {
-    LOG_WARN("Rig to serial queue is full!");
-    return;
-  }
   for (int i = 0; i < packetLength; i++) {
     if (!rigToSerialQueue_.unshift(packet[i])) {
       LOG_WARN("Rig to serial queue is full!");
       return;
     }
+  }
+  if (!rigToSerialQueueIndex_.unshift(packetLength)) {
+    LOG_WARN("Rig to serial index queue is full!");
+    return;
   }
 }
 
