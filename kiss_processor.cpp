@@ -130,6 +130,7 @@ bool Processor::processRigToSerial()
       byte rxByte = rigToSerialQueue_.pop();
       if (disableKiss_) {   
         // filter out properietary identifier
+        /*
         if (usePrefix3_) {
           if ((i == 0 && rxByte == '<') ||
               (i == 1 && rxByte == 0xff) ||
@@ -145,6 +146,7 @@ bool Processor::processRigToSerial()
             continue;
           }
         }
+        */
       }
       buf[j++] = rxByte;
     }
