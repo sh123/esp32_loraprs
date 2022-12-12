@@ -69,7 +69,6 @@ struct Config
   bool EnableBeacon;                    // true - send AprsRawBeacon to RF and APRS-IS if EnableRfToIs is true
   bool EnableTextPackets;               // true - use TNC2 text plain messages insead of AX25 binary frames for interoperability with other projects
   bool EnableTextPackets3;              // true - enable aprs-lora 3 byte prefix '<', 0xff, 0x01
-  bool EnableTextPackets4;              // true - enable oe3cjb 4 byte prefix
 
   // external ptt tx control
   bool PttEnable;                       // true - enable external ptt control

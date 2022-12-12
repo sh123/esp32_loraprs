@@ -86,7 +86,6 @@ private:
 protected:
   bool disableKiss_;
   bool usePrefix3_;
-  bool usePrefix4_;
 
 private:
   bool isRawIdle_;

@@ -5,7 +5,6 @@ namespace Kiss {
 Processor::Processor()
   : disableKiss_(false)
   , usePrefix3_(false)
-  , usePrefix4_(false)
   , isRawIdle_(true)
   , state_(State::GetStart)
 {
@@ -72,12 +71,6 @@ void Processor::queueSerialToRig(Cmd cmd, const byte *packet, int packetLength) 
       result &= serialToRigQueue_.unshift(0xff);
       result &= serialToRigQueue_.unshift(0x01);
     }
-    if (usePrefix4_) {
-      result &= serialToRigQueue_.unshift(' ');
-      result &= serialToRigQueue_.unshift(' ');
-      result &= serialToRigQueue_.unshift(' ');
-      result &= serialToRigQueue_.unshift(' ');
-    }
     // TNC2, send as is, receiveByteRaw will deal with it
     for (int i = 0; i < packetLength; i++) {
       byte rxByte = packet[i];
@@ -135,12 +128,6 @@ bool Processor::processRigToSerial()
               (i == 1 && rxByte == 0xff) ||
               (i == 2 && rxByte == 0x01)) 
           {
-            rxPacketSize--;
-            continue;
-          }
-        // filter out first 4 bytes
-        } else if (usePrefix4_) {
-          if (i >= 0 && i <= 3) {
             rxPacketSize--;
             continue;
           }
