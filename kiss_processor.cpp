@@ -237,6 +237,11 @@ bool Processor::receiveByteRaw(byte rxByte)
     if (!onRigTxBegin()) {
       return false;
     }
+    if (usePrefix3_) {
+      onRigTx('<');
+      onRigTx(0xff);
+      onRigTx(0x01);
+    }
     isRawIdle_ = false;
   }
   // NOTE, TNC2 uses \n as a packet delimiter
