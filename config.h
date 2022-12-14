@@ -24,7 +24,7 @@
 #ifndef LORA_RST
 #pragma message("LoRa pin definitions are not found, redefining...")
 #define LORA_RST              26
-#define LORA_IRQ              14
+#define LORA_IRQ              12
 #endif
 
 // LoRa pinouts
@@ -33,8 +33,8 @@
 #define CFG_LORA_PIN_A        LORA_IRQ    // (sx127x - dio0, sx126x/sx128x - dio1)
 #ifdef USE_SX126X
 #define CFG_LORA_PIN_B        14          // (sx127x - dio1, sx126x/sx128x - busy)
-#define CFG_LORA_PIN_RXEN     4           // (sx127x - unused, sx126x - RXEN pin number)
-#define CFG_LORA_PIN_TXEN     5           // (sx127x - unused, sx126x - TXEN pin number)
+#define CFG_LORA_PIN_RXEN     32           // (sx127x - unused, sx126x - RXEN pin number)
+#define CFG_LORA_PIN_TXEN     33           // (sx127x - unused, sx126x - TXEN pin number)
 #else
 #define CFG_LORA_PIN_B        RADIOLIB_NC // (sx127x - dio1, sx126x/sx128x - busy)
 #endif
