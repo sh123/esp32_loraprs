@@ -39,6 +39,7 @@ protected:
     SetHardware = 0x06,
     SignalReport = 0x07,
     RebootRequested = 0x08,
+    Telemetry = 0x09,
     NoCmd = 0x80
   };
 
@@ -77,7 +78,7 @@ protected:
 
 private:
   bool receiveByte(byte rxByte);
-  bool receiveByteRaw(byte rxByte);
+  bool receiveByteRaw(byte rxByte); 
   bool receiveByteKiss(byte rxByte);
 
   void processData(byte rxByte);

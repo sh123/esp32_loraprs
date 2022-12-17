@@ -75,6 +75,11 @@ struct Config
   int PttPin;                           // esp pin to set high on transmit
   int PttTxDelayMs;                     // ptt tx delay
   int PttTxTailMs;                      // ptt tx tail
+
+  // enable modem telemetry
+  bool TlmEnable;                 // true - enable modem telemetry event
+  int TlmBatMonPin;                        // battery monitor pin
+  float TlmBatMonCal;                      // calibration coefficient
 };
 
 } // LoraPrs

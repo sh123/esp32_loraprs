@@ -1,4 +1,4 @@
-#ifndef LORAPRS_SEVICE_H
+#ifndef LORAPRS_SERVICE_H
 #define LORAPRS_SERVICE_H
 
 #include <Arduino.h>
@@ -16,6 +16,7 @@
 
 #include <WiFi.h>
 #include <endian.h>
+#include <arduino-timer.h>
 
 #include "BluetoothSerial.h"
 #include "ble_serial.h"
@@ -54,6 +55,8 @@ private:
   void onAprsisDataAvailable();
 
   void sendSignalReportEvent(int rssi, float snr);
+  static bool sendModemTelemetryTimer(void *param);
+  void sendModemTelemetry();
   void sendPeriodicBeacon();
   void sendToAprsis(const String &aprsMessage);
   bool sendAx25PayloadToRig(const AX25::Payload &payload);
@@ -110,14 +113,20 @@ private:
     int16_t rssi;
     int16_t snr;
   } __attribute__((packed));
+
+  struct Telemetry {
+    int16_t batteryVoltage;
+  } __attribute__((packed));
   
 private:
-  const String CfgLoraprsVersion = "LoRAPRS 1.0.5";
+  const String CfgLoraprsVersion = "LoRAPRS 1.0.6";
 
   // processor config
   const int CfgConnRetryMs = 500;             // connection retry delay, e.g. wifi
   const int CfgPollDelayMs = 20;              // main loop delay
   const int CfgConnRetryMaxTimes = 10;        // number of connection retries
+  const int CfgTelemetryPeriodMs = 30000;     // how often to send telemetry event
+
   static const int CfgMaxPacketSize = 256;    // maximum packet size
   static const int CfgRadioQueueSize = 1024;  // radio queue size
 
@@ -168,6 +177,9 @@ private:
   std::shared_ptr<WiFiServer> kissServer_;
   WiFiClient kissConnnection_;
   bool isKissClientConnected_;
+
+  // modem telemetry
+  Timer<1> telemetryTimer_;
 };
 
 } // LoraPrs

@@ -94,6 +94,11 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.PttPin = CFG_PTT_PIN;
   cfg.PttTxDelayMs = CFG_PTT_TX_DELAY_MS;
   cfg.PttTxTailMs = CFG_PTT_TX_TAIL_MS;
+
+  // battery level monitor
+  cfg.TlmEnable = CFG_TLM_ENABLE;
+  cfg.TlmBatMonPin = CFG_TLM_BAT_MON_PIN;
+  cfg.TlmBatMonCal = CFG_TLM_BAT_MON_CAL;
 }
 
 LoraPrs::Service loraPrsService;

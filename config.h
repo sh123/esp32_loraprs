@@ -104,3 +104,8 @@
 #define CFG_PTT_PIN           12      // PTT pin
 #define CFG_PTT_TX_DELAY_MS   50      // delay between relay switching ON and transmission startup
 #define CFG_PTT_TX_TAIL_MS    10      // delay between stopping transmission and relay switching OFF
+
+// Enable modem telemetry
+#define CFG_TLM_ENABLE        false   // enable modem battery monitor
+#define CFG_TLM_BAT_MON_PIN   36      // battery ADC pin
+#define CFG_TLM_BAT_MON_CAL   0.37f   // calibration coefficient

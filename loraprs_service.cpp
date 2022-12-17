@@ -87,6 +87,12 @@ void Service::setup(const Config &conf)
     LOG_INFO("External PTT is enabled");
     pinMode(config_.PttPin, OUTPUT);
   }
+
+  // telemetry event
+  if (config_.TlmEnable) {
+    LOG_INFO("Telemetry event is enabled");
+    telemetryTimer_.every(CfgTelemetryPeriodMs, sendModemTelemetryTimer, this);
+  }
 }
 
 void Service::printConfig() {
@@ -301,6 +307,11 @@ void Service::loop()
       csmaSlotTimePrev_ = currentTime;
     }
   }
+
+  // timers
+  if (config_.TlmEnable) {
+    telemetryTimer_.tick();
+  }
   delay(CfgPollDelayMs);
 }
 
@@ -453,6 +464,22 @@ void Service::sendSignalReportEvent(int rssi, float snr)
   signalReport.snr = htobe16(snr * 100);
 
   sendRigToSerial(Cmd::SignalReport, (const byte *)&signalReport, sizeof(SignalReport));
+}
+
+bool Service::sendModemTelemetryTimer(void *param)
+{
+  ((Service *)param)->sendModemTelemetry();
+  return true;
+}
+
+void Service::sendModemTelemetry()
+{
+  float batVoltage = 2 * analogRead(config_.TlmBatMonPin) * (3.3 / 4096.0) + config_.TlmBatMonCal;
+  LOG_INFO("Battery voltage", batVoltage);
+
+  struct Telemetry telemetry;
+  telemetry.batteryVoltage = htobe16(100 * batVoltage);
+  sendRigToSerial(Cmd::Telemetry, (const byte *)&telemetry, sizeof(Telemetry));
 }
 
 bool Service::sendAx25PayloadToRig(const AX25::Payload &payload)
