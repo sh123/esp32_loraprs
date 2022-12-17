@@ -77,9 +77,9 @@ struct Config
   int PttTxTailMs;                      // ptt tx tail
 
   // enable modem telemetry
-  bool TlmEnable;                 // true - enable modem telemetry event
-  int TlmBatMonPin;                        // battery monitor pin
-  float TlmBatMonCal;                      // calibration coefficient
+  bool TlmEnable;                       // true - enable modem telemetry event
+  int TlmBatMonPin;                     // battery monitor pin
+  float TlmBatMonCal;                   // calibration coefficient
 };
 
 } // LoraPrs
