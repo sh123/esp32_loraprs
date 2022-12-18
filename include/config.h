@@ -18,7 +18,9 @@
 #define CFG_LOG_LEVEL         DebugLogLevel::LVL_INFO
 
 // select between client mode and APRS-IS gate mode
+#ifndef CFG_IS_CLIENT_MODE
 #define CFG_IS_CLIENT_MODE    true        // false - server mode (APRS-IS gate mode)
+#endif
 
 // change pinouts if not defined through native board LORA_* definitions
 #ifndef LORA_RST
