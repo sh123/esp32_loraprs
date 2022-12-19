@@ -23,9 +23,9 @@ Modules, which are used by users and known to work
   - TTGO T-Beam (SX1276)
 
 # Building
-- Update `include/config.h`
-- Build for client/tracker mode `pio run -e esp32dev`
-- Build for iGate `pio run -e esp32dev_igate`
+- Update `include/config.h` with your parameters
+- To build for client/tracker mode use `pio run -e esp32dev`
+- To build for iGate mode use `pio run -e esp32dev_igate`
 
 # Development board
 Development board schematics, case and antenna models are available under `extras/cad` and `extras/schematics`.
