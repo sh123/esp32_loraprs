@@ -13,3 +13,4 @@
 - `aprs_tracker_e22_base_battery_lid` - lid for battery compartment.
 - `aprs_tracker_e22_base_battery` - base for tracker case with battery compartment.
 - `aprs_tracker_e22_cover_dv` - DV cover version with holes for screen, encoder, ptt button, speaker, mic.
+- `aprs_tracker_e22_encoder_knob` - knob for encoder.
