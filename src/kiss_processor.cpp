@@ -7,6 +7,7 @@ Processor::Processor()
   , usePrefix3_(false)
   , isRawIdle_(true)
   , state_(State::GetStart)
+  , dataType_(DataType::None)
 {
 }
 
