@@ -24,10 +24,8 @@ Modules, which are used by users and known to work
 
 # Building
 - Update `include/config.h`
-- Build for client/tracker mode
-  `pio run -e esp32dev`
-- Build for iGate
-  `pio run -e esp32dev_igate`
+- Build for client/tracker mode `pio run -e esp32dev`
+- Build for iGate `pio run -e esp32dev_igate`
 
 # Development board
 Development board schematics, case and antenna models are available under `extras/cad` and `extras/schematics`.
