@@ -26,7 +26,7 @@
 
 namespace LoraPrs {
 
-class Service : public Kiss::Processor
+class Service : virtual public Kiss::Processor
 {
 public:
   Service();
@@ -85,18 +85,18 @@ private:
   }
 
 protected:
-  virtual bool onRigTxBegin();
-  virtual void onRigTx(byte b);
-  virtual void onRigTxEnd();
-  virtual void onRigPacket(void *packet, int packetLength);
+  virtual bool onRigTxBegin() override;
+  virtual void onRigTx(byte b) override;
+  virtual void onRigTxEnd() override;
+  virtual void onRigPacket(void *packet, int packetLength) override;
   
-  virtual void onSerialTx(byte b);
-  virtual bool onSerialRxHasData();
-  virtual bool onSerialRx(byte *b);
+  virtual void onSerialTx(byte b) override;
+  virtual bool onSerialRxHasData() override;
+  virtual bool onSerialRx(byte *b) override;
 
-  virtual void onControlCommand(Cmd cmd, byte value);
-  virtual void onRadioControlCommand(const std::vector<byte> &command);
-  virtual void onRebootCommand();
+  virtual void onControlCommand(Cmd cmd, byte value) override;
+  virtual void onRadioControlCommand(const std::vector<byte> &command) override;
+  virtual void onRebootCommand() override;
 
 private:
   struct SetHardware {
