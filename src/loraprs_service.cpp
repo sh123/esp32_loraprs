@@ -92,7 +92,7 @@ void Service::setup(const Config &conf)
   }
 
   // telemetry event
-  if (config_.TlmEnable) {
+  if (config_.TlmEnable && config_.IsClientMode) {
     LOG_INFO("Telemetry event is enabled");
     telemetryTimer_.every(CfgTelemetryPeriodMs, sendModemTelemetryTimer, this);
   }
