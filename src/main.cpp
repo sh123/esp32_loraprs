@@ -105,6 +105,11 @@ LoraPrs::Service loraPrsService;
 
 auto watchdogLedTimer = timer_create_default();
 
+bool toggleWatchdogLed(void *) {
+  digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
+  return true;
+}
+
 void setup() {
   pinMode(BUILTIN_LED, OUTPUT);
   digitalWrite(BUILTIN_LED, 1);
@@ -123,9 +128,4 @@ void setup() {
 void loop() {
   loraPrsService.loop();
   watchdogLedTimer.tick();
-}
-
-bool toggleWatchdogLed(void *) {
-  digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
-  return true;
 }

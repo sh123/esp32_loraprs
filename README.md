@@ -1,5 +1,5 @@
 # ESP32 LoRa APRS Modem 
-![Modes of operation](images/diagram.png)
+![Modes of operation](extras/images/diagram.png)
 
 This project is amateur radio ESP32 based LoRa **KISS Bluetooth/BLE/USB/TCPIP** modem + LoRa **APRS-IS RX/TX iGate** server over WiFI + LoRa **APRS digipeater** + **Codec2 DV modem** (with Codec2 Talkie Android application). 
 
@@ -22,18 +22,12 @@ Modules, which are used by users and known to work
   - RA-02 (SX1276)
   - TTGO T-Beam (SX1276)
 
-# Dependencies
-Install via board manager:
-- Arduino ESP32 (search for esp32): https://github.com/espressif/arduino-esp32
-  - Use latest 2.0.5+ version, if board manager does not list it then update "Additional boards manager URL" to https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json 
-
-Install via libraries:
-- RadioLib library: https://github.com/jgromes/RadioLib
-- Arduino Timer library: https://github.com/contrem/arduino-timer
-- CircularBuffer library: https://github.com/rlogiacco/CircularBuffer
-- DebugLog library: https://github.com/hideakitai/DebugLog
+# Building
+- Update `include/config.h`
+- Build for client/tracker mode `pio run -e esp32dev`
+- Build for iGate `pio run -e esp32dev_igate`
 
 # Development board
-Development board schematics, case and antenna models are available under `cad` and `schematics`.
+Development board schematics, case and antenna models are available under `extras/cad` and `extras/schematics`.
 
-![Modes of operation](images/device.png)
+![Modes of operation](extras/images/device.png)

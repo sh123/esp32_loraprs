@@ -8,11 +8,14 @@ volatile bool Service::rigIsRxIsrEnabled_ = true;
 
 Service::Service()
   : Kiss::Processor()
+  , config_()
   , csmaP_(CfgCsmaPersistence)
   , csmaSlotTime_(CfgCsmaSlotTimeMs)
   , csmaSlotTimePrev_(0)
+  , beaconLastTimestampMs_(0)
   , rigCurrentTxPacketSize_(0)
   , isIsrInstalled_(false)
+  , rigIsImplicitMode_(false)
   , serialBt_()
   , serialBLE_()
   , kissServer_(new WiFiServer(CfgKissPort))
@@ -89,7 +92,7 @@ void Service::setup(const Config &conf)
   }
 
   // telemetry event
-  if (config_.TlmEnable) {
+  if (config_.TlmEnable && config_.IsClientMode) {
     LOG_INFO("Telemetry event is enabled");
     telemetryTimer_.every(CfgTelemetryPeriodMs, sendModemTelemetryTimer, this);
   }

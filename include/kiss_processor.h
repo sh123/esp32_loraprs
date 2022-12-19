@@ -46,7 +46,8 @@ protected:
   enum DataType {
       Raw = 0,
       Control,
-      Reboot
+      Reboot,
+      None = 0x80
   };
 
   static const int CfgSerialToRigQueueSize = 4096;

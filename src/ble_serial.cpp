@@ -43,6 +43,8 @@ class BLESerialCharacteristicCallbacks: public BLECharacteristicCallbacks {
 // Constructor
 
 BLESerial::BLESerial()
+  : pService(NULL)
+  , pTxCharacteristic(NULL)
 {
   // create instance  
   receiveBuffer = "";
