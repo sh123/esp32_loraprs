@@ -22,7 +22,14 @@ Modules, which are used by users and known to work
   - RA-02 (SX1276)
   - TTGO T-Beam (SX1276)
 
+# Building
+- Update `include/config.h`
+- Build for client/tracker mode
+  `pio run -e esp32dev`
+- Build for iGate
+  `pio run -e esp32dev_igate`
+
 # Development board
-Development board schematics, case and antenna models are available under `cad` and `schematics`.
+Development board schematics, case and antenna models are available under `extras/cad` and `extras/schematics`.
 
 ![Modes of operation](extras/images/device.png)
