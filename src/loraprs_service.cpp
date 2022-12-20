@@ -735,7 +735,9 @@ void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
     LOG_INFO("Setting new radio parameters");
     const struct SetHardware * setHardware = reinterpret_cast<const struct SetHardware*>(rawCommand.data());
     
+    // TODO, add support for split set hardware
     config_.LoraFreqRx = be32toh(setHardware->freq);
+    config_.LoraFreqTx = be32toh(setHardware->freq);
     config_.LoraBw = be32toh(setHardware->bw);
     config_.LoraSf = be16toh(setHardware->sf);
     config_.LoraCodingRate = be16toh(setHardware->cr);
