@@ -243,8 +243,8 @@ void Service::setupRig(long loraFreq, long bw, int sf, int cr, int pwr, int sync
 #else
     #pragma message("Using SX127X")
     LOG_INFO("Using SX127X module");
-    if (isIsrInstalled_) radio_->clearDio0Action();
-    radio_->setDio0Action(onRigIsrRxPacket);
+    if (isIsrInstalled_) rig_->clearDio0Action();
+    rig_->setDio0Action(onRigIsrRxPacket);
     isIsrInstalled_ = true;
 #endif
 
@@ -525,7 +525,7 @@ void Service::performFrequencyCorrection() {
 #ifdef USE_SX126X
   long frequencyErrorHz = 0;
 #else
-  long frequencyErrorHz = radio_->getFrequencyError();
+  long frequencyErrorHz = rig_->getFrequencyError();
 #endif
   if (abs(frequencyErrorHz) > config_.AutoFreqCorrectionDeltaHz) {
     config_.LoraFreqRx -= frequencyErrorHz;
@@ -562,7 +562,7 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
 #ifdef USE_SX126X
     long frequencyError = 0;
 #else
-    long frequencyError = radio_->getFrequencyError();
+    long frequencyError = rig_->getFrequencyError();
 #endif
     String signalReport = String("rssi: ") +
       String(snr < 0 ? rssi + snr : rssi) +
