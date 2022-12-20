@@ -38,7 +38,9 @@
 #define CFG_LORA_PIN_RXEN     32          // (sx127x - unused, sx126x - RXEN pin number)
 #define CFG_LORA_PIN_TXEN     33          // (sx127x - unused, sx126x - TXEN pin number)
 #else
-#define CFG_LORA_PIN_B        RADIOLIB_NC // (sx127x - dio1, sx126x/sx128x - busy)
+#define CFG_LORA_PIN_B        RADIOLIB_NC
+#define CFG_LORA_PIN_RXEN     RADIOLIB_NC
+#define CFG_LORA_PIN_TXEN     RADIOLIB_NC
 #endif
 
 // Redefine LED if not defined in Arduino to have module heartbeat indication
