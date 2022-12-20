@@ -326,8 +326,7 @@ ICACHE_RAM_ATTR void Service::onRigIsrRxPacket() {
   BaseType_t xHigherPriorityTaskWoken;
   if (rigIsRxIsrEnabled_) {
     rigIsRxActive_ = true;
-    uint32_t radioReceiveBit = RadioTaskBits::Receive;
-    xTaskNotifyFromISR(rigTaskHandle_, radioReceiveBit, eSetBits, &xHigherPriorityTaskWoken);
+    xTaskNotifyFromISR(rigTaskHandle_, RadioTaskBits::Receive, eSetBits, &xHigherPriorityTaskWoken);
   }
 }
 
@@ -337,10 +336,10 @@ void Service::rigTask(void *self) {
     uint32_t commandBits = 0;
     xTaskNotifyWaitIndexed(0, 0x00, ULONG_MAX, &commandBits, portMAX_DELAY);
     if (commandBits & RadioTaskBits::Receive) {
-      ((Service*)self)->onRigTaskRxPacket();
+      static_cast<Service*>(self)->onRigTaskRxPacket();
     }
     else if (commandBits & RadioTaskBits::Transmit) {
-      ((Service*)self)->onRigTaskTxPacket();
+      static_cast<Service*>(self)->onRigTaskTxPacket();
     }
   }
 }
@@ -471,7 +470,7 @@ void Service::sendSignalReportEvent(int rssi, float snr)
 
 bool Service::sendModemTelemetryTimer(void *param)
 {
-  ((Service *)param)->sendModemTelemetry();
+  static_cast<Service*>(param)->sendModemTelemetry();
   return true;
 }
 
@@ -536,7 +535,7 @@ void Service::performFrequencyCorrection() {
 }
 
 void Service::setFreq(long loraFreq) const {
-  rig_->setFrequency((float)config_.LoraFreqRx / 1e6);
+  rig_->setFrequency((float)loraFreq / 1e6);
   int state = rig_->startReceive();
   if (state != RADIOLIB_ERR_NONE) {
     LOG_ERROR("Start receive error:", state);
