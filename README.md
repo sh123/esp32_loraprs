@@ -23,8 +23,8 @@ Modules, which are used by users and known to work
   - TTGO T-Beam (SX1276)
 
 # Building
-- Update `include/config.h` with your parameters
-  - If you are using lora-aprs iGate (non ax.25) then set `CFG_TEXT_PACKETS` and `CFG_TEXT_PACKETS_3` config parameters to `true`
+- Update `include/config.h` with your radio settings
+  - If you are using lora-aprs iGate (non ax.25) then set `CFG_TEXT_PACKETS` and `CFG_TEXT_PACKETS_3` config parameters to `true` and use APRSDroid TNC2 packet mode
 - To build for client/tracker mode use `pio run -e esp32dev`
 - To build for iGate mode use `pio run -e esp32dev_igate`
 
