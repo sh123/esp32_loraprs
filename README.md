@@ -24,6 +24,7 @@ Modules, which are used by users and known to work
 
 # Building
 - Update `include/config.h` with your parameters
+  - If you are using lora-aprs iGate (non ax.25) then set `CFG_TEXT_PACKETS` and `CFG_TEXT_PACKETS_3` config parameters to `true`
 - To build for client/tracker mode use `pio run -e esp32dev`
 - To build for iGate mode use `pio run -e esp32dev_igate`
 
