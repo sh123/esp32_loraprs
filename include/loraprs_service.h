@@ -123,7 +123,6 @@ private:
 
   // processor config
   const int CfgConnRetryMs = 500;             // connection retry delay, e.g. wifi
-  const int CfgPollDelayMs = 20;              // main loop delay
   const int CfgConnRetryMaxTimes = 10;        // number of connection retries
   const int CfgTelemetryPeriodMs = 60000;     // how often to send telemetry event
 

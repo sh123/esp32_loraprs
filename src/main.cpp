@@ -1,8 +1,5 @@
 #include <arduino-timer.h>
 #include <DebugLog.h>
-#include "WiFi.h"
-
-#include "loraprs_service.h"
 
 #if __has_include("/tmp/esp32_loraprs_config.h")
 #pragma message("Using external config")
@@ -17,6 +14,10 @@
 #else
 #pragma message("Configured for server mode")
 #endif
+
+#include "loraprs_service.h"
+
+const int CfgPollDelayMs = 20;              // main loop delay
 
 /*
  * Initialize config from config.h options.
@@ -128,4 +129,5 @@ void setup() {
 void loop() {
   loraPrsService.loop();
   watchdogLedTimer.tick();
+  delay(CfgPollDelayMs);
 }

@@ -315,7 +315,6 @@ void Service::loop()
   if (config_.TlmEnable) {
     telemetryTimer_.tick();
   }
-  delay(CfgPollDelayMs);
 }
 
 bool Service::isRigRxBusy() {

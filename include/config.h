@@ -1,3 +1,6 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
 // Uncomment for SX126X module usage
 #define USE_SX126X
 
@@ -113,3 +116,5 @@
 #define CFG_TLM_ENABLE        false   // enable modem battery monitor
 #define CFG_TLM_BAT_MON_PIN   36      // battery ADC pin
 #define CFG_TLM_BAT_MON_CAL   0.37f   // calibration coefficient
+
+#endif // CONFIG_H
