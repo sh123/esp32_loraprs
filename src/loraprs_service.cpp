@@ -98,7 +98,8 @@ void Service::setup(const Config &conf)
   }
 }
 
-void Service::printConfig() {
+void Service::printConfig() const {
+  LOG_INFO("Version:", CfgLoraprsVersion);
   LOG_INFO("Current mode:", config_.IsClientMode ? "NORMAL" : "APRS-IS iGate");
   LOG_INFO(disableKiss_ ? "Using TNC2 text mode" : "Using TNC KISS and AX.25 mode");
   LOG_INFO("UsbSerialEnable:", config_.UsbSerialEnable ? "yes" : "no");
@@ -317,7 +318,7 @@ void Service::loop()
   }
 }
 
-bool Service::isRigRxBusy() {
+bool Service::isRigRxBusy() const {
   return config_.LoraUseCad && rigIsRxActive_;
 }
 

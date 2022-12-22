@@ -35,7 +35,7 @@ public:
   void loop();
 
 private:
-  void printConfig();
+  void printConfig() const;
 
   void setupWifi(const String &wifiName, const String &wifiKey);
   void setupRig(long freq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit);
@@ -46,7 +46,7 @@ private:
   bool reconnectAprsis();
   void attachKissNetworkClient();
 
-  bool isRigRxBusy();
+  bool isRigRxBusy() const;
   void onRigTaskRxPacket();
   void onRigTaskTxPacket();
   static void rigTask(void *self);
@@ -119,7 +119,7 @@ private:
   } __attribute__((packed));
 
 private:
-  const String CfgLoraprsVersion = "LoRAPRS 1.0.9";
+  const String CfgLoraprsVersion = "LoRAPRS 1.0.10";
 
   // processor config
   const int CfgConnRetryMs = 500;             // connection retry delay, e.g. wifi
