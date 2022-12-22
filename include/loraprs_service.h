@@ -80,7 +80,7 @@ private:
     return !config_.IsClientMode  // beaconing only in apris gate / server mode
     && config_.EnableBeacon;  // beacon must be explicitly enabled
   }
-  inline bool splitEnabled() const {
+  inline bool isHalfDuplex() const {
     return config_.LoraFreqRx != config_.LoraFreqTx;
   }
 

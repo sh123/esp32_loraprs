@@ -364,6 +364,14 @@ void Service::onRigTaskRxPacket() {
 }
 
 void Service::onRigTaskTxPacket() {
+  rigIsRxIsrEnabled_ = false;
+  if (isHalfDuplex()) {
+    setFreq(config_.LoraFreqTx);
+  }
+  if (config_.PttEnable) {
+    digitalWrite(config_.PttPin, HIGH);
+    delay(config_.PttTxDelayMs);
+  }
   while (rigTxQueueIndex_.size() > 0) {
     int txPacketSize = rigTxQueueIndex_.shift();
     LOG_TRACE("onRigTaskTxPacket", txPacketSize);
@@ -373,25 +381,24 @@ void Service::onRigTaskTxPacket() {
       txBuf[i] = rigTxQueue_.shift();
     }
 
-    rigIsRxIsrEnabled_ = false;
     int state = rig_->transmit(txBuf, txPacketSize);
     if (state != RADIOLIB_ERR_NONE) {
       LOG_ERROR("TX error: ", state);
     }
     vTaskDelay(1);
   }
+  if (config_.PttEnable) {
+    delay(config_.PttTxTailMs);
+    digitalWrite(config_.PttPin, LOW);
+  }
+  if (isHalfDuplex()) {
+    setFreq(config_.LoraFreqRx);
+  }
   int state = rig_->startReceive();
   if (state != RADIOLIB_ERR_NONE) {
     LOG_ERROR("Start receive error: ", state);
   }
   rigIsRxIsrEnabled_ = true;
-  if (config_.PttEnable) {
-    delay(config_.PttTxTailMs);
-    digitalWrite(config_.PttPin, LOW);
-  }
-  if (splitEnabled()) {
-    setFreq(config_.LoraFreqRx);
-  }
 }
 
 void Service::sendPeriodicBeacon()
@@ -595,13 +602,6 @@ bool Service::onRigTxBegin()
 {
   LOG_TRACE("onRigTxBegin");
   rigCurrentTxPacketSize_ = 0;
-  if (splitEnabled()) {
-    setFreq(config_.LoraFreqTx);
-  }
-  if (config_.PttEnable) {
-    digitalWrite(config_.PttPin, HIGH);
-    delay(config_.PttTxDelayMs);
-  }
   return true;
 }
 
@@ -616,8 +616,7 @@ void Service::onRigTxEnd()
 {
   LOG_TRACE("onRigTxEnd", rigCurrentTxPacketSize_);
   rigTxQueueIndex_.push(rigCurrentTxPacketSize_);
-  uint32_t radioTransmitBit = RadioTaskBits::Transmit;
-  xTaskNotify(rigTaskHandle_, radioTransmitBit, eSetBits);
+  xTaskNotify(rigTaskHandle_, RadioTaskBits::Transmit, eSetBits);
 }
 
 void Service::attachKissNetworkClient() 
