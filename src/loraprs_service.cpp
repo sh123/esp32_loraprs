@@ -41,8 +41,6 @@ void Service::setup(const Config &conf)
     LOG_SET_LEVEL(config_.LogLevel);
   }
 
-  printConfig();
-  
   // KISS extensions are disabled in TNC2 mode
   if (disableKiss_) {
     LOG_INFO("KISS extensions are disabled in TNC2 mode");
@@ -188,24 +186,8 @@ bool Service::reconnectAprsis()
   return true;
 }
 
-void Service::setupRig(long loraFreq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit)
+float Service::getSnrLimit(int sf, long bw) const
 {
-  rigIsImplicitMode_ = !isExplicit;
-  rigIsImplicitMode_ = sf == 6;      // must be implicit for SF6
-  int loraSpeed = (int)(sf * (4.0 / cr) / (pow(2.0, sf) / bw));
-        
-  LOG_INFO("Initializing LoRa");
-  LOG_INFO("Frequency:", loraFreq, "Hz");
-  LOG_INFO("Bandwidth:", bw, "Hz");
-  LOG_INFO("Spreading:", sf);
-  LOG_INFO("Coding rate:", cr);
-  LOG_INFO("Power:", pwr, "dBm");
-  LOG_INFO("Sync:", "0x" + String(sync, HEX));
-  LOG_INFO("CRC:", crcBytes);
-  LOG_INFO("Header:", rigIsImplicitMode_ ? "implicit" : "explicit");
-  LOG_INFO("Speed:", loraSpeed, "bps");
-  LOG_INFO("TOA (compressed):", 37.0 / ((double)loraSpeed / 8.0), "sec");
-  LOG_INFO("TOA (uncompressed):", 64.0 / ((double)loraSpeed / 8.0), "sec");
   float snrLimit = -7;
   switch (sf) {
     case 7:
@@ -227,7 +209,30 @@ void Service::setupRig(long loraFreq, long bw, int sf, int cr, int pwr, int sync
         snrLimit = -20.0;
         break;
   }
-  LOG_INFO("Min level:", -174 + 10 * log10(bw) + 6 + snrLimit, "dBm");
+  return -174 + 10 * log10(bw) + 6 + snrLimit;
+}
+
+void Service::setupRig(long loraFreq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit)
+{
+  rigIsImplicitMode_ = !isExplicit;
+  rigIsImplicitMode_ = sf == 6;      // must be implicit for SF6
+  int loraSpeed = getSpeed(sf, cr, bw);
+        
+  LOG_INFO("Initializing LoRa");
+  LOG_INFO("Frequency:", loraFreq, "Hz");
+  LOG_INFO("Bandwidth:", bw, "Hz");
+  LOG_INFO("Spreading:", sf);
+  LOG_INFO("Coding rate:", cr);
+  LOG_INFO("Power:", pwr, "dBm");
+  LOG_INFO("Sync:", "0x" + String(sync, HEX));
+  LOG_INFO("CRC:", crcBytes);
+  LOG_INFO("Header:", rigIsImplicitMode_ ? "implicit" : "explicit");
+  LOG_INFO("Speed:", loraSpeed, "bps");
+  LOG_INFO("TOA (compressed): ~", 37.0 / ((double)loraSpeed / 8.0), "sec");
+  LOG_INFO("TOA (uncompressed): ~", 64.0 / ((double)loraSpeed / 8.0), "sec");
+  LOG_INFO("Min level:", getSnrLimit(sf, bw), "dBm");
+  printConfig();
+
   rig_ = std::make_shared<MODULE_NAME>(new Module(config_.LoraPinSs, config_.LoraPinA, config_.LoraPinRst, config_.LoraPinB));
   int state = rig_->begin((float)loraFreq / 1e6, (float)bw / 1e3, sf, cr, sync, pwr);
   if (state != RADIOLIB_ERR_NONE) {

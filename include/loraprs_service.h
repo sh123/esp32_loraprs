@@ -85,6 +85,9 @@ private:
     return config_.LoraFreqRx != config_.LoraFreqTx;
   }
 
+  inline int getSpeed(int sf, int cr, long bw) const { return (int)(sf * (4.0 / cr) / (pow(2.0, sf) / bw)); }
+  float getSnrLimit(int sf, long bw) const;
+
 protected:
   virtual bool onRigTxBegin() override;
   virtual void onRigTx(byte b) override;
