@@ -46,7 +46,8 @@ private:
   bool reconnectAprsis();
   void attachKissNetworkClient();
 
-  bool isRigRxBusy() const;
+  inline bool isRigRxBusy() const { return config_.LoraUseCad && rigIsRxActive_; }
+
   void onRigTaskRxPacket();
   void onRigTaskTxPacket();
   static void rigTask(void *self);

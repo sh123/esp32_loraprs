@@ -282,31 +282,34 @@ void Service::setupBt(const String &btName)
 
 void Service::loop()
 { 
+  // wifi connectivity check
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
     reconnectWifi();
   }
+  // aprs connectivity check
   if (needsAprsis() && !aprsisConnection_.connected() && config_.EnablePersistentAprsConnection) {
     reconnectAprsis();
   }
+  // tcp/ip kiss client connectivity check
   if (config_.KissEnableTcpIp) {
     attachKissNetworkClient();
   }
 
   // RX path, Rig -> Serial
-  bool isRigToSerialProcessed = false;
-  isRigToSerialProcessed = processRigToSerial();
+  if (!processRigToSerial()) {
 
-  // TX path, Serial -> Rig
-  if (!isRigToSerialProcessed) {
-
+    // TX path, Serial -> Rig
     long currentTime = millis();
     if (!isRigRxBusy() && currentTime > csmaSlotTimePrev_ + csmaSlotTime_ && random(0, 255) < csmaP_) {
+      // new data from aprsis
       if (aprsisConnection_.available() > 0) {
         onAprsisDataAvailable();
       }
+      // periodic beacon
       if (needsBeacon()) {
         sendPeriodicBeacon();
       }
+      // tx if data available
       processSerialToRig();
       csmaSlotTimePrev_ = currentTime;
     }
@@ -316,10 +319,6 @@ void Service::loop()
   if (config_.TlmEnable) {
     telemetryTimer_.tick();
   }
-}
-
-bool Service::isRigRxBusy() const {
-  return config_.LoraUseCad && rigIsRxActive_;
 }
 
 ICACHE_RAM_ATTR void Service::onRigIsrRxPacket() {
