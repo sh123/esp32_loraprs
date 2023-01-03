@@ -503,7 +503,8 @@ bool Service::sendAx25PayloadToRig(const AX25::Payload &payload)
   // TNC2 text mode
   if (config_.EnableTextPackets) {
     String textPayload = payload.ToString();
-    bytesWritten = textPayload.length() > CfgMaxPacketSize ? CfgMaxPacketSize : textPayload.length();
+    int textPayloadLength = textPayload.length() + 1; // include null terminator
+    bytesWritten = textPayloadLenght > CfgMaxPacketSize ? CfgMaxPacketSize : textPayloadLength;
     textPayload.getBytes(buf, bytesWritten);
     buf[bytesWritten-1] = '\0';
 
