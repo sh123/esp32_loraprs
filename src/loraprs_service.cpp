@@ -528,7 +528,7 @@ void Service::onRigPacket(void *packet, int packetLength)
   if (config_.KissEnableExtensions) {
     sendSignalReportEvent(rig_->getRSSI(), rig_->getSNR());
   }
-  if (!config_.IsClientMode) {
+  if (!config_.IsClientMode || config_.EnableRepeater) {
     processIncomingRawPacketAsServer((const byte*)packet, packetLength);
   }
 }
