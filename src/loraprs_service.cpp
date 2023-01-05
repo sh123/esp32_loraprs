@@ -504,7 +504,7 @@ bool Service::sendAx25PayloadToRig(const AX25::Payload &payload)
   if (config_.EnableTextPackets) {
     String textPayload = payload.ToString();
     int textPayloadLength = textPayload.length() + 1; // include null terminator
-    bytesWritten = textPayloadLenght > CfgMaxPacketSize ? CfgMaxPacketSize : textPayloadLength;
+    bytesWritten = textPayloadLength > CfgMaxPacketSize ? CfgMaxPacketSize : textPayloadLength;
     textPayload.getBytes(buf, bytesWritten);
     buf[bytesWritten-1] = '\0';
 
