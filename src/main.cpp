@@ -41,6 +41,7 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.LoraCrc = CFG_LORA_CRC; // set to 0 to disable
   cfg.LoraExplicit = CFG_LORA_EXPLICIT;
   cfg.LoraPower = CFG_LORA_PWR;
+  cfg.LoraPreamble = CFG_LORA_PREAMBLE;
 
   // lora pinouts
   cfg.LoraPinSs = CFG_LORA_PIN_SS;

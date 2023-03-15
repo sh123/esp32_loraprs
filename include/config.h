@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 // Uncomment for SX126X module usage
-#define USE_SX126X
+// #define USE_SX126X
 
 // Check your module name at https://github.com/jgromes/RadioLib/wiki/Modules
 #ifdef USE_SX126X
@@ -69,6 +69,7 @@
 #define CFG_LORA_EXPLICIT     true        // header mode, true - explicit, false - implicit
 #define CFG_LORA_SYNC         0x12        // sync word (0x12 - private used by other trackers, 0x34 - public used by LoRaWAN)
 #define CFG_LORA_PWR          20          // output power in dBm
+#define CFG_LORA_PREAMBLE     8           // preamble length from 6 to 65535
 
 // WiFi client and AP options
 #define CFG_WIFI_ENABLE_AP    false       // run as wifi access point (for CFG_KISS_TCP_IP mode)
