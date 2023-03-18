@@ -87,7 +87,7 @@
       (mirror false)
       (drillshape 0)
       (scaleselection 1)
-      (outputdirectory "/home/sh/tmp/gerber/"))
+      (outputdirectory "gerber/"))
   )
 
   (net 0 "")

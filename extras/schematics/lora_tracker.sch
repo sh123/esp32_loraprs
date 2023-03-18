@@ -1,6 +1,5 @@
 EESchema Schematic File Version 4
-LIBS:lora_tracker-cache
-EELAYER 26 0
+EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -523,7 +522,7 @@ U 1 1 61978D9D
 P 2650 1850
 F 0 "U1" H 2725 2015 50  0000 C CNN
 F 1 "ESP32" H 2725 1924 50  0000 C CNN
-F 2 "lora_tracker:esp32 devkit" H 2700 2000 50  0001 C CNN
+F 2 "lora_tracker:esp32-devkit-wide" H 2700 2000 50  0001 C CNN
 F 3 "" H 2700 2000 50  0001 C CNN
 	1    2650 1850
 	1    0    0    -1  
