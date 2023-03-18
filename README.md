@@ -33,6 +33,6 @@ Development board schematics, case and antenna models are available under `extra
 
 Supported ESP32 boards are with 36 and 38 pinouts (configured with solder pads).
 
-&#x26A0; **There are ESP32 boards with different socket widths: 22mm and 25mm, board files for 25mm have _wide siffux in file names.**
+&#x26A0; **There are ESP32 boards with different socket widths: 22mm and 25mm, board files for 25mm have _wide suffux in file names.**
 
 ![Modes of operation](extras/images/device.png)
