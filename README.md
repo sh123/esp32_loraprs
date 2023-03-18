@@ -33,6 +33,6 @@ Development board schematics, case and antenna models are available under `extra
 
 Supported ESP32 boards are with 30 and 38 pinouts (configured with solder pads).
 
-&#x26A0; **ESP32 socket on the devboard is for narrow ESP32 boards, such as NodeMCU-32S!**
+&#x26A0; **ESP32 socket on the devboard is for narrow ESP32 boards (22mm socket width), such as NodeMCU-32S, usually without labels!**
 
 ![Modes of operation](extras/images/device.png)
