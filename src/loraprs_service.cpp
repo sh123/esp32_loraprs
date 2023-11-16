@@ -781,19 +781,27 @@ void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
   if (config_.KissEnableExtensions && rawCommand.size() == sizeof(SetHardware)) {
     LOG_INFO("Setting new radio parameters");
     const struct SetHardware * setHardware = reinterpret_cast<const struct SetHardware*>(rawCommand.data());
-    
-    // TODO, add support for split set hardware
-    config_.LoraFreqRx = be32toh(setHardware->freq);
-    config_.LoraFreqTx = be32toh(setHardware->freq);
+
+    config_.LoraFreqRx = be32toh(setHardware->freqRx);
+    config_.LoraFreqTx = be32toh(setHardware->freqTx);
+    config_.ModType = setHardware->modType;
     config_.LoraBw = be32toh(setHardware->bw);
     config_.LoraSf = be16toh(setHardware->sf);
     config_.LoraCodingRate = be16toh(setHardware->cr);
     config_.LoraPower = be16toh(setHardware->pwr);
     config_.LoraSync = be16toh(setHardware->sync);
+    config_.FskBitRate = be32toh(setHardware->fskBitRate);
+    config_.FskFreqDev = be32toh(setHardware->fskFreqDev);
+    config_.FskRxBw = be32toh(setHardware->fskRxBw);
     int crcType = setHardware->crc ? config_.LoraCrc : 0;
 
-    setupRig(config_.LoraFreqRx, config_.LoraBw, config_.LoraSf, 
-      config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, crcType, config_.LoraExplicit);
+    if (config_.ModType == CFG_MOD_TYPE_FSK) {
+      setupRigFsk(config_.LoraFreqRx, config_.FskBitRate, config_.FskFreqDev, config_.FskRxBw, config_.LoraPower);
+    } 
+    else {
+      setupRig(config_.LoraFreqRx, config_.LoraBw, config_.LoraSf, 
+        config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, crcType, config_.LoraExplicit);
+    }
   } else {
     LOG_ERROR("Radio control command of wrong size");
   }

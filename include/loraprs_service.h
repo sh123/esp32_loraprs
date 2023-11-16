@@ -106,13 +106,18 @@ protected:
 
 private:
   struct SetHardware {
-    uint32_t freq;
+    uint32_t freqRx;
+    uint32_t freqTx;
+    uint8_t modType;
+    uint16_t pwr;
     uint32_t bw;
     uint16_t sf;
     uint16_t cr;
-    uint16_t pwr;
     uint16_t sync;
     uint8_t crc;
+    uint32_t fskBitRate;
+    uint32_t fskFreqDev;
+    uint32_t fskRxBw;
   } __attribute__((packed));
 
   struct SignalReport {
@@ -125,7 +130,7 @@ private:
   } __attribute__((packed));
 
 private:
-  const String CfgLoraprsVersion = "LoRAPRS 1.0.13";
+  const String CfgLoraprsVersion = "LoRAPRS 1.0.14";
 
   // processor config
   const int CfgConnRetryMs = 500;             // connection retry delay, e.g. wifi
