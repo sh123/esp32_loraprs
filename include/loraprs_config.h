@@ -11,17 +11,27 @@ struct Config
   DebugLogLevel LogLevel;    // log level
   bool IsClientMode;    // false - server mode, true - client mode (disables wifi and aprsis)
 
-  // lora protocol parameters
+  // modulation type
+  int ModType;          // 0 - lora, 1 - fsk
+
+  // general radio parameters
   long LoraFreqRx;      // lora RX frequency, e.g. 433.775e6
   long LoraFreqTx;      // lora TX frequency, e.g. 433.775e6
+  int LoraPower;        // lora power level in dbm, 20
+
+  // lora protocol parameters
   long LoraBw;          // lora bandwidth, e.g. 125e3
   int LoraSf;           // lora spreading factor, e.g. 12
   int LoraCodingRate;   // lora coding rate, e.g. 7
-  int LoraPower;        // lora power level in dbm, 20
   int LoraSync;         // lora sync word/packet id, 0x34
   int LoraCrc;          // lora crc mode, 0 - disabled, 1 - 1 byte, 2 - 2 bytes
   bool LoraExplicit;    // lora header mode, true - explicit, false - implicit
   int LoraPreamble;     // lora preamble length from 6 to 65535
+
+  // fsk modulation parameters
+  float FskBitRate;     // fsk bit rate, 0.6 - 300.0 Kbps
+  float FskFreqDev;     // fsk frequency deviation 0.6 - 200 kHz
+  float FskRxBw;        // fsk rx bandwidth, discrete from 4.8 to 467 kHz
 
   // lora hardware pinouts and isr
   byte LoraPinSs;       // lora ss pin

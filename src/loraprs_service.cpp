@@ -61,9 +61,14 @@ void Service::setup(const Config &conf)
   }
   aprsLoginCommand_ += String("\n");
 
-  // peripherals, LoRa
-  setupRig(config_.LoraFreqRx, config_.LoraBw, config_.LoraSf, 
-    config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraCrc, config_.LoraExplicit);
+  // radio module, FSK/LoRa
+  if (config_.ModType == CFG_MOD_TYPE_FSK) {
+    setupRigFsk(config_.LoraFreqRx, config_.FskBitRate, config_.FskFreqDev, config_.FskRxBw, config_.LoraPower);
+  }
+  else {
+    setupRig(config_.LoraFreqRx, config_.LoraBw, config_.LoraSf, 
+      config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, config_.LoraCrc, config_.LoraExplicit);
+  }
 
   // start radio task
   xTaskCreate(rigTask, "rigTask", 4096, this, 5, &rigTaskHandle_);
@@ -267,6 +272,43 @@ void Service::setupRig(long loraFreq, long bw, int sf, int cr, int pwr, int sync
   }
 
   LOG_INFO("LoRa initialized");
+}
+
+void Service::setupRigFsk(long freq, float bitRate, float freqDev, float rxBw, int pwr)
+{
+  LOG_INFO("Initializing FSK");
+  LOG_INFO("Frequency:", freq, "Hz");
+  LOG_INFO("Bit rate:", bitRate, "kbps");
+  LOG_INFO("Deviation:", freqDev, "kHz");
+  LOG_INFO("Bandwidth:", rxBw, "kHz");
+  LOG_INFO("Power:", pwr, "dBm");
+  rig_ = std::make_shared<MODULE_NAME>(new Module(config_.LoraPinSs, config_.LoraPinA, config_.LoraPinRst, config_.LoraPinB));
+  int state = rig_->beginFSK((float)freq / 1e6, bitRate, freqDev, rxBw, pwr);
+  if (state != RADIOLIB_ERR_NONE) {
+    LOG_ERROR("Radio start error:", state);
+  }
+  rig_->disableAddressFiltering();
+#ifdef USE_SX126X
+    #pragma message("Using SX126X")
+    LOG_INFO("Using SX126X module");
+    rig_->setRfSwitchPins(config_.LoraPinSwitchRx, config_.LoraPinSwitchTx);
+    if (isIsrInstalled_) rig_->clearDio1Action();
+    rig_->setDio1Action(onRigIsrRxPacket);
+    isIsrInstalled_ = true;
+#else
+    #pragma message("Using SX127X")
+    LOG_INFO("Using SX127X module");
+    if (isIsrInstalled_) rig_->clearDio0Action();
+    rig_->setDio0Action(onRigIsrRxPacket);
+    isIsrInstalled_ = true;
+#endif
+
+  state = rig_->startReceive();
+  if (state != RADIOLIB_ERR_NONE) {
+    LOG_ERROR("Receive start error:", state);
+  }
+
+  LOG_INFO("FSK initialized");
 }
 
 void Service::setupBt(const String &btName)

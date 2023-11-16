@@ -31,17 +31,27 @@ void initializeConfig(LoraPrs::Config &cfg) {
   // client/server mode switch
   cfg.IsClientMode = CFG_IS_CLIENT_MODE;
 
-  // lora parameters, must match on devices
+  // modulation
+  cfg.ModType = CFG_MOD_TYPE;
+
+  // generic module parameters
   cfg.LoraFreqRx = CFG_LORA_FREQ_RX;
   cfg.LoraFreqTx = CFG_LORA_FREQ_TX;
+  cfg.LoraPower = CFG_LORA_PWR;
+
+  // lora parameters, must match on devices
   cfg.LoraBw = CFG_LORA_BW;
   cfg.LoraSf = CFG_LORA_SF;
   cfg.LoraCodingRate = CFG_LORA_CR;
   cfg.LoraSync = CFG_LORA_SYNC;
   cfg.LoraCrc = CFG_LORA_CRC; // set to 0 to disable
   cfg.LoraExplicit = CFG_LORA_EXPLICIT;
-  cfg.LoraPower = CFG_LORA_PWR;
   cfg.LoraPreamble = CFG_LORA_PREAMBLE;
+
+  // fsk parameters
+  cfg.FskBitRate = CFG_FSK_BIT_RATE;
+  cfg.FskFreqDev = CFG_FSK_FREQ_DEV;
+  cfg.FskRxBw = CFG_FSK_RX_BW;
 
   // lora pinouts
   cfg.LoraPinSs = CFG_LORA_PIN_SS;

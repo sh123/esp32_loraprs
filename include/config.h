@@ -59,17 +59,29 @@
 #define CFG_LORA_USE_CAD      true        // set to true to utilize carrier detection
 #endif
 
-// LoRa protocol default parameters (they need to match between devices!!!)
+// modulation
+#define CFG_MOD_TYPE_LORA     0
+#define CFG_MOD_TYPE_FSK      1
+#define CFG_MOD_TYPE          CFG_MOD_TYPE_LORA
+
+// general radio parameters
 #define CFG_LORA_FREQ_RX      433.775e6   // RX frequency in MHz
 #define CFG_LORA_FREQ_TX      433.775e6   // TX frequency in MHz
+#define CFG_LORA_PWR          20          // output power in dBm
+
+// LoRa protocol default parameters (they need to match between devices!!!)
 #define CFG_LORA_BW           125e3       // bandwidth (from 7.8 kHz up to 500 kHz)
 #define CFG_LORA_SF           12          // spreading factor (6 - 12), 6 requires implicit header mode
 #define CFG_LORA_CR           7           // coding rate (5 - 8)
 #define CFG_LORA_CRC          1           // 0 - disabled, 1 - 1 byte, 2 - 2 bytes
 #define CFG_LORA_EXPLICIT     true        // header mode, true - explicit, false - implicit
 #define CFG_LORA_SYNC         0x12        // sync word (0x12 - private used by other trackers, 0x34 - public used by LoRaWAN)
-#define CFG_LORA_PWR          20          // output power in dBm
 #define CFG_LORA_PREAMBLE     8           // preamble length from 6 to 65535
+
+// fsk modem default parameters (they need to match between devices!!!)
+#define CFG_FSK_BIT_RATE      4.8         // bit rate in Kbps from 0.6 to 300.0
+#define CFG_FSK_FREQ_DEV      1.2         // frequency deviation in kHz from 0.6 to 200.0
+#define CFG_FSK_RX_BW         9.7         // rx bandwidth in kHz !!discrete!! from 4.8 to 467.0
 
 // WiFi client and AP options
 #define CFG_WIFI_ENABLE_AP    false       // run as wifi access point (for CFG_KISS_TCP_IP mode)
