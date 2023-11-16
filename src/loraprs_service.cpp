@@ -788,7 +788,7 @@ void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
     config_.LoraBw = be32toh(setHardware->bw);
     config_.LoraSf = be16toh(setHardware->sf);
     config_.LoraCodingRate = be16toh(setHardware->cr);
-    config_.LoraPower = be16toh(setHardware->pwr);
+    config_.LoraPower = (int16_t)be16toh(setHardware->pwr);
     config_.LoraSync = be16toh(setHardware->sync);
     config_.FskBitRate = (float)be32toh(setHardware->fskBitRate) / 1e3;
     config_.FskFreqDev = (float)be32toh(setHardware->fskFreqDev) / 1e3; 
@@ -803,7 +803,7 @@ void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
         config_.LoraCodingRate, config_.LoraPower, config_.LoraSync, crcType, config_.LoraExplicit);
     }
   } else {
-    LOG_ERROR("Radio control command of wrong size");
+    LOG_ERROR("Radio control command of wrong size", rawCommand.size());
   }
 }
 

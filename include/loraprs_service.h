@@ -109,7 +109,7 @@ private:
     uint32_t freqRx;
     uint32_t freqTx;
     uint8_t modType;
-    uint16_t pwr;
+    int16_t pwr;
     uint32_t bw;
     uint16_t sf;
     uint16_t cr;

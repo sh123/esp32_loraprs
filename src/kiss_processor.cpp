@@ -280,11 +280,19 @@ bool Processor::receiveByteKiss(byte rxByte)
       break;
     case State::Escape:
       if (rxByte == Marker::Tfend) {
-        onRigTx((byte)Marker::Fend);
+        if (dataType_ == DataType::Raw) {
+          onRigTx((byte)Marker::Fend);
+        } else if (dataType_ == DataType::Control) {
+          cmdBuffer_.push_back((byte)Marker::Fend);
+        }
         state_ = State::GetData;
       }
       else if (rxByte == Marker::Tfesc) {
-        onRigTx((byte)Marker::Fesc);
+        if (dataType_ == DataType::Raw) {
+          onRigTx((byte)Marker::Fesc);
+        } else if (dataType_ == DataType::Control) {
+          cmdBuffer_.push_back((byte)Marker::Fesc);
+        }
         state_ = State::GetData;
       }
       else if (rxByte != Marker::Fend) {
