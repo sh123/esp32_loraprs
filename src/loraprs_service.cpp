@@ -790,9 +790,9 @@ void Service::onRadioControlCommand(const std::vector<byte> &rawCommand) {
     config_.LoraCodingRate = be16toh(setHardware->cr);
     config_.LoraPower = be16toh(setHardware->pwr);
     config_.LoraSync = be16toh(setHardware->sync);
-    config_.FskBitRate = be32toh(setHardware->fskBitRate);
-    config_.FskFreqDev = be32toh(setHardware->fskFreqDev);
-    config_.FskRxBw = be32toh(setHardware->fskRxBw);
+    config_.FskBitRate = (float)be32toh(setHardware->fskBitRate) / 1e3;
+    config_.FskFreqDev = (float)be32toh(setHardware->fskFreqDev) / 1e3; 
+    config_.FskRxBw = (float)be32toh(setHardware->fskRxBw) / 1e3;
     int crcType = setHardware->crc ? config_.LoraCrc : 0;
 
     if (config_.ModType == CFG_MOD_TYPE_FSK) {
