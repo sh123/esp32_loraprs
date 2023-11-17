@@ -52,8 +52,13 @@ private:
 
   void onRigTaskRxPacket();
   void onRigTaskTxPacket();
+  void onRigTaskStartRx();
+  void onRigTaskStartTx();
   static void rigTask(void *self);
   static ICACHE_RAM_ATTR void onRigIsrRxPacket();
+
+  void startRx();
+  static bool startRxTimer(void *param);
 
   void onAprsisDataAvailable();
 
@@ -150,7 +155,9 @@ private:
   // radio task commands
   enum RadioTaskBits {
     Receive = 0x01,
-    Transmit = 0x02
+    Transmit = 0x02,
+    StartReceive = 0x04,
+    StartTransmit = 0x10
   };
 
 private:
@@ -169,6 +176,7 @@ private:
 
   // peripherals, radio
   static TaskHandle_t rigTaskHandle_;
+  Timer<1> startRxTimer_;
   static volatile bool rigIsRxActive_;
   static volatile bool rigIsRxIsrEnabled_;
   bool rigIsImplicitMode_;

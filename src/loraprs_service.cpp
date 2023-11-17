@@ -367,6 +367,7 @@ void Service::loop()
   if (config_.TlmEnable) {
     telemetryTimer_.tick();
   }
+  startRxTimer_.tick();
 }
 
 ICACHE_RAM_ATTR void Service::onRigIsrRxPacket() {
@@ -388,7 +389,28 @@ void Service::rigTask(void *self) {
     else if (commandBits & RadioTaskBits::Transmit) {
       static_cast<Service*>(self)->onRigTaskTxPacket();
     }
+    if (commandBits & RadioTaskBits::StartReceive) {
+      static_cast<Service*>(self)->onRigTaskStartRx();
+    }
+    else if (commandBits & RadioTaskBits::StartTransmit) {
+      static_cast<Service*>(self)->onRigTaskStartTx();
+    }
   }
+}
+
+void Service::onRigTaskStartRx() {
+  LOG_TRACE("onRigTaskStartRx");
+  if (config_.PttEnable) {
+    digitalWrite(config_.PttPin, LOW);
+  }
+  if (isHalfDuplex()) {
+    setFreq(config_.LoraFreqRx);
+  }
+  int state = rig_->startReceive();
+  if (state != RADIOLIB_ERR_NONE) {
+    LOG_ERROR("Start receive error: ", state);
+  }
+  rigIsRxIsrEnabled_ = true;
 }
 
 void Service::onRigTaskRxPacket() {
@@ -411,15 +433,21 @@ void Service::onRigTaskRxPacket() {
   rigIsRxActive_ = false;
 }
 
-void Service::onRigTaskTxPacket() {
-  rigIsRxIsrEnabled_ = false;
-  if (isHalfDuplex()) {
-    setFreq(config_.LoraFreqTx);
-  }
-  if (config_.PttEnable) {
-    digitalWrite(config_.PttPin, HIGH);
+void Service::onRigTaskStartTx() {
+  LOG_TRACE("onRigTaskStartTx");
+  if (rigIsRxIsrEnabled_) {
+    rigIsRxIsrEnabled_ = false;
+    if (isHalfDuplex()) {
+      setFreq(config_.LoraFreqTx);
+    }
+    if (config_.PttEnable) {
+      digitalWrite(config_.PttPin, HIGH);
+    }
     delay(config_.PttTxDelayMs);
   }
+}
+
+void Service::onRigTaskTxPacket() {
   while (rigTxQueueIndex_.size() > 0) {
     int txPacketSize = rigTxQueueIndex_.shift();
     LOG_TRACE("onRigTaskTxPacket", txPacketSize);
@@ -435,18 +463,7 @@ void Service::onRigTaskTxPacket() {
     }
     vTaskDelay(1);
   }
-  if (config_.PttEnable) {
-    delay(config_.PttTxTailMs);
-    digitalWrite(config_.PttPin, LOW);
-  }
-  if (isHalfDuplex()) {
-    setFreq(config_.LoraFreqRx);
-  }
-  int state = rig_->startReceive();
-  if (state != RADIOLIB_ERR_NONE) {
-    LOG_ERROR("Start receive error: ", state);
-  }
-  rigIsRxIsrEnabled_ = true;
+  startRxTimer_.in(config_.PttTxTailMs, &startRxTimer);
 }
 
 void Service::sendPeriodicBeacon()
@@ -528,6 +545,16 @@ bool Service::sendModemTelemetryTimer(void *param)
   return true;
 }
 
+bool Service::startRxTimer(void *param)
+{
+  static_cast<Service*>(param)->startRx();
+  return true;
+}
+
+void Service::startRx() {
+  xTaskNotify(rigTaskHandle_, RadioTaskBits::StartReceive, eSetBits);
+}
+
 void Service::sendModemTelemetry()
 {
   float batVoltage = 2 * analogRead(config_.TlmBatMonPin) * (3.3 / 4096.0) + config_.TlmBatMonCal;
@@ -591,10 +618,6 @@ void Service::performFrequencyCorrection() {
 
 void Service::setFreq(long loraFreq) const {
   rig_->setFrequency((float)loraFreq / 1e6);
-  int state = rig_->startReceive();
-  if (state != RADIOLIB_ERR_NONE) {
-    LOG_ERROR("Start receive error:", state);
-  }
 }
 
 void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLength) {
@@ -650,6 +673,8 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
 bool Service::onRigTxBegin()
 {
   LOG_TRACE("onRigTxBegin");
+  startRxTimer_.cancel();
+  xTaskNotify(rigTaskHandle_, RadioTaskBits::StartTransmit, eSetBits);
   rigCurrentTxPacketSize_ = 0;
   return true;
 }

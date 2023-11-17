@@ -17,7 +17,7 @@
 
 #include "loraprs_service.h"
 
-const int CfgPollDelayMs = 20;              // main loop delay
+const int CfgPollDelayMs = 10;              // main loop delay
 
 /*
  * Initialize config from config.h options.
