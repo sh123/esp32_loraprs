@@ -50,6 +50,7 @@ protected:
       None = 0x80
   };
 
+  static const int CfgToSerialDelayMs = 10;
   static const int CfgSerialToRigQueueSize = 4096;
   static const int CfgRigToSerialQueueSize = 4096;
 

@@ -134,7 +134,7 @@ bool Processor::processRigToSerial()
     onRigPacket(&buf, rxPacketSize);
 
     isProcessed = true;
-    yield();
+    if (!rigToSerialQueueIndex_.isEmpty()) delay(CfgToSerialDelayMs);
   }
   return isProcessed;
 }
