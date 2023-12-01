@@ -256,7 +256,7 @@ void Service::setupRig(long loraFreq, long bw, int sf, int cr, int pwr, int sync
     #pragma message("Using SX127X")
     LOG_INFO("Using SX127X module");
     if (isIsrInstalled_) rig_->clearDio0Action();
-    rig_->setDio0Action(onRigIsrRxPacket);
+    rig_->setDio0Action(onRigIsrRxPacket, RISING);
     isIsrInstalled_ = true;
 #endif
 
@@ -299,7 +299,7 @@ void Service::setupRigFsk(long freq, float bitRate, float freqDev, float rxBw, i
     #pragma message("Using SX127X")
     LOG_INFO("Using SX127X module");
     if (isIsrInstalled_) rig_->clearDio0Action();
-    rig_->setDio0Action(onRigIsrRxPacket);
+    rig_->setDio0Action(onRigIsrRxPacket, RISING);
     isIsrInstalled_ = true;
 #endif
 
