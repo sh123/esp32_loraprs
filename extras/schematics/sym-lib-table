@@ -1,3 +1,4 @@
 (sym_lib_table
-  (lib (name lora_tracker)(type Legacy)(uri ${KIPRJMOD}/lora_tracker.lib)(options "")(descr ""))
+  (lib (name "lora_tracker")(type "Legacy")(uri "${KIPRJMOD}/lora_tracker.lib")(options "")(descr ""))
+  (lib (name "lora_tracker-rescue")(type "Legacy")(uri "${KIPRJMOD}/lora_tracker-rescue.lib")(options "")(descr ""))
 )
