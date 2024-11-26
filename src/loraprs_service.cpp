@@ -16,7 +16,9 @@ Service::Service()
   , rigCurrentTxPacketSize_(0)
   , isIsrInstalled_(false)
   , rigIsImplicitMode_(false)
+#ifndef  USE_NIMBLE
   , serialBt_()
+#endif
   , serialBLE_()
   , kissServer_(new WiFiServer(CfgKissPort))
   , isKissClientConnected_(false)
@@ -316,9 +318,13 @@ void Service::setupBt(const String &btName)
   String btType = config_.BtEnableBle ? "BLE" : "BT";
   LOG_INFO(btType, "init", btName);
   
-  bool btOk = config_.BtEnableBle 
+  bool btOk = config_.BtEnableBle
     ? serialBLE_.begin(btName.c_str()) 
+    #ifdef USE_NIMBLE
+    : false;
+    #else
     : serialBt_.begin(btName);
+    #endif
   
   if (btOk) {
     LOG_INFO(btType, "initialized");
@@ -725,12 +731,18 @@ void Service::onSerialTx(byte b)
   else if (isKissClientConnected_) {
     kissConnnection_.write(b);
   }
+  #ifndef USE_NIMBLE
   else if (config_.BtEnableBle) {
     serialBLE_.write(b);
   }
   else {
     serialBt_.write(b);
   }
+  #else
+  else {
+    serialBLE_.write(b);
+  }
+  #endif
 }
 
 bool Service::onSerialRxHasData()
@@ -741,12 +753,23 @@ bool Service::onSerialRxHasData()
   else if (isKissClientConnected_) {
     return kissConnnection_.available();
   }
+  
+  #ifndef USE_NIMBLE
+  
   else if (config_.BtEnableBle) {
     return serialBLE_.available();
   }
   else {
     return serialBt_.available();
   }
+  
+  #else
+  
+  else {
+  return serialBLE_.available();
+  }
+  
+  #endif
 }
 
 bool Service::onSerialRx(byte *b)
@@ -767,7 +790,12 @@ bool Service::onSerialRx(byte *b)
   else {
     rxResult = config_.BtEnableBle 
       ? serialBLE_.read() 
+      #ifdef USE_NIMBLE
+      : -1;
+      #else
       : serialBt_.read();
+      #endif
+
   }
   if (rxResult == -1) {
     return false;

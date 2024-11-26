@@ -25,6 +25,22 @@
 #define CFG_IS_CLIENT_MODE    true        // false - server mode (APRS-IS gate mode)
 #endif
 
+// Support for heltec_wifi_lora_32_V3 board
+// https://github.com/espressif/arduino-esp32/blob/master/variants/heltec_wifi_lora_32_V3/pins_arduino.h
+// static const uint8_t RST_LoRa = 12;
+// static const uint8_t BUSY_LoRa = 13;
+// static const uint8_t DIO0 = 14;
+
+
+
+#ifdef WIFI_LoRa_32_V3
+    #define LORA_RST              RST_LoRa //OK
+    #define LORA_IRQ              14       //schematic:dio1  include: dio0. Follow schematic ???? 
+    #define LED_BUILTIN           35
+    #define BUILTIN_LED           35
+#endif
+
+
 // change pinouts if not defined through native board LORA_* definitions
 #ifndef LORA_RST
 #pragma message("LoRa pin definitions are not found, redefining...")
@@ -37,9 +53,15 @@
 #define CFG_LORA_PIN_RST      LORA_RST
 #define CFG_LORA_PIN_A        LORA_IRQ    // (sx127x - dio0, sx126x/sx128x - dio1)
 #ifdef USE_SX126X
-#define CFG_LORA_PIN_B        14          // (sx127x - dio1, sx126x/sx128x - busy)
-#define CFG_LORA_PIN_RXEN     32          // (sx127x - unused, sx126x - RXEN pin number)
-#define CFG_LORA_PIN_TXEN     33          // (sx127x - unused, sx126x - TXEN pin number)
+    #ifdef WIFI_LoRa_32_V3
+        #define CFG_LORA_PIN_B        BUSY_LoRa          // (sx1262 - busy)
+        #define CFG_LORA_PIN_RXEN     33                // (sx1262 - unused but assigned)
+        #define CFG_LORA_PIN_TXEN     34                // (sx1262 - unused bur assigned)
+    #else
+        #define CFG_LORA_PIN_B        14          // (sx127x - dio1, sx126x/sx128x - busy)
+        #define CFG_LORA_PIN_RXEN     32          // (sx127x - unused, sx126x - RXEN pin number)
+        #define CFG_LORA_PIN_TXEN     33          // (sx127x - unused, sx126x - TXEN pin number)
+    #endif
 #else
 #define CFG_LORA_PIN_B        RADIOLIB_NC
 #define CFG_LORA_PIN_RXEN     RADIOLIB_NC
@@ -90,7 +112,7 @@
 
 // Bluetooth
 #define CFG_BT_NAME           "loraprs"   // set to empty to disable Bluetooth
-#define CFG_BT_USE_BLE        false       // set to true to use bluetooth low energy (for ios devices)
+#define CFG_BT_USE_BLE        true       // set to true to use bluetooth low energy (for ios devices)
 
 // USB serial
 #define CFG_USB_SERIAL_ENABLE false       // true - enable KISS communication over USB Serial (e.g. with APRSDroid over USB-OTG), disables USB logging
