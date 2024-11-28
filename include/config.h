@@ -6,7 +6,11 @@
 
 // Check your module name at https://github.com/jgromes/RadioLib/wiki/Modules
 #ifdef USE_SX126X
-#define MODULE_NAME   SX1268
+    #ifdef WIFI_LoRa_32_V3
+        #define MODULE_NAME   SX1262
+    #else
+        #define MODULE_NAME   SX1268
+    #endif
 #else
 #define MODULE_NAME   SX1278
 #endif
@@ -55,8 +59,8 @@
 #ifdef USE_SX126X
     #ifdef WIFI_LoRa_32_V3
         #define CFG_LORA_PIN_B        BUSY_LoRa          // (sx1262 - busy)
-        #define CFG_LORA_PIN_RXEN     33                // (sx1262 - unused but assigned)
-        #define CFG_LORA_PIN_TXEN     34                // (sx1262 - unused bur assigned)
+        #define CFG_LORA_PIN_RXEN     RADIOLIB_NC                // (sx1262 unused)
+        #define CFG_LORA_PIN_TXEN     RADIOLIB_NC                // (sx1262 unused)
     #else
         #define CFG_LORA_PIN_B        14          // (sx127x - dio1, sx126x/sx128x - busy)
         #define CFG_LORA_PIN_RXEN     32          // (sx127x - unused, sx126x - RXEN pin number)
