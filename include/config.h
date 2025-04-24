@@ -3,6 +3,7 @@
 
 // Uncomment for SX126X module usage
 // #define USE_SX126X
+// #define WIFI_LoRa_32_V3
 
 // Check your module name at https://github.com/jgromes/RadioLib/wiki/Modules
 #ifdef USE_SX126X
@@ -30,16 +31,16 @@
 #endif
 
 // Support for heltec_wifi_lora_32_V3 board
-// https://github.com/espressif/arduino-esp32/blob/master/variants/heltec_wifi_lora_32_V3/pins_arduino.h
-// static const uint8_t RST_LoRa = 12;
-// static const uint8_t BUSY_LoRa = 13;
-// static const uint8_t DIO0 = 14;
+// https://github.com/espressif/arduino-esp32/blob/master/variants/heltec_wireless_stick_lite_v3/pins_arduino.h
+//static const uint8_t RST_LoRa = 12;
+//static const uint8_t BUSY_LoRa = 13;
+//static const uint8_t DIO1 = 14;
 
 
 
 #ifdef WIFI_LoRa_32_V3
     #define LORA_RST              RST_LoRa //OK
-    #define LORA_IRQ              14       //schematic:dio1  include: dio0. Follow schematic ???? 
+    #define LORA_IRQ              14        
     #define LED_BUILTIN           35
     #define BUILTIN_LED           35
 #endif
@@ -53,18 +54,19 @@
 #endif
 
 // LoRa pinouts
-#define CFG_LORA_PIN_SS       SS
 #define CFG_LORA_PIN_RST      LORA_RST
 #define CFG_LORA_PIN_A        LORA_IRQ    // (sx127x - dio0, sx126x/sx128x - dio1)
 #ifdef USE_SX126X
     #ifdef WIFI_LoRa_32_V3
-        #define CFG_LORA_PIN_B        BUSY_LoRa          // (sx1262 - busy)
-        #define CFG_LORA_PIN_RXEN     RADIOLIB_NC                // (sx1262 unused)
-        #define CFG_LORA_PIN_TXEN     RADIOLIB_NC                // (sx1262 unused)
+        #define CFG_LORA_PIN_B        BUSY_LoRa          
+        #define CFG_LORA_PIN_RXEN     RADIOLIB_NC        // (sx1262 unused)
+        #define CFG_LORA_PIN_TXEN     RADIOLIB_NC       // (sx1262 unused)
+        #define CFG_LORA_PIN_SS       8       // NSS_LoRa
     #else
         #define CFG_LORA_PIN_B        14          // (sx127x - dio1, sx126x/sx128x - busy)
         #define CFG_LORA_PIN_RXEN     32          // (sx127x - unused, sx126x - RXEN pin number)
         #define CFG_LORA_PIN_TXEN     33          // (sx127x - unused, sx126x - TXEN pin number)
+        #define CFG_LORA_PIN_SS       SS
     #endif
 #else
 #define CFG_LORA_PIN_B        RADIOLIB_NC
@@ -122,7 +124,7 @@
 #define CFG_USB_SERIAL_ENABLE false       // true - enable KISS communication over USB Serial (e.g. with APRSDroid over USB-OTG), disables USB logging
 
 // KISS protocol options
-#define CFG_KISS_EXTENSIONS   false   // true - enable modem control from application with KISS commands and signal reports
+#define CFG_KISS_EXTENSIONS   true   // true - enable modem control from application with KISS commands and signal reports
 #define CFG_KISS_TCP_IP       false   // true - run as KISS TCP/IP server, no bluetooth operations performed
 
 // APRS-IS options, valid in when CFG_IS_CLIENT_MODE = false

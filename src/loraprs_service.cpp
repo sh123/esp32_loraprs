@@ -247,8 +247,13 @@ void Service::setupRig(long loraFreq, long bw, int sf, int cr, int pwr, int sync
   }
   rig_->setCRC(crcBytes);
   rig_->setPreambleLength(config_.LoraPreamble);
-#ifdef USE_SX126X
-    #pragma message("Using SX126X")
+#if defined(USE_SX126X) && MODULE_NAME == SX1262
+    #pragma message("Using SX1262")
+    LOG_INFO("Using SX1262 module");
+    if (isIsrInstalled_) rig_->clearDio1Action();
+    rig_->setDio1Action(onRigIsrRxPacket);
+    isIsrInstalled_ = true;
+#elif defined(USE_SX126X)
     LOG_INFO("Using SX126X module");
     rig_->setRfSwitchPins(config_.LoraPinSwitchRx, config_.LoraPinSwitchTx);
     if (isIsrInstalled_) rig_->clearDio1Action();
@@ -290,13 +295,22 @@ void Service::setupRigFsk(long freq, float bitRate, float freqDev, float rxBw, i
     LOG_ERROR("Radio start error:", state);
   }
   rig_->disableAddressFiltering();
-#ifdef USE_SX126X
+
+  #if defined(USE_SX126X) && MODULE_NAME == SX1262
+    #pragma message("Using SX1262")
+    LOG_INFO("Using SX1262 module");
+    if (isIsrInstalled_) rig_->clearDio1Action();
+    rig_->setDio1Action(onRigIsrRxPacket);
+    isIsrInstalled_ = true;
+
+#elif defined(USE_SX126X)
     #pragma message("Using SX126X")
     LOG_INFO("Using SX126X module");
     rig_->setRfSwitchPins(config_.LoraPinSwitchRx, config_.LoraPinSwitchTx);
     if (isIsrInstalled_) rig_->clearDio1Action();
     rig_->setDio1Action(onRigIsrRxPacket);
     isIsrInstalled_ = true;
+
 #else
     #pragma message("Using SX127X")
     LOG_INFO("Using SX127X module");
