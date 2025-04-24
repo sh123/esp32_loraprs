@@ -18,7 +18,9 @@
 #include <endian.h>
 #include <arduino-timer.h>
 
+#ifndef USE_NIMBLE
 #include "BluetoothSerial.h"
+#endif
 #include "ble_serial.h"
 #include "ax25_payload.h"
 #include "kiss_processor.h"
@@ -187,7 +189,9 @@ private:
   std::shared_ptr<MODULE_NAME> rig_;
 
   // bluetooth, wifi
+  #ifndef USE_NIMBLE
   BluetoothSerial serialBt_;
+  #endif
   BLESerial serialBLE_;
   WiFiClient aprsisConnection_;
   

@@ -17,11 +17,19 @@
 
 #include "Arduino.h"
 #include "Stream.h"
+
+#ifdef USE_NIMBLE
+#include <NimBLEDevice.h>
+#include <NimBLELog.h>
+#else
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
 #include <DebugLog.h>
+#endif
+
+
 
 #define SERVICE_UUID           "00000001-ba2a-46c9-ae49-01b0961f68bb" // KISS service UUID
 #define CHARACTERISTIC_UUID_TX "00000003-ba2a-46c9-ae49-01b0961f68bb"
@@ -46,9 +54,15 @@ class BLESerial: public Stream
 
     private:
         String local_name;
+#ifdef USE_NIMBLE
+        NimBLEServer *pServer = NULL;
+        NimBLEService *pService;
+        NimBLECharacteristic * pTxCharacteristic;
+#else
         BLEServer *pServer = NULL;
         BLEService *pService;
         BLECharacteristic * pTxCharacteristic;
+#endif
         bool deviceConnected = false;
         uint8_t txValue = 0;
         

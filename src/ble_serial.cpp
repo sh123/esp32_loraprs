@@ -13,6 +13,35 @@
 // limitations under the License.
 
 #include "ble_serial.h"
+#ifdef USE_NIMBLE
+static const  char* LOG_TAG = "[NimBLE]";
+
+class BLESerialServerCallbacks: public BLEServerCallbacks {
+    friend class BLESerial; 
+    BLESerial* bleSerial;
+    
+    void onConnect(NimBLEServer* pServer) {
+        // do anything needed on connection
+        NIMBLE_LOGI(LOG_TAG , "BLE client connected");
+        delay(1000); // wait for connection to complete or messages can be lost
+    };
+
+    void onDisconnect(NimBLEServer* pServer) {
+        pServer->startAdvertising(); // restart advertising
+        NIMBLE_LOGI(LOG_TAG, "BLE client disconnected, started advertising");
+    }
+};
+
+class BLESerialCharacteristicCallbacks: public NimBLECharacteristicCallbacks {
+    friend class BLESerial; 
+    BLESerial* bleSerial;
+    
+    void onWrite(NimBLECharacteristic *pCharacteristic) {
+      bleSerial->receiveBuffer += pCharacteristic->getValue();
+    }
+
+};
+#else
 
 class BLESerialServerCallbacks: public BLEServerCallbacks {
     friend class BLESerial; 
@@ -35,16 +64,18 @@ class BLESerialCharacteristicCallbacks: public BLECharacteristicCallbacks {
     BLESerial* bleSerial;
     
     void onWrite(BLECharacteristic *pCharacteristic) {
-      bleSerial->receiveBuffer = bleSerial->receiveBuffer + pCharacteristic->getValue();
+      bleSerial->receiveBuffer += pCharacteristic->getValue();
     }
 
 };
 
+#endif
+
 // Constructor
 
 BLESerial::BLESerial()
-  : pService(NULL)
-  , pTxCharacteristic(NULL)
+  : pService(nullptr)
+  , pTxCharacteristic(nullptr)
   , receiveBuffer("")
 {
 }
@@ -60,6 +91,15 @@ BLESerial::~BLESerial(void)
 
 bool BLESerial::begin(const char* localName)
 {
+#ifdef USE_NIMBLE
+    // Create the BLE Device
+    NimBLEDevice::init(localName);
+
+    // Create the BLE Server
+    pServer = NimBLEDevice::createServer();
+    if (pServer == nullptr)
+        return false;
+#else
     // Create the BLE Device
     BLEDevice::init(localName);
 
@@ -67,6 +107,7 @@ bool BLESerial::begin(const char* localName)
     pServer = BLEDevice::createServer();
     if (pServer == nullptr)
         return false;
+#endif
     
     BLESerialServerCallbacks* bleSerialServerCallbacks =  new BLESerialServerCallbacks(); 
     bleSerialServerCallbacks->bleSerial = this;      
@@ -77,26 +118,53 @@ bool BLESerial::begin(const char* localName)
     if (pService == nullptr)
         return false;
 
+#ifdef USE_NIMBLE
     // Create a BLE Characteristic
+    pTxCharacteristic = pService->createCharacteristic(
+                                            CHARACTERISTIC_UUID_TX,
+                                            NIMBLE_PROPERTY::NOTIFY
+                                        );
+    if (pTxCharacteristic == nullptr)
+        return false;                    
+
+    NimBLECharacteristic * pRxCharacteristic = pService->createCharacteristic(
+                                                CHARACTERISTIC_UUID_RX,
+                                                NIMBLE_PROPERTY::WRITE |
+                                                NIMBLE_PROPERTY::WRITE_NR
+                                                );
+#else
     pTxCharacteristic = pService->createCharacteristic(
                                             CHARACTERISTIC_UUID_TX,
                                             BLECharacteristic::PROPERTY_NOTIFY
                                         );
     if (pTxCharacteristic == nullptr)
         return false;                    
-    pTxCharacteristic->addDescriptor(new BLE2902());
 
     BLECharacteristic * pRxCharacteristic = pService->createCharacteristic(
                                                 CHARACTERISTIC_UUID_RX,
                                                 BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_WRITE_NR
-                                            );
+                                                );
+#endif
+
     if (pRxCharacteristic == nullptr)
         return false; 
 
     BLESerialCharacteristicCallbacks* bleSerialCharacteristicCallbacks = new BLESerialCharacteristicCallbacks(); 
     bleSerialCharacteristicCallbacks->bleSerial = this;  
     pRxCharacteristic->setCallbacks(bleSerialCharacteristicCallbacks);
+#ifdef USE_NIMBLE
+    // Start the service
+    pService->start();
+    NIMBLE_LOGI(LOG_TAG , "BLE started service");
 
+    // Start advertising
+    NimBLEAdvertising* pAdvertising = NimBLEDevice::getAdvertising();
+    pAdvertising->addServiceUUID(pService->getUUID());
+    pAdvertising->setScanResponse(true);
+    pAdvertising->start();
+    NIMBLE_LOGI(LOG_TAG ,"BLE started advertising and waiting for client connection...");
+    return true;
+#else
     // Start the service
     pService->start();
     LOG_INFO("BLE started service");
@@ -109,6 +177,7 @@ bool BLESerial::begin(const char* localName)
     pServer->getAdvertising()->start();
     LOG_INFO("BLE started advertising and waiting for client connection...");
     return true;
+#endif
 }
 
 int BLESerial::available(void)

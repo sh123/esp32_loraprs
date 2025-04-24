@@ -16,7 +16,9 @@ Service::Service()
   , rigCurrentTxPacketSize_(0)
   , isIsrInstalled_(false)
   , rigIsImplicitMode_(false)
+#ifndef  USE_NIMBLE
   , serialBt_()
+#endif
   , serialBLE_()
   , kissServer_(new WiFiServer(CfgKissPort))
   , isKissClientConnected_(false)
@@ -245,8 +247,13 @@ void Service::setupRig(long loraFreq, long bw, int sf, int cr, int pwr, int sync
   }
   rig_->setCRC(crcBytes);
   rig_->setPreambleLength(config_.LoraPreamble);
-#ifdef USE_SX126X
-    #pragma message("Using SX126X")
+#if defined(USE_SX126X) && MODULE_NAME == SX1262
+    #pragma message("Using SX1262")
+    LOG_INFO("Using SX1262 module");
+    if (isIsrInstalled_) rig_->clearDio1Action();
+    rig_->setDio1Action(onRigIsrRxPacket);
+    isIsrInstalled_ = true;
+#elif defined(USE_SX126X)
     LOG_INFO("Using SX126X module");
     rig_->setRfSwitchPins(config_.LoraPinSwitchRx, config_.LoraPinSwitchTx);
     if (isIsrInstalled_) rig_->clearDio1Action();
@@ -288,13 +295,22 @@ void Service::setupRigFsk(long freq, float bitRate, float freqDev, float rxBw, i
     LOG_ERROR("Radio start error:", state);
   }
   rig_->disableAddressFiltering();
-#ifdef USE_SX126X
+
+  #if defined(USE_SX126X) && MODULE_NAME == SX1262
+    #pragma message("Using SX1262")
+    LOG_INFO("Using SX1262 module");
+    if (isIsrInstalled_) rig_->clearDio1Action();
+    rig_->setDio1Action(onRigIsrRxPacket);
+    isIsrInstalled_ = true;
+
+#elif defined(USE_SX126X)
     #pragma message("Using SX126X")
     LOG_INFO("Using SX126X module");
     rig_->setRfSwitchPins(config_.LoraPinSwitchRx, config_.LoraPinSwitchTx);
     if (isIsrInstalled_) rig_->clearDio1Action();
     rig_->setDio1Action(onRigIsrRxPacket);
     isIsrInstalled_ = true;
+
 #else
     #pragma message("Using SX127X")
     LOG_INFO("Using SX127X module");
@@ -316,9 +332,13 @@ void Service::setupBt(const String &btName)
   String btType = config_.BtEnableBle ? "BLE" : "BT";
   LOG_INFO(btType, "init", btName);
   
-  bool btOk = config_.BtEnableBle 
+  bool btOk = config_.BtEnableBle
     ? serialBLE_.begin(btName.c_str()) 
+    #ifdef USE_NIMBLE
+    : false;
+    #else
     : serialBt_.begin(btName);
+    #endif
   
   if (btOk) {
     LOG_INFO(btType, "initialized");
@@ -725,12 +745,18 @@ void Service::onSerialTx(byte b)
   else if (isKissClientConnected_) {
     kissConnnection_.write(b);
   }
+  #ifndef USE_NIMBLE
   else if (config_.BtEnableBle) {
     serialBLE_.write(b);
   }
   else {
     serialBt_.write(b);
   }
+  #else
+  else {
+    serialBLE_.write(b);
+  }
+  #endif
 }
 
 bool Service::onSerialRxHasData()
@@ -741,12 +767,23 @@ bool Service::onSerialRxHasData()
   else if (isKissClientConnected_) {
     return kissConnnection_.available();
   }
+  
+  #ifndef USE_NIMBLE
+  
   else if (config_.BtEnableBle) {
     return serialBLE_.available();
   }
   else {
     return serialBt_.available();
   }
+  
+  #else
+  
+  else {
+  return serialBLE_.available();
+  }
+  
+  #endif
 }
 
 bool Service::onSerialRx(byte *b)
@@ -767,7 +804,12 @@ bool Service::onSerialRx(byte *b)
   else {
     rxResult = config_.BtEnableBle 
       ? serialBLE_.read() 
+      #ifdef USE_NIMBLE
+      : -1;
+      #else
       : serialBt_.read();
+      #endif
+
   }
   if (rxResult == -1) {
     return false;
