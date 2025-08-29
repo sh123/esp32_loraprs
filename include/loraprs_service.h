@@ -16,7 +16,7 @@
 
 #include <WiFi.h>
 #include <endian.h>
-#include <arduino-timer.h>
+#include <SimpleTimer.h>
 
 #include "BluetoothSerial.h"
 #include "ble_serial.h"

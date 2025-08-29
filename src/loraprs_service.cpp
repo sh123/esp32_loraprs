@@ -1,4 +1,5 @@
 #include "loraprs_service.h"
+#include "debuglog_compat.h"
 
 namespace LoraPrs {
 

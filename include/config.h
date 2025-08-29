@@ -89,8 +89,8 @@
 #define CFG_WIFI_KEY          "<key>"     // wifi key
 
 // Bluetooth
-#define CFG_BT_NAME           "loraprs"   // set to empty to disable Bluetooth
-#define CFG_BT_USE_BLE        false       // set to true to use bluetooth low energy (for ios devices)
+#define CFG_BT_NAME           "Heltec-Voice-1"   // set to empty to disable Bluetooth
+#define CFG_BT_USE_BLE        true       // set to true to use bluetooth low energy (for ios devices)
 
 // USB serial
 #define CFG_USB_SERIAL_ENABLE false       // true - enable KISS communication over USB Serial (e.g. with APRSDroid over USB-OTG), disables USB logging
@@ -129,5 +129,20 @@
 #define CFG_TLM_ENABLE        false   // enable modem battery monitor
 #define CFG_TLM_BAT_MON_PIN   36      // battery ADC pin
 #define CFG_TLM_BAT_MON_CAL   0.37f   // calibration coefficient
+
+// Heltec WiFi LoRa 32 V3 (SX1262) pin definitions
+#define LORA_SS        8    // NSS/CS
+#define LORA_SCK       9    // SCK
+#define LORA_MOSI      10   // MOSI
+#define LORA_MISO      11   // MISO
+#define LORA_RST       12   // RST
+#define LORA_BUSY      13   // BUSY
+#define LORA_IRQ       14   // DIO1 (IRQ)
+
+// Update config pin mappings
+#define CFG_LORA_PIN_SS    LORA_SS
+#define CFG_LORA_PIN_RST   LORA_RST
+#define CFG_LORA_PIN_A     LORA_IRQ
+#define CFG_LORA_PIN_B     LORA_BUSY
 
 #endif // CONFIG_H

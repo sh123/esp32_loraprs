@@ -1,5 +1,6 @@
-#include <arduino-timer.h>
+#include <SimpleTimer.h>
 #include <DebugLog.h>
+#include "debuglog_compat.h"
 
 #if __has_include("/tmp/esp32_loraprs_config.h")
 #pragma message("Using external config")
