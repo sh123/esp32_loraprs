@@ -25,8 +25,8 @@ Modules, which are used by users and known to work
 # Building
 - Update `include/config.h` with your radio settings
   - If you are using lora-aprs iGate (non AX.25) then set `CFG_TEXT_PACKETS` and `CFG_TEXT_PACKETS_3` config parameters to `true` and use APRSDroid TNC2 connection protocol
-- To build for client/tracker mode use `pio run -e esp32dev`
-- To build for iGate mode use `pio run -e esp32dev_igate`
+- To build for client/tracker mode use `pio run -e esp32dev_e22_modem`
+- To build for iGate mode use `pio run -e esp32dev_e22_igate`
 
 # Development board
 Development board schematics, case and antenna models are available under `extras/cad` and `extras/schematics`. 
