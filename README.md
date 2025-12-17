@@ -3,7 +3,7 @@
 
 This project is amateur radio ESP32 based LoRa/FSK **KISS Bluetooth/BLE/USB/TCPIP** modem + LoRa **APRS-IS RX/TX iGate** server over WiFI + LoRa/FSK **APRS digipeater** + **Codec2 DV modem** (with Codec2 Talkie Android application). 
 
-&#x26A0; **To configure sketch modify default parameters in config.h file.**
+&#x26A0; **To configure sketch modify default parameters in config.h file or board specific pinouts in variants/<board>/variant.h.**
 
 - For project description, detailed setup and more information, please, visit our Wiki at https://github.com/sh123/esp32_loraprs/wiki
 - For discussions, visit https://github.com/sh123/esp32_loraprs/discussions
