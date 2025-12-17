@@ -7,7 +7,7 @@
 #include <vector>
 
 #define CIRCULAR_BUFFER_INT_SAFE
-#include <CircularBuffer.h>
+#include <CircularBuffer.hpp>
 
 namespace Kiss {
 

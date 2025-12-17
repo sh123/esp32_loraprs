@@ -35,8 +35,6 @@ void Service::setup(const Config &conf)
   disableKiss_ = conf.EnableTextPackets;
   usePrefix3_ = conf.EnableTextPackets3;
 
-  LOG_SET_OPTION(false, false, true);  // disable file, line, enable func
-
   // disable logging when USB is used for data transfer
   if (config_.UsbSerialEnable) {
     LOG_SET_LEVEL(DebugLogLevel::LVL_NONE);
@@ -290,7 +288,6 @@ void Service::setupRigFsk(long freq, float bitRate, float freqDev, float rxBw, i
   if (state != RADIOLIB_ERR_NONE) {
     LOG_ERROR("Radio start error:", state);
   }
-  rig_->disableAddressFiltering();
 #ifdef USE_SX126X
     #pragma message("Using SX126X")
     LOG_INFO("Using SX126X module");
