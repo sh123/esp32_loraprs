@@ -46,6 +46,7 @@ BLESerial::BLESerial()
   : pService(NULL)
   , pTxCharacteristic(NULL)
   , receiveBuffer("")
+  , transmitBuffer("")
 {
 }
 
@@ -152,21 +153,33 @@ int BLESerial::read(void)
 
 size_t BLESerial::write(uint8_t c)
 {
-    // write a character
-    uint8_t _c = c;
-    pTxCharacteristic->setValue(&_c, 1);
-    pTxCharacteristic->notify();
-    delay(3); // bluetooth stack will go into congestion, if too many packets are sent
+    uint16_t mtu = BLEDevice::getMTU();
+    size_t maxPayload = mtu - 3;
+    if (maxPayload < 1) {
+        maxPayload = 20;
+    }
+    if (transmitBuffer.length() >= maxPayload)
+        write();
+    transmitBuffer.push_back(c);
     return 1;
 }
 
 size_t BLESerial::write(const uint8_t *buffer, size_t size)
 {
-    // write a buffer
     for(int i=0; i < size; i++){
         write(buffer[i]);
-  }
-  return size;
+    }
+    return size;
+}
+
+void BLESerial::write() 
+{
+    size_t len = transmitBuffer.length();
+    if (len == 0) return;
+    pTxCharacteristic->setValue((uint8_t*)transmitBuffer.c_str(), len);
+    pTxCharacteristic->notify();
+    transmitBuffer.clear();
+    // delay(3);
 }
 
 void BLESerial::flush()

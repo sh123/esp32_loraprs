@@ -86,6 +86,7 @@ protected:
   virtual void onRigTxEnd() = 0;
   virtual void onRigPacket(void *packet, int packetLength) = 0;
   virtual void onSerialTx(byte b) = 0;
+  virtual void onSerialTxEnd() = 0;
   virtual bool onSerialRxHasData() = 0;
   virtual bool onSerialRx(byte *b) = 0;
   virtual void onControlCommand(Cmd cmd, byte value) = 0;

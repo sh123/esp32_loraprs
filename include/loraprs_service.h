@@ -98,6 +98,7 @@ protected:
   virtual void onRigPacket(void *packet, int packetLength) override;
   
   virtual void onSerialTx(byte b) override;
+  virtual void onSerialTxEnd() override;
   virtual bool onSerialRxHasData() override;
   virtual bool onSerialRx(byte *b) override;
 

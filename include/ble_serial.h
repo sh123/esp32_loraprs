@@ -42,6 +42,7 @@ class BLESerial: public Stream
         int read(void);
         size_t write(uint8_t c);
         size_t write(const uint8_t *buffer, size_t size);
+        void write();
         void flush();
         void end(void);
 
@@ -54,6 +55,7 @@ class BLESerial: public Stream
         uint8_t txValue = 0;
         
         std::string receiveBuffer;
+        std::string transmitBuffer;
 
         friend class BLESerialServerCallbacks;
         friend class BLESerialCharacteristicCallbacks;

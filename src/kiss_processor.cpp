@@ -47,6 +47,7 @@ void Processor::sendRigToSerial(Cmd cmd, const byte *packet, int packetLength) {
     }
   
     onSerialTx((byte)Marker::Fend);
+    onSerialTxEnd();
   }
 }
 
