@@ -5,7 +5,7 @@
 #define MODULE_NAME           SX1278
 
 // module pinouts
-#define CFG_LORA_PIN_SS       15
+#define CFG_LORA_PIN_SS       5
 #define CFG_LORA_PIN_RST      26
 #define CFG_LORA_PIN_A        12
 #define CFG_LORA_PIN_B        RADIOLIB_NC
