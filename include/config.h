@@ -57,7 +57,7 @@
 #define CFG_USB_SERIAL_ENABLE false       // true - enable KISS communication over USB Serial (e.g. with APRSDroid over USB-OTG), disables USB logging
 
 // KISS protocol options
-#define CFG_KISS_EXTENSIONS   false   // true - enable modem control from application with KISS commands and signal reports
+#define CFG_KISS_EXTENSIONS   true   // true - enable modem control from application with KISS commands and signal reports
 #define CFG_KISS_TCP_IP       false   // true - run as KISS TCP/IP server, no bluetooth operations performed
 
 // APRS-IS options, valid in when CFG_IS_CLIENT_MODE = false

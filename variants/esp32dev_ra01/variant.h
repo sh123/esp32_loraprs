@@ -22,7 +22,7 @@
 #define CFG_BT_USE_BLE        false
 
 // Enable modem telemetry
-#define CFG_TLM_ENABLE        false   // enable modem battery monitor
+#define CFG_TLM_ENABLE        true   // enable modem battery monitor
 #define CFG_TLM_BAT_MON_CAL   0.37f   // calibration coefficient
 #define CFG_TLM_BAT_MON_PIN   36      // battery ADC pin
 
