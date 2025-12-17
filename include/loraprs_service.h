@@ -5,12 +5,7 @@
 #include <SPI.h>
 #include <DebugLog.h>
 
-// some generic options (module name, library type) are loaded from config.h
-#if __has_include("/tmp/esp32_loraprs_config.h")
-#include "/tmp/esp32_loraprs_config.h"
-#else
 #include "config.h"
-#endif
 
 #include <RadioLib.h>
 
@@ -135,7 +130,7 @@ private:
   } __attribute__((packed));
 
 private:
-  const String CfgLoraprsVersion = "LoRAPRS 1.0.16";
+  const String CfgLoraprsVersion = "LoRAPRS 1.0.17";
 
   // processor config
   const int CfgConnRetryMs = 500;             // connection retry delay, e.g. wifi
@@ -187,8 +182,11 @@ private:
   std::shared_ptr<MODULE_NAME> rig_;
 
   // bluetooth, wifi
-  BluetoothSerial serialBt_;
+#if CFG_BT_USE_BLE == true
   BLESerial serialBLE_;
+#else
+  BluetoothSerial serialBt_;
+#endif
   WiFiClient aprsisConnection_;
   
   // kiss server

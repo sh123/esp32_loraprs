@@ -1,15 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// Uncomment for SX126X module usage
-//#define USE_SX126X
-
-// Check your module name at https://github.com/jgromes/RadioLib/wiki/Modules
-#ifdef USE_SX126X
-#define MODULE_NAME   SX1268
-#else
-#define MODULE_NAME   SX1278
-#endif
+#include "variant.h"
 
 // generic options
 #define LED_TOGGLE_PERIOD     1000    // heartbeat LED period
@@ -23,33 +15,6 @@
 // select between client mode and APRS-IS gate mode
 #ifndef CFG_IS_CLIENT_MODE
 #define CFG_IS_CLIENT_MODE    true        // false - server mode (APRS-IS gate mode)
-#endif
-
-// change pinouts if not defined through native board LORA_* definitions
-#ifndef LORA_RST
-#pragma message("LoRa pin definitions are not found, redefining...")
-#define LORA_RST              26
-#define LORA_IRQ              12
-#endif
-
-// LoRa pinouts
-#define CFG_LORA_PIN_SS       SS
-#define CFG_LORA_PIN_RST      LORA_RST
-#define CFG_LORA_PIN_A        LORA_IRQ    // (sx127x - dio0, sx126x/sx128x - dio1)
-#ifdef USE_SX126X
-#define CFG_LORA_PIN_B        14          // (sx127x - dio1, sx126x/sx128x - busy)
-#define CFG_LORA_PIN_RXEN     32          // (sx127x - unused, sx126x - RXEN pin number)
-#define CFG_LORA_PIN_TXEN     33          // (sx127x - unused, sx126x - TXEN pin number)
-#else
-#define CFG_LORA_PIN_B        RADIOLIB_NC
-#define CFG_LORA_PIN_RXEN     RADIOLIB_NC
-#define CFG_LORA_PIN_TXEN     RADIOLIB_NC
-#endif
-
-// Redefine LED if not defined in Arduino to have module heartbeat indication
-#ifndef BUILTIN_LED
-#pragma message("BUILDIN_LED is not found, defining as 2")
-#define BUILTIN_LED           2
 #endif
 
 // CAD and ISR usage selection
@@ -88,10 +53,6 @@
 #define CFG_WIFI_SSID         "<ssid>"    // connect to SSID or run as this SSID in AP mode
 #define CFG_WIFI_KEY          "<key>"     // wifi key
 
-// Bluetooth
-#define CFG_BT_NAME           "loraprs"   // set to empty to disable Bluetooth
-#define CFG_BT_USE_BLE        false       // set to true to use bluetooth low energy (for ios devices)
-
 // USB serial
 #define CFG_USB_SERIAL_ENABLE false       // true - enable KISS communication over USB Serial (e.g. with APRSDroid over USB-OTG), disables USB logging
 
@@ -125,9 +86,5 @@
 #define CFG_PTT_TX_DELAY_MS   50      // delay between relay switching ON and transmission startup
 #define CFG_PTT_TX_TAIL_MS    10      // delay between stopping transmission and relay switching OFF
 
-// Enable modem telemetry
-#define CFG_TLM_ENABLE        false   // enable modem battery monitor
-#define CFG_TLM_BAT_MON_PIN   36      // battery ADC pin
-#define CFG_TLM_BAT_MON_CAL   0.37f   // calibration coefficient
 
 #endif // CONFIG_H

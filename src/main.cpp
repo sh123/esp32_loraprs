@@ -1,13 +1,7 @@
 #include <arduino-timer.h>
 #include <DebugLog.h>
 
-#if __has_include("/tmp/esp32_loraprs_config.h")
-#pragma message("Using external config")
-#include "/tmp/esp32_loraprs_config.h"
-#else
-#pragma message("Using default built-in config")
 #include "config.h"
-#endif
 
 #if CFG_IS_CLIENT_MODE == true
 #pragma message("Configured for client mode")
@@ -118,13 +112,17 @@ LoraPrs::Service loraPrsService;
 auto watchdogLedTimer = timer_create_default();
 
 bool toggleWatchdogLed(void *) {
+  #ifdef BUILTIN_LED
   digitalWrite(BUILTIN_LED, !digitalRead(BUILTIN_LED));
+  #endif
   return true;
 }
 
 void setup() {
+  #ifdef BUILTIN_LED
   pinMode(BUILTIN_LED, OUTPUT);
   digitalWrite(BUILTIN_LED, 1);
+  #endif
 
   Serial.begin(SERIAL_BAUD_RATE);
   while (!Serial);
