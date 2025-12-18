@@ -7,6 +7,7 @@
 #include <DebugLog.h>
 
 #include "config.h"
+#include "version.h"
 
 #include <RadioLib.h>
 
@@ -132,7 +133,7 @@ private:
   } __attribute__((packed));
 
 private:
-  const String CfgLoraprsVersion = "LoRAPRS 1.0.17";
+  const String CfgLoraprsVersion = String("LoRAPRS ") + LORAPRS_VERSION;
 
   // processor config
   const int CfgConnRetryMs = 500;             // connection retry delay, e.g. wifi
