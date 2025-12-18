@@ -2,6 +2,8 @@
 #define LORAPRS_CONFIG_H
 
 #include <Arduino.h>
+
+#define DEBUGLOG_DEFAULT_LOG_LEVEL_INFO
 #include <DebugLog.h>
 
 namespace LoraPrs {
