@@ -10,7 +10,7 @@ This project is amateur radio ESP32 based LoRa/FSK **KISS Bluetooth/BLE/USB/TCPI
 
 &#x26A0; Project also supports **APRSDroid TNC2 text APRS packet mode** (configurable), which makes it interoperable with other LoRa APRS trackers without AX25 support.
 
-Supported module types: **SX126X**, **SX127X** and other modules supported by RadioLib.
+Supported module types: **SX126X**, **SX127X** and other modules supported by RadioLib, idle RX power consumption is around 60mA, so single 18650 cell should last for about 24 hours in RX.
 
 Modules, which are used by users and known to work
 - **SX126X** (**suggested**, 1W/2W modules will provide decent coverage for APRS, stable frequency suitable for < 125 kHz BW at 433 MHz, 5V from USB power bank is enough to power it, has additional LNA)
