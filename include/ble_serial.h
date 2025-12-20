@@ -43,11 +43,12 @@ class BLESerial: public Stream
         int read(void);
         size_t write(uint8_t c);
         size_t write(const uint8_t *buffer, size_t size);
-        void write();
         void flush();
         void end(void);
 
     private:
+        void transmit();
+
         String local_name;
         BLEServer *pServer = NULL;
         BLEService *pService;
@@ -60,7 +61,6 @@ class BLESerial: public Stream
 
         friend class BLESerialServerCallbacks;
         friend class BLESerialCharacteristicCallbacks;
-
 };
 
 #endif

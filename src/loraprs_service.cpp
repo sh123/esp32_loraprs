@@ -737,7 +737,7 @@ void Service::onSerialTx(byte b)
 void Service::onSerialTxEnd()
 {
 #if CFG_BT_USE_BLE == true
-    serialBLE_.write();
+    serialBLE_.flush();
 #endif
 }
 

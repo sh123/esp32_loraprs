@@ -159,7 +159,7 @@ size_t BLESerial::write(uint8_t c)
         maxPayload = 20;
     }
     if (transmitBuffer.length() >= maxPayload)
-        write();
+        transmit();
     transmitBuffer.push_back(c);
     return 1;
 }
@@ -172,7 +172,7 @@ size_t BLESerial::write(const uint8_t *buffer, size_t size)
     return size;
 }
 
-void BLESerial::write() 
+void BLESerial::transmit() 
 {
     size_t len = transmitBuffer.length();
     if (len == 0) return;
@@ -184,11 +184,9 @@ void BLESerial::write()
 
 void BLESerial::flush()
 {
-    // remove buffered data
-    receiveBuffer.clear();
+    transmit();
 }
 
 void BLESerial::end()
 {
-    // close connection
 }
