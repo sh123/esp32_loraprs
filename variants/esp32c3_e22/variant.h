@@ -8,8 +8,8 @@
 // lora pinouts
 #define CFG_LORA_PIN_SS       7
 #define CFG_LORA_PIN_RST      8
-#define CFG_LORA_PIN_A        2
-#define CFG_LORA_PIN_B        9
+#define CFG_LORA_PIN_A        3
+#define CFG_LORA_PIN_B        10
 #define CFG_LORA_PIN_RXEN     21
 #define CFG_LORA_PIN_TXEN     20
 
