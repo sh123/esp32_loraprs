@@ -3,6 +3,7 @@
 
 // module name
 #define USE_SX126X
+//#define MODULE_NAME           SX1262
 #define MODULE_NAME           SX1268
 
 // lora pinouts

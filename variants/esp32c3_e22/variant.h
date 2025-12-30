@@ -4,6 +4,7 @@
 // lora module
 #define USE_SX126X
 #define MODULE_NAME           SX1262
+//#define MODULE_NAME           SX1268
 
 // lora pinouts
 #define CFG_LORA_PIN_SS       7
@@ -19,7 +20,7 @@
 #endif
 
 // Bluetooth
-#define CFG_BT_NAME           "loraprs"
+#define CFG_BT_NAME           "wx1"
 #define CFG_BT_USE_BLE        true
 
 // Enable modem telemetry
