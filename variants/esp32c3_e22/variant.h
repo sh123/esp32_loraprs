@@ -3,7 +3,7 @@
 
 // lora module
 #define USE_SX126X
-#define MODULE_NAME           SX1268
+#define MODULE_NAME           SX1262
 
 // lora pinouts
 #define CFG_LORA_PIN_SS       7
