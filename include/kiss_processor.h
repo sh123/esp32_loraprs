@@ -2,9 +2,11 @@
 #define KISS_PROCESSOR_H
 
 #include <Arduino.h>
-#include <DebugLog.h>
 #include <memory>
 #include <vector>
+
+#define DEBUGLOG_DEFAULT_LOG_LEVEL_INFO
+#include <DebugLog.h>
 
 #define CIRCULAR_BUFFER_INT_SAFE
 #include <CircularBuffer.hpp>
