@@ -1,6 +1,6 @@
 
-# ESP32 C3 LoRa modem devboard
+# ESP32-C3-MINI LoRa modem devboard
 
-This is power bank style LoRA APRS modem based on ESP32 C3 board with built in charge controller and battery.
+This is power bank style LoRA APRS modem based on ESP32-C3-DEV board with built in charge/boost IP5306 controller and battery.
 
 ![Board](../../images/boardc3.png)
