@@ -20,7 +20,7 @@
 #endif
 
 // Bluetooth
-#define CFG_BT_NAME           "wx1"
+#define CFG_BT_NAME           "loraprs"
 #define CFG_BT_USE_BLE        true
 
 // Enable modem telemetry
