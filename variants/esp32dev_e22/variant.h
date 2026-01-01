@@ -3,12 +3,12 @@
 
 // module name
 #define USE_SX126X
-//#define MODULE_NAME           SX1262
-#define MODULE_NAME           SX1268
+//#define MODULE_NAME           SX1262    // 868/915 MHz modules
+#define MODULE_NAME           SX1268    // 433 MHz modules
 
 // lora pinouts
 #define CFG_LORA_PIN_SS       5
-#define CFG_LORA_PIN_RST      26
+#define CFG_LORA_PIN_RST      27    // could be also 26 on early boards, check schematics
 #define CFG_LORA_PIN_A        12    // (sx127x - dio0, sx126x/sx128x - dio1)
 #define CFG_LORA_PIN_B        14    // (sx127x - dio1, sx126x/sx128x - busy)
 #define CFG_LORA_PIN_RXEN     32    // (sx127x - unused, sx126x - RXEN pin number)

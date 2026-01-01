@@ -6,7 +6,7 @@
 
 // module pinouts
 #define CFG_LORA_PIN_SS       5
-#define CFG_LORA_PIN_RST      26
+#define CFG_LORA_PIN_RST      27    // could be also 26 on early boards, check schematics
 #define CFG_LORA_PIN_A        12
 #define CFG_LORA_PIN_B        RADIOLIB_NC
 #define CFG_LORA_PIN_RXEN     RADIOLIB_NC
