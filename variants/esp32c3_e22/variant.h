@@ -3,18 +3,14 @@
 
 // lora module
 #define USE_SX126X
-
-// 868MHz module uses SX1262
-#define MODULE_NAME           SX1262
-
-// 433MHz module uses SX1268
-//#define MODULE_NAME           SX1268
+//#define MODULE_NAME           SX1262    // 868/915 MHz modules
+#define MODULE_NAME           SX1268    // 433 MHz modules
 
 // lora pinouts
-#define CFG_LORA_PIN_SS       7
+#define CFG_LORA_PIN_NSS      7
 #define CFG_LORA_PIN_RST      8
-#define CFG_LORA_PIN_A        3
-#define CFG_LORA_PIN_B        10
+#define CFG_LORA_PIN_DIO1     3
+#define CFG_LORA_PIN_BUSY     10
 #define CFG_LORA_PIN_RXEN     21
 #define CFG_LORA_PIN_TXEN     20
 

@@ -50,10 +50,10 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.FskRxBw = CFG_FSK_RX_BW;
 
   // lora pinouts
-  cfg.LoraPinSs = CFG_LORA_PIN_SS;
+  cfg.LoraPinSs = CFG_LORA_PIN_NSS;
   cfg.LoraPinRst = CFG_LORA_PIN_RST;
-  cfg.LoraPinA = CFG_LORA_PIN_A; // (sx127x - dio0, sx126x/sx128x - dio1)
-  cfg.LoraPinB = CFG_LORA_PIN_B; // (sx127x - dio1, sx126x/sx128x - busy)
+  cfg.LoraPinA = CFG_LORA_PIN_DIO1; // (sx127x - dio0, sx126x/sx128x - dio1)
+  cfg.LoraPinB = CFG_LORA_PIN_BUSY; // (sx127x - dio1, sx126x/sx128x - busy)
   cfg.LoraPinSwitchRx = CFG_LORA_PIN_RXEN;  // (sx127x - unused, sx126x - RXEN pin number)
   cfg.LoraPinSwitchTx = CFG_LORA_PIN_TXEN;  // (sx127x - unused, sx126x - TXEN pin number)
   cfg.LoraUseCad = CFG_LORA_USE_CAD;  // carrier detect

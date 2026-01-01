@@ -5,10 +5,10 @@
 #define MODULE_NAME           SX1278
 
 // module pinouts
-#define CFG_LORA_PIN_SS       5
+#define CFG_LORA_PIN_NSS      5
 #define CFG_LORA_PIN_RST      27    // could be also 26 on early boards, check schematics
-#define CFG_LORA_PIN_A        12
-#define CFG_LORA_PIN_B        RADIOLIB_NC
+#define CFG_LORA_PIN_DIO1     12    // DIO0 on RA1 module
+#define CFG_LORA_PIN_BUSY     RADIOLIB_NC
 #define CFG_LORA_PIN_RXEN     RADIOLIB_NC
 #define CFG_LORA_PIN_TXEN     RADIOLIB_NC
 
