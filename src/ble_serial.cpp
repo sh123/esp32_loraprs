@@ -1,130 +1,110 @@
-// Copyright 2019 Ian Archbell / oddWires
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 #include "ble_serial.h"
 
-class BLESerialServerCallbacks: public BLEServerCallbacks {
-    friend class BLESerial; 
+namespace LoraPrs {
+
+class BLESerialServerCallbacks: public NimBLEServerCallbacks {
+    friend class BLESerial;
     BLESerial* bleSerial;
-    
-    void onConnect(BLEServer* pServer) {
-        // do anything needed on connection
-        LOG_INFO("BLE client connected");
-        delay(1000); // wait for connection to complete or messages can be lost
+
+    void onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) override {
+        NimBLEDevice::stopAdvertising();
+        LOG_INFO("BLE client connected, stopped advertising");
     };
 
-    void onDisconnect(BLEServer* pServer) {
-        pServer->startAdvertising(); // restart advertising
+    void onDisconnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo, int reason) override {
+        NimBLEDevice::startAdvertising();
         LOG_INFO("BLE client disconnected, started advertising");
     }
 };
 
-class BLESerialCharacteristicCallbacks: public BLECharacteristicCallbacks {
-    friend class BLESerial; 
+class BLESerialCharacteristicCallbacks: public NimBLECharacteristicCallbacks {
+    friend class BLESerial;
     BLESerial* bleSerial;
-    
-    void onWrite(BLECharacteristic *pCharacteristic) {
-      bleSerial->receiveBuffer = bleSerial->receiveBuffer + pCharacteristic->getValue();
-    }
 
+    void onWrite(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo& connInfo) override {
+        if (!bleSerial || !pCharacteristic) return;
+        NimBLEAttValue attValue = pCharacteristic->getValue();
+        if (bleSerial->receiveQueue_.available() < attValue.size()) {
+            LOG_ERROR("RX queue overflow");
+            return;
+        }
+        for (int i = 0; i < attValue.size(); i++) {
+            bleSerial->receiveQueue_.unshift(attValue.data()[i]);
+        }
+    }
 };
 
-// Constructor
-
 BLESerial::BLESerial()
-  : pService(NULL)
-  , pTxCharacteristic(NULL)
-  , receiveBuffer("")
-  , transmitBuffer("")
+  : pService_(nullptr)
+  , pTxCharacteristic_(nullptr)
 {
 }
-
-// Destructor
 
 BLESerial::~BLESerial(void)
 {
-    // clean up
 }
-
-// Begin bluetooth serial
 
 bool BLESerial::begin(const char* localName)
 {
-    // Create the BLE Device
-    BLEDevice::init(localName);
+    NimBLEDevice::init(localName);
+    NimBLEDevice::setPower(CfgPower);
 
-    // Create the BLE Server
-    pServer = BLEDevice::createServer();
-    if (pServer == nullptr)
+    pServer_ = NimBLEDevice::createServer();
+    if (pServer_ == nullptr) {
+        LOG_ERROR("Failed to create server");
         return false;
-    
-    BLESerialServerCallbacks* bleSerialServerCallbacks =  new BLESerialServerCallbacks(); 
-    bleSerialServerCallbacks->bleSerial = this;      
-    pServer->setCallbacks(bleSerialServerCallbacks);
+    }
 
-    // Create the BLE Service
-    pService = pServer->createService(SERVICE_UUID);
-    if (pService == nullptr)
+    BLESerialServerCallbacks* bleSerialServerCallbacks = new BLESerialServerCallbacks();
+    bleSerialServerCallbacks->bleSerial = this;
+    pServer_->setCallbacks(bleSerialServerCallbacks);
+
+    pService_ = pServer_->createService(CfgServiceUuid);
+    if (pService_ == nullptr) {
+        LOG_ERROR("Failed to create service");
         return false;
+    }
 
-    // Create a BLE Characteristic
-    pTxCharacteristic = pService->createCharacteristic(
-                                            CHARACTERISTIC_UUID_TX,
-                                            BLECharacteristic::PROPERTY_NOTIFY
-                                        );
-    if (pTxCharacteristic == nullptr)
-        return false;                    
-    pTxCharacteristic->addDescriptor(new BLE2902());
+    pTxCharacteristic_ = pService_->createCharacteristic(
+        CfgCharacteristicUuidTx, NIMBLE_PROPERTY::NOTIFY);
+    if (pTxCharacteristic_ == nullptr) {
+        LOG_ERROR("Failed to create TX characteristic");
+        return false;
+    }
 
-    BLECharacteristic * pRxCharacteristic = pService->createCharacteristic(
-                                                CHARACTERISTIC_UUID_RX,
-                                                BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_WRITE_NR
-                                            );
-    if (pRxCharacteristic == nullptr)
-        return false; 
+    NimBLECharacteristic * pRxCharacteristic = pService_->createCharacteristic(
+        CfgCharacteristicUuidRx, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
+    if (pRxCharacteristic == nullptr) {
+        LOG_ERROR("Failed to create RX characteristic");
+        return false;
+    }
 
-    BLESerialCharacteristicCallbacks* bleSerialCharacteristicCallbacks = new BLESerialCharacteristicCallbacks(); 
-    bleSerialCharacteristicCallbacks->bleSerial = this;  
+    BLESerialCharacteristicCallbacks* bleSerialCharacteristicCallbacks = new BLESerialCharacteristicCallbacks();
+    bleSerialCharacteristicCallbacks->bleSerial = this;
     pRxCharacteristic->setCallbacks(bleSerialCharacteristicCallbacks);
 
-    // Start the service
-    pService->start();
+    pService_->start();
     LOG_INFO("BLE started service");
 
-    // Start advertising
-    pServer->getAdvertising()->addServiceUUID(pService->getUUID()); 
-    pServer->getAdvertising()->setScanResponse(true);
-    pServer->getAdvertising()->setMinPreferred(0x06);
-    pServer->getAdvertising()->setMaxPreferred(0x12);
-    pServer->getAdvertising()->start();
+    NimBLEAdvertising* advertising = NimBLEDevice::getAdvertising();
+    if (advertising) {
+        advertising->addServiceUUID(pService_->getUUID());
+        advertising->enableScanResponse(false);
+        advertising->start();
+    }
     LOG_INFO("BLE started advertising and waiting for client connection...");
     return true;
 }
 
 int BLESerial::available(void)
 {
-    // reply with data available
-    return receiveBuffer.length();
+    return receiveQueue_.size() > 0;
 }
 
 int BLESerial::peek(void)
 {
-    // return first character available
-    // but don't remove it from the buffer
-    if ((receiveBuffer.length() > 0)){
-        uint8_t c = receiveBuffer[0];
-        return c;
+    if ((receiveQueue_.size() > 0)){
+        return receiveQueue_.last();
     }
     else
         return -1;
@@ -132,20 +112,16 @@ int BLESerial::peek(void)
 
 bool BLESerial::connected(void)
 {
-    // true if connected
-    if (pServer->getConnectedCount() > 0)
+    if (pServer_ && pServer_->getConnectedCount() > 0)
         return true;
-    else 
-        return false;        
+    else
+        return false;
 }
 
 int BLESerial::read(void)
 {
-    // read a character
-    if ((receiveBuffer.length() > 0)){
-        uint8_t c = receiveBuffer[0];
-        receiveBuffer.erase(0,1); // remove it from the buffer
-        return c;
+    if (receiveQueue_.size() > 0){
+        return receiveQueue_.pop();
     }
     else
         return -1;
@@ -153,33 +129,51 @@ int BLESerial::read(void)
 
 size_t BLESerial::write(uint8_t c)
 {
-    uint16_t mtu = BLEDevice::getMTU();
-    size_t maxPayload = mtu - 3;
-    if (maxPayload < 1) {
-        maxPayload = 20;
+    if (transmitQueue_.isFull()) {
+        LOG_ERROR("TX queue overflow");
+        return 0;
     }
-    if (transmitBuffer.length() >= maxPayload)
+    transmitQueue_.unshift(c);
+    if (transmitQueue_.size() >= getMaxPayloadSize())
         transmit();
-    transmitBuffer.push_back(c);
     return 1;
 }
 
 size_t BLESerial::write(const uint8_t *buffer, size_t size)
 {
-    for(int i=0; i < size; i++){
+    for (size_t i = 0; i < size; i++){
         write(buffer[i]);
     }
     return size;
 }
 
-void BLESerial::transmit() 
+size_t BLESerial::getMaxPayloadSize() 
 {
-    size_t len = transmitBuffer.length();
-    if (len == 0) return;
-    pTxCharacteristic->setValue((uint8_t*)transmitBuffer.c_str(), len);
-    pTxCharacteristic->notify();
-    transmitBuffer.clear();
-    // delay(3);
+    uint16_t mtu = NimBLEDevice::getMTU();
+    size_t maxPayload = 0;
+    if (mtu >= CfgMinMtuSize && mtu <= CfgMaxMtuSize) {
+        maxPayload = (size_t)(mtu - CfgHdrMtuSize);
+    } else {
+        maxPayload = CfgMinMtuSize - CfgHdrMtuSize;
+    }
+    return maxPayload;
+}
+
+void BLESerial::transmit()
+{
+    if (!pTxCharacteristic_) return;
+    size_t maxPayloadSize = getMaxPayloadSize();
+
+    size_t queueLen;
+    while ((queueLen = transmitQueue_.size()) > 0) {
+        size_t txLen = queueLen > maxPayloadSize ? maxPayloadSize : queueLen;
+        uint8_t buffer[txLen];
+        for (int i = 0; i < txLen; i++) {
+            buffer[i] = transmitQueue_.pop();
+        }
+        pTxCharacteristic_->setValue(buffer, txLen);
+        pTxCharacteristic_->notify();
+    }
 }
 
 void BLESerial::flush()
@@ -190,3 +184,5 @@ void BLESerial::flush()
 void BLESerial::end()
 {
 }
+
+} // LoraPrs

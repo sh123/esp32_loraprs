@@ -1,66 +1,65 @@
-// Copyright 2019 Ian Archbell / oddWires
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-#ifndef _BLE_SERIAL_H_
-#define _BLE_SERIAL_H_
+#ifndef BLE_SERIAL_H
+#define BLE_SERIAL_H
 
 #include "Arduino.h"
 #include "Stream.h"
-#include <BLEDevice.h>
-#include <BLEServer.h>
-#include <BLEUtils.h>
-#include <BLE2902.h>
+
+#include <NimBLEDevice.h>
+#include <NimBLEServer.h>
+#include <NimBLEUtils.h>
+
+#define CIRCULAR_BUFFER_INT_SAFE
+#include <CircularBuffer.hpp>
 
 #define DEBUGLOG_DEFAULT_LOG_LEVEL_INFO
 #include <DebugLog.h>
 
-#define SERVICE_UUID           "00000001-ba2a-46c9-ae49-01b0961f68bb" // KISS service UUID
-#define CHARACTERISTIC_UUID_TX "00000003-ba2a-46c9-ae49-01b0961f68bb"
-#define CHARACTERISTIC_UUID_RX "00000002-ba2a-46c9-ae49-01b0961f68bb"
+namespace LoraPrs {
 
 class BLESerial: public Stream
 {
-    public:
+    friend class BLESerialServerCallbacks;
+    friend class BLESerialCharacteristicCallbacks;
 
-        BLESerial(void);
-        ~BLESerial(void);
+public:
+    static constexpr const char* CfgServiceUuid = "00000001-ba2a-46c9-ae49-01b0961f68bb"; // KISS service UUID
+    static constexpr const char* CfgCharacteristicUuidTx = "00000003-ba2a-46c9-ae49-01b0961f68bb";
+    static constexpr const char* CfgCharacteristicUuidRx = "00000002-ba2a-46c9-ae49-01b0961f68bb";
 
-        bool begin(const char* localName);
-        int available(void);
-        int peek(void);
-        bool connected(void);
-        int read(void);
-        size_t write(uint8_t c);
-        size_t write(const uint8_t *buffer, size_t size);
-        void flush();
-        void end(void);
+    static constexpr int CfgQueueSize = 256;
+    static constexpr int CfgHdrMtuSize = 3;
+    static constexpr int CfgMinMtuSize = 23;
+    static constexpr int CfgMaxMtuSize = 247;
+    static constexpr int CfgPower = -8;
 
-    private:
-        void transmit();
+public:
+    BLESerial(void);
+    ~BLESerial(void);
 
-        String local_name;
-        BLEServer *pServer = NULL;
-        BLEService *pService;
-        BLECharacteristic * pTxCharacteristic;
-        bool deviceConnected = false;
-        uint8_t txValue = 0;
-        
-        std::string receiveBuffer;
-        std::string transmitBuffer;
+    bool begin(const char* localName);
+    int available(void) override;
+    int peek(void) override;
+    bool connected(void);
+    int read(void) override;
+    size_t write(uint8_t c) override;
+    size_t write(const uint8_t *buffer, size_t size) override;
+    void flush() override;
+    void end(void);
 
-        friend class BLESerialServerCallbacks;
-        friend class BLESerialCharacteristicCallbacks;
+private:
+    size_t getMaxPayloadSize();
+    void transmit();
+
+private:
+    NimBLEServer *pServer_ = nullptr;
+    NimBLEService *pService_ = nullptr;
+    NimBLECharacteristic *pTxCharacteristic_ = nullptr;
+
+    CircularBuffer<uint8_t, CfgQueueSize> transmitQueue_;
+    CircularBuffer<uint8_t, CfgQueueSize> receiveQueue_;
+
 };
 
-#endif
+} // LoraPrs
+
+#endif // BLE_SERIAL_H
