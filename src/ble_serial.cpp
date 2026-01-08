@@ -28,9 +28,8 @@ class BLESerialCharacteristicCallbacks: public NimBLECharacteristicCallbacks {
             LOG_ERROR("RX queue overflow");
             return;
         }
-        for (int i = 0; i < attValue.size(); i++) {
+        for (int i = 0; i < attValue.size(); i++)
             bleSerial->receiveQueue_.unshift(attValue.data()[i]);
-        }
     }
 };
 
@@ -103,9 +102,8 @@ int BLESerial::available(void)
 
 int BLESerial::peek(void)
 {
-    if ((receiveQueue_.size() > 0)){
+    if (receiveQueue_.size() > 0)
         return receiveQueue_.last();
-    }
     else
         return -1;
 }
@@ -141,9 +139,8 @@ size_t BLESerial::write(uint8_t c)
 
 size_t BLESerial::write(const uint8_t *buffer, size_t size)
 {
-    for (size_t i = 0; i < size; i++){
+    for (size_t i = 0; i < size; i++)
         write(buffer[i]);
-    }
     return size;
 }
 
@@ -151,26 +148,25 @@ size_t BLESerial::getMaxPayloadSize()
 {
     uint16_t mtu = NimBLEDevice::getMTU();
     size_t maxPayload = 0;
-    if (mtu >= CfgMinMtuSize && mtu <= CfgMaxMtuSize) {
-        maxPayload = (size_t)(mtu - CfgHdrMtuSize);
-    } else {
-        maxPayload = CfgMinMtuSize - CfgHdrMtuSize;
-    }
-    return maxPayload;
+    return (mtu >= CfgMinMtuSize && mtu <= CfgMaxMtuSize)
+        ? (size_t)(mtu - CfgHdrMtuSize)
+        : CfgMinMtuSize - CfgHdrMtuSize;
 }
 
 void BLESerial::transmit()
 {
-    if (!pTxCharacteristic_) return;
+    if (!pTxCharacteristic_) {
+        LOG_ERROR("No TX characteristic to transmit");
+        return;
+    }
     size_t maxPayloadSize = getMaxPayloadSize();
 
     size_t queueLen;
     while ((queueLen = transmitQueue_.size()) > 0) {
         size_t txLen = queueLen > maxPayloadSize ? maxPayloadSize : queueLen;
         uint8_t buffer[txLen];
-        for (int i = 0; i < txLen; i++) {
+        for (int i = 0; i < txLen; i++)
             buffer[i] = transmitQueue_.pop();
-        }
         pTxCharacteristic_->setValue(buffer, txLen);
         pTxCharacteristic_->notify();
     }
