@@ -20,49 +20,48 @@ namespace LoraPrs {
 
 class BLESerial: public Stream
 {
-    friend class BLESerialServerCallbacks;
-    friend class BLESerialCharacteristicCallbacks;
+  friend class BLESerialServerCallbacks;
+  friend class BLESerialCharacteristicCallbacks;
 
 public:
-    static constexpr const char* CfgServiceUuid = "00000001-ba2a-46c9-ae49-01b0961f68bb"; // KISS service UUID
-    static constexpr const char* CfgCharacteristicUuidTx = "00000003-ba2a-46c9-ae49-01b0961f68bb";
-    static constexpr const char* CfgCharacteristicUuidRx = "00000002-ba2a-46c9-ae49-01b0961f68bb";
+  static constexpr const char* CfgServiceUuid = "00000001-ba2a-46c9-ae49-01b0961f68bb"; // KISS service UUID
+  static constexpr const char* CfgCharacteristicUuidTx = "00000003-ba2a-46c9-ae49-01b0961f68bb";
+  static constexpr const char* CfgCharacteristicUuidRx = "00000002-ba2a-46c9-ae49-01b0961f68bb";
 
-    static constexpr int CfgQueueSize = 256;
-    static constexpr int CfgHdrMtuSize = 3;
-    static constexpr int CfgMinMtuSize = 23;
-    static constexpr int CfgMaxMtuSize = 247;
-    static constexpr int CfgPower = -8;
+  static constexpr int CfgQueueSize = 256;
+  static constexpr int CfgHdrMtuSize = 3;
+  static constexpr int CfgMinMtuSize = 23;
+  static constexpr int CfgMaxMtuSize = 247;
+  static constexpr int CfgPower = -8;
 
 public:
-    BLESerial(void);
-    ~BLESerial(void);
+  BLESerial(void);
+  ~BLESerial(void);
 
-    bool begin(const Config &conf);
-    int available(void) override;
-    int peek(void) override;
-    bool connected(void);
-    int read(void) override;
-    size_t write(uint8_t c) override;
-    size_t write(const uint8_t *buffer, size_t size) override;
-    void flush() override;
-    void end(void);
-
-private:
-    size_t getMaxPayloadSize();
-    void transmit();
+  bool begin(const Config &conf);
+  int available(void) override;
+  int peek(void) override;
+  bool connected(void);
+  int read(void) override;
+  size_t write(uint8_t c) override;
+  size_t write(const uint8_t *buffer, size_t size) override;
+  void flush() override;
+  void end(void);
 
 private:
-    Config config_;
+  size_t getMaxPayloadSize();
+  void transmit();
 
-    bool isConnected_;
-    NimBLEServer *pServer_ = nullptr;
-    NimBLEService *pService_ = nullptr;
-    NimBLECharacteristic *pTxCharacteristic_ = nullptr;
+private:
+  Config config_;
 
-    CircularBuffer<uint8_t, CfgQueueSize> transmitQueue_;
-    CircularBuffer<uint8_t, CfgQueueSize> receiveQueue_;
+  bool isConnected_;
+  NimBLEServer *pServer_ = nullptr;
+  NimBLEService *pService_ = nullptr;
+  NimBLECharacteristic *pTxCharacteristic_ = nullptr;
 
+  CircularBuffer<uint8_t, CfgQueueSize> transmitQueue_;
+  CircularBuffer<uint8_t, CfgQueueSize> receiveQueue_;
 };
 
 } // LoraPrs
