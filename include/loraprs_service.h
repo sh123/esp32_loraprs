@@ -71,20 +71,20 @@ private:
 
   inline bool needsAprsis() const { 
     return !config_.IsClientMode  // only in server mode
-      && (config_.EnableRfToIs || config_.EnableIsToRf)  // rx/tx igate enabled
-      && !config_.WifiEnableAp;  // wifi is NOT in AP mode
+      && (config_.EnableRfToIs || config_.EnableIsToRf)  // AND rx/tx igate enabled
+      && !config_.WifiEnableAp;  // AND wifi is NOT in AP mode otherwise no internet
   }
   inline bool needsWifi() const { 
     return needsAprsis()  // aprsis is needed
-      || config_.KissEnableTcpIp; // or kiss over tcp ip is enabled
+      || config_.KissEnableTcpIp; // OR kiss over tcp ip is enabled
   }
   inline bool needsBt() const { 
     return (config_.IsClientMode || config_.BtName.length() > 0)  // client mode or name must be specified
-      && !config_.UsbSerialEnable;  // inactive in usb serial mode
+      && !config_.UsbSerialEnable;  // AND no usb serial mode
   }
   inline bool needsBeacon() const { 
     return !config_.IsClientMode  // beaconing only in apris gate / server mode
-    && config_.EnableBeacon;  // beacon must be explicitly enabled
+      && config_.EnableBeacon;  // AND beacon must be explicitly enabled
   }
   inline bool isHalfDuplex() const {
     return config_.LoraFreqRx != config_.LoraFreqTx;

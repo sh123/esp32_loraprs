@@ -1,6 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+// below argumentrs could be overriden in variant.h and/or platformio.ini file
 #include "variant.h"
 
 // generic options
@@ -13,16 +14,10 @@
 #define CFG_LOG_LEVEL         DebugLogLevel::LVL_INFO
 
 // select between client mode and APRS-IS gate mode
-#ifndef CFG_IS_CLIENT_MODE
 #define CFG_IS_CLIENT_MODE    true        // false - server mode (APRS-IS gate mode)
-#endif
 
 // CAD and ISR usage selection
-#ifdef USE_SX126X
 #define CFG_LORA_USE_CAD      true        // do not transmit if channel is busy
-#else
-#define CFG_LORA_USE_CAD      true        // set to true to utilize carrier detection
-#endif
 
 // modulation
 #define CFG_MOD_TYPE_LORA     0
@@ -50,8 +45,8 @@
 
 // WiFi client and AP options
 #define CFG_WIFI_ENABLE_AP    false       // run as wifi access point (for CFG_KISS_TCP_IP mode)
-#define CFG_WIFI_SSID         "<ssid>"    // connect to SSID or run as this SSID in AP mode
-#define CFG_WIFI_KEY          "<key>"     // wifi key
+#define CFG_WIFI_SSID         "loraprs"   // connect to SSID or run as this SSID in AP mode
+#define CFG_WIFI_KEY          "key12345"  // wifi key
 
 // USB serial
 #define CFG_USB_SERIAL_ENABLE false       // true - enable KISS communication over USB Serial (e.g. with APRSDroid over USB-OTG), disables USB logging
@@ -85,6 +80,5 @@
 #define CFG_PTT_PIN           12      // PTT pin
 #define CFG_PTT_TX_DELAY_MS   50      // delay between relay switching ON and transmission startup
 #define CFG_PTT_TX_TAIL_MS    10      // delay between stopping transmission and relay switching OFF
-
 
 #endif // CONFIG_H
