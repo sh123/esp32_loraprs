@@ -1,9 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// below argumentrs could be overriden in variant.h and/or platformio.ini file
-#include "variant.h"
-
 // generic options
 #define LED_TOGGLE_PERIOD     1000    // heartbeat LED period
 #define SERIAL_BAUD_RATE      115200  // USB serial baud rate
@@ -48,6 +45,11 @@
 #define CFG_WIFI_SSID         "loraprs"   // connect to SSID or run as this SSID in AP mode
 #define CFG_WIFI_KEY          "key12345"  // wifi key
 
+// BLE
+#define CFG_BT_NAME           "loraprs"   // BT/BLE dev and advert name
+#define CFG_BT_BLE_PWR        0           // BLE power in dBm (0 dBm = 1mW, 10 dBm = 10mW, 20dBm = 100mW, etc)
+#define CFG_BT_BLE_PINCODE    0           // pin code, set to 0 to disable
+
 // USB serial
 #define CFG_USB_SERIAL_ENABLE false       // true - enable KISS communication over USB Serial (e.g. with APRSDroid over USB-OTG), disables USB logging
 
@@ -80,5 +82,8 @@
 #define CFG_PTT_PIN           12      // PTT pin
 #define CFG_PTT_TX_DELAY_MS   50      // delay between relay switching ON and transmission startup
 #define CFG_PTT_TX_TAIL_MS    10      // delay between stopping transmission and relay switching OFF
+
+// below argumentrs could be overriden in variant.h and/or platformio.ini file
+#include "variant.h"
 
 #endif // CONFIG_H

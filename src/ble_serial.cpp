@@ -8,11 +8,13 @@ class BLESerialServerCallbacks: public NimBLEServerCallbacks {
 
     void onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) override {
         NimBLEDevice::stopAdvertising();
+        bleSerial->isConnected_ = true;
         LOG_INFO("BLE client connected, stopped advertising");
     };
 
     void onDisconnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo, int reason) override {
         NimBLEDevice::startAdvertising();
+        bleSerial->isConnected_ = false;
         LOG_INFO("BLE client disconnected, started advertising");
     }
 };
@@ -34,7 +36,8 @@ class BLESerialCharacteristicCallbacks: public NimBLECharacteristicCallbacks {
 };
 
 BLESerial::BLESerial()
-  : pService_(nullptr)
+  : isConnected_(false)
+  , pService_(nullptr)
   , pTxCharacteristic_(nullptr)
 {
 }
@@ -43,11 +46,23 @@ BLESerial::~BLESerial(void)
 {
 }
 
-bool BLESerial::begin(const char* localName)
+bool BLESerial::begin(const Config &conf)
 {
-    NimBLEDevice::init(localName);
-    NimBLEDevice::setPower(CfgPower);
+    config_ = conf;
 
+    LOG_INFO("Setting up BLE", config_.BtName.c_str());
+
+    NimBLEDevice::init(config_.BtName.c_str());
+    NimBLEDevice::setPower(config_.BtBlePwr);
+
+    bool hasPinCode = config_.BtBlePinCode != 0;
+
+    if (hasPinCode) {
+        LOG_INFO("Enabling pincode auth");
+        NimBLEDevice::setSecurityAuth(true, true, false);
+        NimBLEDevice::setSecurityPasskey(config_.BtBlePinCode);
+        NimBLEDevice::setSecurityIOCap(BLE_HS_IO_NO_INPUT_OUTPUT);
+    }
     pServer_ = NimBLEDevice::createServer();
     if (pServer_ == nullptr) {
         LOG_ERROR("Failed to create server");
@@ -64,15 +79,17 @@ bool BLESerial::begin(const char* localName)
         return false;
     }
 
-    pTxCharacteristic_ = pService_->createCharacteristic(
-        CfgCharacteristicUuidTx, NIMBLE_PROPERTY::NOTIFY);
+    uint32_t txProperties = NIMBLE_PROPERTY::NOTIFY;
+    pTxCharacteristic_ = pService_->createCharacteristic(CfgCharacteristicUuidTx, txProperties);
     if (pTxCharacteristic_ == nullptr) {
         LOG_ERROR("Failed to create TX characteristic");
         return false;
     }
 
-    NimBLECharacteristic * pRxCharacteristic = pService_->createCharacteristic(
-        CfgCharacteristicUuidRx, NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
+    uint32_t rxProperties = NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR;
+    if (hasPinCode)
+        rxProperties |= NIMBLE_PROPERTY::WRITE_ENC | NIMBLE_PROPERTY::WRITE_AUTHEN;
+    NimBLECharacteristic * pRxCharacteristic = pService_->createCharacteristic(CfgCharacteristicUuidRx, rxProperties);
     if (pRxCharacteristic == nullptr) {
         LOG_ERROR("Failed to create RX characteristic");
         return false;
@@ -87,6 +104,7 @@ bool BLESerial::begin(const char* localName)
 
     NimBLEAdvertising* advertising = NimBLEDevice::getAdvertising();
     if (advertising) {
+        advertising->setName(config_.BtName.c_str());
         advertising->addServiceUUID(pService_->getUUID());
         advertising->enableScanResponse(false);
         advertising->start();
@@ -127,6 +145,7 @@ int BLESerial::read(void)
 
 size_t BLESerial::write(uint8_t c)
 {
+    if (!isConnected_) return 0;
     if (transmitQueue_.isFull()) {
         LOG_ERROR("TX queue overflow");
         return 0;
@@ -139,9 +158,15 @@ size_t BLESerial::write(uint8_t c)
 
 size_t BLESerial::write(const uint8_t *buffer, size_t size)
 {
+    if (!isConnected_) return 0;
+    if (transmitQueue_.isFull()) {
+        LOG_ERROR("Tx queue overflow");
+        return 0;
+    }
+    int cntWritten = 0;
     for (size_t i = 0; i < size; i++)
-        write(buffer[i]);
-    return size;
+        cntWritten += write(buffer[i]);
+    return cntWritten;
 }
 
 size_t BLESerial::getMaxPayloadSize() 

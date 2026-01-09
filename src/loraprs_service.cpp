@@ -81,7 +81,7 @@ void Service::setup(const Config &conf)
   
   // peripherals, Bluetooth/BLE
   if (needsBt()) {
-    setupBt(config_.BtName);
+    setupBt();
   }
 
   // APRS-IS
@@ -311,14 +311,14 @@ void Service::setupRigFsk(long freq, float bitRate, float freqDev, float rxBw, i
   LOG_INFO("FSK initialized");
 }
 
-void Service::setupBt(const String &btName)
+void Service::setupBt()
 {
   String btType = config_.BtEnableBle ? "BLE" : "BT";
-  LOG_INFO(btType, "init", btName);
+  LOG_INFO(btType, "init", config_.BtName);
 #if CFG_BT_USE_BLE == true
-  bool btOk = serialBLE_.begin(btName.c_str());
+  bool btOk = serialBLE_.begin(config_);
 #else
-  bool btOk = serialBt_.begin(btName);
+  bool btOk = serialBt_.begin(config_.BtName);
 #endif
   if (btOk) {
     LOG_INFO(btType, "initialized");

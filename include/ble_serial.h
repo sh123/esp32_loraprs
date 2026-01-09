@@ -14,6 +14,8 @@
 #define DEBUGLOG_DEFAULT_LOG_LEVEL_INFO
 #include <DebugLog.h>
 
+#include "loraprs_config.h"
+
 namespace LoraPrs {
 
 class BLESerial: public Stream
@@ -36,7 +38,7 @@ public:
     BLESerial(void);
     ~BLESerial(void);
 
-    bool begin(const char* localName);
+    bool begin(const Config &conf);
     int available(void) override;
     int peek(void) override;
     bool connected(void);
@@ -51,6 +53,9 @@ private:
     void transmit();
 
 private:
+    Config config_;
+
+    bool isConnected_;
     NimBLEServer *pServer_ = nullptr;
     NimBLEService *pService_ = nullptr;
     NimBLECharacteristic *pTxCharacteristic_ = nullptr;

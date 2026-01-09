@@ -38,7 +38,7 @@ private:
   void setupWifi(const String &wifiName, const String &wifiKey);
   void setupRig(long freq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit);
   void setupRigFsk(long freq, float bitRate, float freqDev, float rxBw, int pwr);
-  void setupBt(const String &btName);
+  void setupBt();
 
   void setFreq(long freq) const;
 
