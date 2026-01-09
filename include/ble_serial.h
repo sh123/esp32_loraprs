@@ -32,7 +32,6 @@ public:
   static constexpr int CfgHdrMtuSize = 3;
   static constexpr int CfgMinMtuSize = 23;
   static constexpr int CfgMaxMtuSize = 247;
-  static constexpr int CfgPower = -8;
 
 public:
   BLESerial(void);
