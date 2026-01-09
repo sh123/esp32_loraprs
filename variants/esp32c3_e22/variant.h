@@ -15,14 +15,14 @@
 #define CFG_LORA_PIN_TXEN     20
 
 // not in use
-#undef BUILTIN_LED 
+#undef BUILTIN_LED
 
 // bluetooth
 #define CFG_BT_USE_BLE        true
 
 // enable modem telemetry
 #define CFG_TLM_ENABLE        true   // enable modem battery monitor
-#define CFG_TLM_BAT_MON_CAL   0.37f   // calibration coefficient
+#define CFG_TLM_BAT_MON_CAL   0.37f  // voltage correction
 #define CFG_TLM_BAT_MON_PIN   0      // battery ADC pin
 
 #endif // VARIANT_H
