@@ -48,7 +48,7 @@
 // BLE
 #define CFG_BT_NAME           "loraprs"   // BT/BLE dev and advert name
 #define CFG_BT_BLE_PWR        0           // BLE power in dBm (0 dBm = 1mW, 10 dBm = 10mW, 20dBm = 100mW, etc)
-#define CFG_BT_BLE_PINCODE    0           // pin code, set to 0 to disable
+#define CFG_BT_PASSKEY        123456      // passkey, set to 0 to disable authorization
 
 // USB serial
 #define CFG_USB_SERIAL_ENABLE false       // true - enable KISS communication over USB Serial (e.g. with APRSDroid over USB-OTG), disables USB logging

@@ -17,6 +17,20 @@ namespace LoraPrs {
       bleSerial_->isConnected_ = false;
       LOG_INFO("BLE client disconnected, started advertising");
     }
+
+    uint32_t onPassKeyDisplay() override {
+      LOG_INFO("Passkey requested");
+      return bleSerial_->config_.BtPassKey;
+    }
+
+    void onAuthenticationComplete(NimBLEConnInfo& connInfo) override {
+      if (!connInfo.isEncrypted()) {
+        NimBLEDevice::getServer()->disconnect(connInfo.getConnHandle());
+        LOG_ERROR("Encrypt connection failed - disconnecting client");
+        return;
+      }
+      LOG_INFO("Secured connection");
+    }
   };
 
   class BLESerialCharacteristicCallbacks: public NimBLECharacteristicCallbacks {
@@ -55,13 +69,12 @@ namespace LoraPrs {
     NimBLEDevice::init(config_.BtName.c_str());
     NimBLEDevice::setPower(config_.BtBlePwr);
 
-    bool hasPinCode = config_.BtBlePinCode != 0;
+    bool hasPinCode = config_.BtPassKey != 0;
 
     if (hasPinCode) {
-      LOG_INFO("Enabling pincode auth");
-      NimBLEDevice::setSecurityAuth(true, true, false);
-      NimBLEDevice::setSecurityPasskey(config_.BtBlePinCode);
-      NimBLEDevice::setSecurityIOCap(BLE_HS_IO_NO_INPUT_OUTPUT);
+      LOG_INFO("Enabling passkey auth");
+      NimBLEDevice::setSecurityAuth(true, true, true);
+      NimBLEDevice::setSecurityIOCap(BLE_HS_IO_DISPLAY_ONLY);
     }
     pServer_ = NimBLEDevice::createServer();
     if (pServer_ == nullptr) {

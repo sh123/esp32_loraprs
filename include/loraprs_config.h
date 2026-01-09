@@ -50,7 +50,7 @@ struct Config
   // bluetooth
   String BtName;        // bluetooth device name for the client, set to empty string to disable bluetooth in server mode
   bool BtEnableBle;     // bluetooth device presents as BLE rather than serial bluetooth e.g. for iOS devices
-  uint32_t BtBlePinCode; // ble pin code
+  uint32_t BtPassKey;   // pass key for access
   int BtBlePwr;         // ble power in dBm (0dBm = 1mW)
 
   // wifi
