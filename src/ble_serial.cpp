@@ -179,6 +179,12 @@ void BLESerial::flush()
 
 void BLESerial::end()
 {
+    LOG_INFO("Deinitializing BLE");
+    NimBLEDevice::stopAdvertising();
+    pServer_ = nullptr;
+    pTxCharacteristic_ = nullptr;
+    pService_ = nullptr;
+    NimBLEDevice::deinit(true);
 }
 
 } // LoraPrs
