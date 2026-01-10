@@ -22,7 +22,7 @@
 
 // enable modem telemetry
 #define CFG_TLM_ENABLE        true   // enable modem battery monitor
-#define CFG_TLM_BAT_MON_CAL   0.37f  // voltage correction
+#define CFG_TLM_BAT_MON_CAL   (-0.45f)  // voltage correction
 #define CFG_TLM_BAT_MON_PIN   0      // battery ADC pin
 
 #endif // VARIANT_H
