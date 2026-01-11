@@ -666,7 +666,12 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
       LOG_INFO("Packet digirepeated");
     }
   } else {
-    LOG_WARN("Skipping non-AX25 payload");
+    if (config_.EnableRepeaterRaw) {
+      LOG_INFO("Retransmitting raw non-AX25 packet");
+      queueSerialToRig(Cmd::Data, packet, packetLength);
+    } else {
+      LOG_WARN("Skipping non-AX25 payload");
+    }
   }
 }
 

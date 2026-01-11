@@ -80,7 +80,8 @@ struct Config
   bool EnablePersistentAprsConnection;  // true - keep aprs-is connection active all the time
   bool EnableRfToIs;                    // true - enable RF to APRS-IS submission
   bool EnableIsToRf;                    // true - enable APRS-IS to RF submission
-  bool EnableRepeater;                  // true - digirepeat incoming packets based on WIDEn-n paths
+  bool EnableRepeater;                  // true - digirepeat incoming AX.25 packets based on WIDEn-n paths
+  bool EnableRepeaterRaw;               // true - retransmit incoming raw non-AX.25 (e.g. raw speech)
   bool EnableBeacon;                    // true - send AprsRawBeacon to RF and APRS-IS if EnableRfToIs is true
   bool EnableTextPackets;               // true - use TNC2 text plain messages insead of AX25 binary frames for interoperability with other projects
   bool EnableTextPackets3;              // true - enable aprs-lora 3 byte prefix '<', 0xff, 0x01
