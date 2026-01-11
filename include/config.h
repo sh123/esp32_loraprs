@@ -92,15 +92,18 @@
 #define CFG_WIFI_KEY          "123456"    // wifi key, always specified
 #endif
 
-// BLE
+// Bluetooth classic or BLE
 #ifndef CFG_BT_NAME        
 #define CFG_BT_NAME           "loraprs"   // BT/BLE dev and advert name
+#endif
+#ifndef CFG_BT_USE_BLE
+#define CFG_BT_USE_BLE        true        // Use BLE LE by default, false sets to classic
 #endif
 #ifndef CFG_BT_BLE_PWR    
 #define CFG_BT_BLE_PWR        0           // BLE power in dBm (0 dBm = 1mW, 10 dBm = 10mW, 20dBm = 100mW, etc)
 #endif
 #ifndef CFG_BT_PASSKEY   
-#define CFG_BT_PASSKEY        123456      // passkey, set to 0 to disable BLE passkey authorization
+#define CFG_BT_PASSKEY        123456      // passkey, integer, set to 0 to disable BLE passkey authorization
 #endif
 
 // USB serial
@@ -179,6 +182,17 @@
 #endif
 #ifndef CFG_PTT_TX_TAIL_MS   
 #define CFG_PTT_TX_TAIL_MS    10      // delay between stopping transmission and relay switching OFF
+#endif
+
+// enable modem telemetry
+#ifndef CFG_TLM_ENABLE
+#define CFG_TLM_ENABLE        true   // enable modem battery monitor
+#endif
+#ifndef CFG_TLM_BAT_MON_CAL
+#define CFG_TLM_BAT_MON_CAL   0.0f   // voltage correction, override for specific board type
+#endif
+#ifndef CFG_TLM_BAT_MON_PIN
+#define CFG_TLM_BAT_MON_PIN   36     // battery ADC pin
 #endif
 
 #endif // CONFIG_H

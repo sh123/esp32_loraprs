@@ -15,16 +15,9 @@
 #define CFG_LORA_PIN_TXEN     33    // (sx127x - unused, sx126x - TXEN pin number)
 
 // built in led
-#ifndef BUILTIN_LED
-#define BUILTIN_LED           2
-#endif
-
-// Bluetooth
-#define CFG_BT_NAME           "loraprs"
-#define CFG_BT_USE_BLE        false
+#define BUILTIN_LED           2     // heartbeat led
 
 // Enable modem telemetry
-#define CFG_TLM_ENABLE        true    // enable modem battery monitor
 #define CFG_TLM_BAT_MON_CAL   0.37f   // voltage correction
 #define CFG_TLM_BAT_MON_PIN   36      // battery ADC pin
 

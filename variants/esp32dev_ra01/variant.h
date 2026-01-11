@@ -13,16 +13,9 @@
 #define CFG_LORA_PIN_TXEN     RADIOLIB_NC
 
 // built-in led
-#ifndef BUILTIN_LED
-#define BUILTIN_LED           2
-#endif
+#define BUILTIN_LED           2     // heartbeat led
 
-// Bluetooth
-#define CFG_BT_NAME           "loraprs"
-#define CFG_BT_USE_BLE        false
-
-// Enable modem telemetry
-#define CFG_TLM_ENABLE        true   // enable modem battery monitor
+// Modem telemetry
 #define CFG_TLM_BAT_MON_CAL   0.37f  // voltage correction
 #define CFG_TLM_BAT_MON_PIN   36     // battery ADC pin
 

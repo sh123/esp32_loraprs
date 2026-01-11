@@ -14,14 +14,12 @@
 #define CFG_LORA_PIN_RXEN     21
 #define CFG_LORA_PIN_TXEN     20
 
-// not in use
+// led is not in use
+#ifdef BUILTIN_LED
 #undef BUILTIN_LED
+#endif
 
-// bluetooth
-#define CFG_BT_USE_BLE        true
-
-// enable modem telemetry
-#define CFG_TLM_ENABLE        true   // enable modem battery monitor
+// modem telemetry
 #define CFG_TLM_BAT_MON_CAL   (-0.45f)  // voltage correction
 #define CFG_TLM_BAT_MON_PIN   0      // battery ADC pin
 
