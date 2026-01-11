@@ -24,9 +24,30 @@
 #define CFG_IS_CLIENT_MODE    true        // false - server mode (APRS-IS gate mode)
 #endif
 
-// CAD and ISR usage selection
-#ifndef CFG_LORA_USE_CAD
-#define CFG_LORA_USE_CAD      true        // do not transmit if channel is busy
+// LoRa default module parameters, should be overriden in variant.h file
+#define USE_SX126X                      // undef in variant file if SX126X is not in use
+#ifndef MODULE_NAME
+#define MODULE_NAME           SX1268    // RadioLib module name
+#endif
+
+// LoRa pinouts, override in variant.h file
+#ifndef CFG_LORA_PIN_NSS
+#define CFG_LORA_PIN_NSS      5
+#endif
+#ifndef CFG_LORA_PIN_RST
+#define CFG_LORA_PIN_RST      27    // could be also 26 on early boards, check schematics
+#endif
+#ifndef CFG_LORA_PIN_DIO1
+#define CFG_LORA_PIN_DIO1     12    // (sx127x - dio0, sx126x/sx128x - dio1)
+#endif
+#ifndef CFG_LORA_PIN_BUSY
+#define CFG_LORA_PIN_BUSY     14    // (sx127x - dio1, sx126x/sx128x - busy)
+#endif
+#ifndef CFG_LORA_PIN_RXEN
+#define CFG_LORA_PIN_RXEN     32    // (sx127x - unused, sx126x - RXEN pin number)
+#endif
+#ifndef CFG_LORA_PIN_TXEN
+#define CFG_LORA_PIN_TXEN     33    // (sx127x - unused, sx126x - TXEN pin number)
 #endif
 
 // modulation
@@ -79,6 +100,11 @@
 #endif
 #ifndef CFG_FSK_RX_BW  
 #define CFG_FSK_RX_BW         9.7         // rx bandwidth in kHz !!discrete!! from 4.8 to 467.0
+#endif
+
+// CAD and ISR usage selection
+#ifndef CFG_LORA_USE_CAD
+#define CFG_LORA_USE_CAD      true        // do not transmit if channel is busy
 #endif
 
 // WiFi client and AP options
