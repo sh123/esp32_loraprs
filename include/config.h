@@ -1,5 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
+#include <RadioLib.h>
 
 // below argumentrs could be overriden in board variant.h and/or platformio.ini file
 #include "variant.h"
@@ -25,9 +26,9 @@
 #endif
 
 // LoRa default module parameters, should be overriden in variant.h file
-#define USE_SX126X                      // undef in variant file if SX126X is not in use
+//#define USE_SX126X                      // define in variant file if SX126X is in use
 #ifndef MODULE_NAME
-#define MODULE_NAME           SX1268    // RadioLib module name
+#define MODULE_NAME           SX1278    // RadioLib module name
 #endif
 
 // LoRa pinouts, override in variant.h file
@@ -41,13 +42,13 @@
 #define CFG_LORA_PIN_DIO1     12    // (sx127x - dio0, sx126x/sx128x - dio1)
 #endif
 #ifndef CFG_LORA_PIN_BUSY
-#define CFG_LORA_PIN_BUSY     14    // (sx127x - dio1, sx126x/sx128x - busy)
+#define CFG_LORA_PIN_BUSY     RADIOLIB_NC    // (sx127x - dio1, sx126x/sx128x - busy)
 #endif
 #ifndef CFG_LORA_PIN_RXEN
-#define CFG_LORA_PIN_RXEN     32    // (sx127x - unused, sx126x - RXEN pin number)
+#define CFG_LORA_PIN_RXEN     RADIOLIB_NC    // (sx127x - unused, sx126x - RXEN pin number)
 #endif
 #ifndef CFG_LORA_PIN_TXEN
-#define CFG_LORA_PIN_TXEN     33    // (sx127x - unused, sx126x - TXEN pin number)
+#define CFG_LORA_PIN_TXEN     RADIOLIB_NC    // (sx127x - unused, sx126x - TXEN pin number)
 #endif
 
 // modulation
