@@ -121,7 +121,7 @@
 
 // Bluetooth classic or BLE
 #ifndef CFG_BT_NAME        
-#define CFG_BT_NAME           "loraprs"   // BT/BLE dev and advert name
+#define CFG_BT_NAME           "loraprs"   // BT/BLE dev and advert name, set to empty to disable
 #endif
 #ifndef CFG_BT_USE_BLE
 #define CFG_BT_USE_BLE        true        // Use BLE LE by default, false sets to classic
