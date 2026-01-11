@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// below argumentrs could be overriden in variant.h and/or platformio.ini file
+// below argumentrs could be overriden in board variant.h and/or platformio.ini file
 #include "variant.h"
 
 // generic options
@@ -89,7 +89,7 @@
 #define CFG_WIFI_SSID         "loraprs"   // connect to SSID or run as this SSID in AP mode
 #endif
 #ifndef CFG_WIFI_KEY        
-#define CFG_WIFI_KEY          "key12345"  // wifi key
+#define CFG_WIFI_KEY          "123456"    // wifi key, always specified
 #endif
 
 // BLE
@@ -100,7 +100,7 @@
 #define CFG_BT_BLE_PWR        0           // BLE power in dBm (0 dBm = 1mW, 10 dBm = 10mW, 20dBm = 100mW, etc)
 #endif
 #ifndef CFG_BT_PASSKEY   
-#define CFG_BT_PASSKEY        123456      // passkey, set to 0 to disable authorization
+#define CFG_BT_PASSKEY        123456      // passkey, set to 0 to disable BLE passkey authorization
 #endif
 
 // USB serial
