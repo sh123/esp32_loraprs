@@ -22,7 +22,7 @@ const int CfgPollDelayMs = 10;              // main loop delay
 void initializeConfig(LoraPrs::Config &cfg) {
 
   // log level
-  cfg.LogLevel = CFG_LOG_LEVEL;
+  cfg.LogLevel = (DebugLogLevel)CFG_LOG_LEVEL;
   
   // client/server mode switch
   cfg.IsClientMode = CFG_IS_CLIENT_MODE;
