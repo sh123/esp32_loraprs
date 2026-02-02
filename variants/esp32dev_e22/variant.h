@@ -4,7 +4,6 @@
 // module name
 #define USE_SX126X
 #define MODULE_NAME           SX1268    // 433 MHz modules
-//#define MODULE_NAME           SX1262    // 868/915 MHz modules
 
 // lora pinouts
 #define CFG_LORA_PIN_NSS      5
