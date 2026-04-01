@@ -347,7 +347,7 @@ void Service::loop()
   if (!processRigToSerial()) {
 
     // TX path, Serial -> Rig
-    long currentTime = millis();
+    unsigned long currentTime = millis();
     if (!isRigRxBusy() && currentTime > csmaSlotTimePrev_ + csmaSlotTime_ && random(0, 255) < csmaP_) {
       // new data from aprsis
       if (aprsisConnection_.available() > 0) {
@@ -468,7 +468,7 @@ void Service::onRigTaskTxPacket() {
 
 void Service::sendPeriodicBeacon()
 {
-  long currentMs = millis();
+  unsigned long currentMs = millis();
 
   if (beaconLastTimestampMs_ == 0 || currentMs - beaconLastTimestampMs_ >= config_.AprsRawBeaconPeriodMinutes * 60 * 1000) {
       AX25::Payload payload(config_.AprsRawBeacon);
@@ -702,10 +702,10 @@ void Service::attachKissNetworkClient()
 {
   // connected, client dropped off
   if (isKissClientConnected_) {
-    if (!kissConnnection_.connected()) {
+    if (!kissConnection_.connected()) {
       LOG_INFO("KISS TCP/IP client disconnected");
       isKissClientConnected_ = false;
-      kissConnnection_.stop();
+      kissConnection_.stop();
     }
   }
   WiFiClient wifiClient = kissServer_->available();
@@ -713,10 +713,10 @@ void Service::attachKissNetworkClient()
   if (wifiClient && wifiClient.connected()) {
     // drop off current one
     if (isKissClientConnected_) {
-      kissConnnection_.stop();
+      kissConnection_.stop();
     }
     LOG_INFO("New KISS TCP/IP client connected");
-    kissConnnection_ = wifiClient;
+    kissConnection_ = wifiClient;
     isKissClientConnected_ = true;
   }
 }
@@ -728,7 +728,7 @@ void Service::onSerialTx(byte b)
     Serial.write(b);
   } 
   else if (isKissClientConnected_) {
-    kissConnnection_.write(b);
+    kissConnection_.write(b);
   }
   else {
 #if CFG_BT_USE_BLE == true
@@ -752,7 +752,7 @@ bool Service::onSerialRxHasData()
     return Serial.available();
   } 
   else if (isKissClientConnected_) {
-    return kissConnnection_.available();
+    return kissConnection_.available();
   }
   else {
 #if CFG_BT_USE_BLE == true
@@ -771,10 +771,10 @@ bool Service::onSerialRx(byte *b)
     rxResult = Serial.read();
   } 
   else if (isKissClientConnected_) {
-    rxResult = kissConnnection_.read();
+    rxResult = kissConnection_.read();
     // client dropped off
     if (rxResult == -1) {
-      kissConnnection_.stop();
+      kissConnection_.stop();
       isKissClientConnected_ = false;
     }
   }

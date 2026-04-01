@@ -156,7 +156,7 @@ private:
     Receive = 0x01,
     Transmit = 0x02,
     StartReceive = 0x04,
-    StartTransmit = 0x10
+    StartTransmit = 0x08
   };
 
 private:
@@ -195,7 +195,7 @@ private:
   
   // kiss server
   std::shared_ptr<WiFiServer> kissServer_;
-  WiFiClient kissConnnection_;
+  WiFiClient kissConnection_;
   bool isKissClientConnected_;
 
   // modem telemetry
